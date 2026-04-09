@@ -1,0 +1,39 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Python / ML
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+
+# ML artifacts (use DVC for large files)
+ml/datasets/raw/
+ml/models/*.onnx
+ml/models/*.tflite
+ml/models/*.pt
+ml/models/*.h5
+*.checkpoint
+
+# Node
+node_modules/
+
+# Build outputs
+software/build/
+hardware/firmware/build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Environment
+.env
+.env.local
+
+# DVC cache
+.dvc/cache/
+.dvc/tmp/
