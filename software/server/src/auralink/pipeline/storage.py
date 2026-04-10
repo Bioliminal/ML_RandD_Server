@@ -1,7 +1,11 @@
 import uuid
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from auralink.api.schemas import Session
+
+if TYPE_CHECKING:
+    from auralink.pipeline.artifacts import PipelineArtifacts
 
 
 class SessionStorage:
@@ -29,3 +33,17 @@ class SessionStorage:
 
     def _path_for(self, session_id: str) -> Path:
         return self.base_dir / f"{session_id}.json"
+
+    def save_artifacts(self, session_id: str, artifacts: "PipelineArtifacts") -> None:
+        path = self._artifacts_path_for(session_id)
+        path.write_text(artifacts.model_dump_json(indent=2))
+
+    def load_artifacts(self, session_id: str) -> "PipelineArtifacts":
+        from auralink.pipeline.artifacts import PipelineArtifacts
+        path = self._artifacts_path_for(session_id)
+        if not path.exists():
+            raise FileNotFoundError(f"artifacts for session {session_id} not found at {path}")
+        return PipelineArtifacts.model_validate_json(path.read_text())
+
+    def _artifacts_path_for(self, session_id: str) -> Path:
+        return self.base_dir / f"{session_id}.artifacts.json"
