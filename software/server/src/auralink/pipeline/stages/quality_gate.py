@@ -21,4 +21,18 @@ def run_quality_gate(ctx: StageContext) -> SessionQualityReport:
             )
         )
 
+    all_vis: list[float] = []
+    for frame in ctx.session.frames:
+        for lm in frame.landmarks:
+            all_vis.append(lm.visibility)
+    avg_vis = sum(all_vis) / len(all_vis) if all_vis else 0.0
+    metrics["avg_visibility"] = avg_vis
+    if avg_vis < MIN_AVG_VISIBILITY:
+        issues.append(
+            QualityIssue(
+                code="low_visibility",
+                detail=f"avg visibility {avg_vis:.2f} < {MIN_AVG_VISIBILITY:.2f}",
+            )
+        )
+
     return SessionQualityReport(passed=not issues, issues=issues, metrics=metrics)

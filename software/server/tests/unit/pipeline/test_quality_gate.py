@@ -42,3 +42,19 @@ def test_accepts_normal_frame_rate():
     report = run_quality_gate(_ctx(session))
     assert report.passed is True
     assert report.issues == []
+
+
+def test_rejects_low_average_visibility():
+    frames = [_frame(i * 33, visibility=0.3) for i in range(40)]
+    session = _session(frames, frame_rate=30.0)
+    report = run_quality_gate(_ctx(session))
+    assert report.passed is False
+    assert any(issue.code == "low_visibility" for issue in report.issues)
+    assert report.metrics["avg_visibility"] == pytest.approx(0.3)
+
+
+def test_accepts_good_visibility():
+    frames = [_frame(i * 33, visibility=0.9) for i in range(40)]
+    session = _session(frames, frame_rate=30.0)
+    report = run_quality_gate(_ctx(session))
+    assert report.passed is True
