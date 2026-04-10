@@ -35,4 +35,15 @@ def run_quality_gate(ctx: StageContext) -> SessionQualityReport:
             )
         )
 
+    frame_count = len(ctx.session.frames)
+    duration_s = frame_count / frame_rate if frame_rate > 0 else 0.0
+    metrics["duration_s"] = duration_s
+    if duration_s < MIN_DURATION_S:
+        issues.append(
+            QualityIssue(
+                code="short_duration",
+                detail=f"{duration_s:.2f}s < {MIN_DURATION_S:.1f}s minimum",
+            )
+        )
+
     return SessionQualityReport(passed=not issues, issues=issues, metrics=metrics)

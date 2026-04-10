@@ -58,3 +58,18 @@ def test_accepts_good_visibility():
     session = _session(frames, frame_rate=30.0)
     report = run_quality_gate(_ctx(session))
     assert report.passed is True
+
+
+def test_rejects_short_session():
+    frames = [_frame(i * 33) for i in range(20)]
+    session = _session(frames, frame_rate=30.0)
+    report = run_quality_gate(_ctx(session))
+    assert report.passed is False
+    assert any(issue.code == "short_duration" for issue in report.issues)
+
+
+def test_accepts_session_with_sufficient_duration():
+    frames = [_frame(i * 33) for i in range(40)]
+    session = _session(frames, frame_rate=30.0)
+    report = run_quality_gate(_ctx(session))
+    assert report.passed is True
