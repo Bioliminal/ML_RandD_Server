@@ -1070,7 +1070,16 @@ def test_run_pipeline_populates_lift_skeleton_for_push_up():
     artifacts = run_pipeline(session)
     assert artifacts.lift_result is not None
     assert artifacts.skeleton_result is not None
-    assert artifacts.per_rep_metrics is not None
+    # push_up pipeline stops at skeleton — rep-based stages require
+    # elbow_flexion angle which will be added in a follow-on epoch.
+    # Registering push_up with _default_stage_list() would silently
+    # produce empty reps because rep_segment's PRIMARY_REP_ANGLES_BY_MOVEMENT
+    # dict only covers knee-flexion movements. Per L1 principle 4
+    # (movement-type dispatch via strategy pattern) push_up gets its
+    # own stage list rather than hiding the gap behind default registration.
+    assert artifacts.rep_boundaries is None
+    assert artifacts.per_rep_metrics is None
+    assert artifacts.within_movement_trend is None
     assert artifacts.phase_boundaries is None
 
 
@@ -1249,7 +1258,7 @@ from auralink.pipeline.stages.within_movement_trend import run_within_movement_t
 
 
 def _default_stage_list() -> list[Stage]:
-    """Rep-based pipeline: squats and push-ups."""
+    """Rep-based pipeline for knee-flexion movements: overhead_squat, single_leg_squat."""
     return [
         Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
         Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
@@ -1262,8 +1271,20 @@ def _default_stage_list() -> list[Stage]:
     ]
 
 
+def _push_up_stage_list() -> list[Stage]:
+    """Push-up pipeline: stops at skeleton. Rep-based stages require
+    elbow_flexion angles which are deferred to a follow-on epoch."""
+    return [
+        Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
+        Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
+        Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
+        Stage(name=STAGE_NAME_LIFT, run=run_lift),
+        Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
+    ]
+
+
 def _rollup_stage_list() -> list[Stage]:
-    """Phase-based pipeline: rollup. Skips rep-specific stages."""
+    """Phase-based pipeline: rollup. Uses phase_segment instead of rep_segment."""
     return [
         Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
         Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
@@ -1278,7 +1299,7 @@ def _build_default_registry() -> StageRegistry:
     registry = StageRegistry()
     registry.register_movement("overhead_squat", _default_stage_list())
     registry.register_movement("single_leg_squat", _default_stage_list())
-    registry.register_movement("push_up", _default_stage_list())
+    registry.register_movement("push_up", _push_up_stage_list())
     registry.register_movement("rollup", _rollup_stage_list())
     return registry
 
@@ -1579,6 +1600,13 @@ def generate_session(
     payload contains `rep_count * frames_per_rep` frames cycling through a
     90°..180° knee flexion sweep. For rollup, the payload contains a single
     continuous half-cosine motion with no rep cycling.
+
+    Plan 4 stub: all rep-cycling movements share a knee-flexion sweep, so a
+    push_up fixture is biomechanically nonsense (it has squat landmarks
+    labeled as push_up). This is tolerable because push_up's pipeline stops
+    at the skeleton stage and never inspects the frames for push-up-specific
+    angles. Realism is deferred to a follow-on epoch that adds real pose
+    templates per movement.
 
     `injected_compensations` accepts:
     - `knee_valgus_deg: float` — horizontal ankle offset driver
@@ -2100,7 +2128,11 @@ def test_push_up_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
     assert body["quality_report"]["passed"] is True
     assert body["lift_result"] is not None
     assert body["skeleton_result"] is not None
-    assert body["per_rep_metrics"] is not None
+    # push_up pipeline stops at skeleton — rep-based stages require
+    # elbow_flexion (deferred). See Task 9 and the stage composition matrix.
+    assert body["rep_boundaries"] is None
+    assert body["per_rep_metrics"] is None
+    assert body["within_movement_trend"] is None
     assert body["phase_boundaries"] is None
 ```
 
@@ -2221,18 +2253,22 @@ sleep 2
 PAYLOAD=$(uv run python -c 'import json, sys; sys.path.insert(0, "."); from tests.fixtures.synthetic.generator import generate_session; print(json.dumps(generate_session("push_up", rep_count=2, frames_per_rep=30)))')
 POST_RESP=$(curl -sf -X POST "localhost:8000/sessions?sync=true" -H "Content-Type: application/json" -d "$PAYLOAD")
 SESSION_ID=$(echo "$POST_RESP" | uv run python -c 'import json, sys; print(json.load(sys.stdin)["session_id"])')
-curl -sf "localhost:8000/sessions/$SESSION_ID/report" | uv run python -c 'import json, sys; r = json.load(sys.stdin); assert r["lift_result"] is not None; assert r["per_rep_metrics"] is not None; print("push_up path ok")'
+curl -sf "localhost:8000/sessions/$SESSION_ID/report" | uv run python -c 'import json, sys; r = json.load(sys.stdin); assert r["lift_result"] is not None; assert r["skeleton_result"] is not None; assert r["per_rep_metrics"] is None; print("push_up path ok")'
 kill $DEV_PID
 ```
 Expected: `push_up path ok`.
 
 - [ ] **Step 5: Final validation commit (if anything changed)**
 
+If Step 2 (lint) auto-applied fixes via `ruff check --fix` or `black .`, the modified files are under `software/server/`. Stage only those files and commit:
+
 ```bash
-git add -A
-git diff --cached --quiet || git commit -m "chore: plan 4 final validation (full suite green, rollup+push_up smoke ok)"
+cd /home/context/olorin/projects/Capstone
+git add -u software/server/
+git diff --cached --quiet || git commit -m "chore(server): ruff/black cleanup after plan 4"
 ```
-(Only commits if there is something to commit — typically lint fixes or no-op.)
+
+`git add -u software/server/` stages only tracked files under that path — never untracked files (which may include out-of-scope team work in `docs/research/`, `hardware/`, etc.). Skip this step entirely if Steps 1–4 made no changes to the working tree.
 
 ---
 
@@ -2242,10 +2278,10 @@ git diff --cached --quiet || git commit -m "chore: plan 4 final validation (full
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | `overhead_squat`   | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 | `single_leg_squat` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| `push_up`          | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| `push_up`          | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | — |
 | `rollup`           | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | — | ✓ |
 
-Rep-based movements (`overhead_squat`, `single_leg_squat`, `push_up`) share `_default_stage_list()` — 8 stages. Rollup uses `_rollup_stage_list()` — 6 stages; no rep indexing. This is the only movement-type dispatch point; everything else is uniform.
+Rep-based knee-flexion movements (`overhead_squat`, `single_leg_squat`) share `_default_stage_list()` — 8 stages. `push_up` uses `_push_up_stage_list()` — 5 stages, stopping at skeleton because rep detection needs elbow_flexion angles which are deferred to a follow-on epoch. `rollup` uses `_rollup_stage_list()` — 6 stages with phase-based segmentation. Movement-type dispatch is the only variability point; everything else is uniform per L1 principle 4.
 
 ---
 
