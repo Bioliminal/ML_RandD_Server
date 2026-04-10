@@ -47,4 +47,8 @@ class LandmarkIndex(IntEnum):
 
 
 def landmark_index(name: str) -> int:
-    raise NotImplementedError
+    """Look up landmark index by lowercase underscored name.
+
+    Example: landmark_index("left_hip") == 23
+    """
+    return LandmarkIndex[name.upper()].value
