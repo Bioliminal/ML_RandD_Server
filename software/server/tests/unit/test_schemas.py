@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.api.schemas import Landmark, Frame
+from auralink.api.schemas import Landmark, Frame, SessionMetadata, Session
 
 
 def test_landmark_valid():
@@ -31,3 +31,33 @@ def test_frame_rejects_wrong_landmark_count():
     ]
     with pytest.raises(ValidationError):
         Frame(timestamp_ms=0, landmarks=landmarks)
+
+
+def test_session_metadata():
+    meta = SessionMetadata(
+        movement="overhead_squat",
+        device="Pixel 8",
+        model="mlkit_pose_detection",
+        frame_rate=30.0,
+    )
+    assert meta.movement == "overhead_squat"
+
+
+def test_session_round_trip():
+    landmarks = [
+        Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0)
+        for _ in range(33)
+    ]
+    session = Session(
+        metadata=SessionMetadata(
+            movement="overhead_squat",
+            device="Pixel 8",
+            model="mlkit_pose_detection",
+            frame_rate=30.0,
+        ),
+        frames=[Frame(timestamp_ms=0, landmarks=landmarks)],
+    )
+    dumped = session.model_dump_json()
+    loaded = Session.model_validate_json(dumped)
+    assert loaded.metadata.movement == "overhead_squat"
+    assert len(loaded.frames) == 1

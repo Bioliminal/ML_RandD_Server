@@ -1,3 +1,6 @@
+from datetime import datetime, timezone
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -27,3 +30,29 @@ class Frame(BaseModel):
         if len(v) != 33:
             raise ValueError(f"expected 33 BlazePose landmarks, got {len(v)}")
         return v
+
+
+MovementType = Literal[
+    "overhead_squat",
+    "single_leg_squat",
+    "push_up",
+    "rollup",
+]
+
+
+class SessionMetadata(BaseModel):
+    movement: MovementType
+    device: str
+    model: str  # e.g. "mlkit_pose_detection", "mediapipe_blazepose_full"
+    frame_rate: float = Field(gt=0)
+    captured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class Session(BaseModel):
+    metadata: SessionMetadata
+    frames: list[Frame]
+
+
+class SessionCreateResponse(BaseModel):
+    session_id: str
+    frames_received: int
