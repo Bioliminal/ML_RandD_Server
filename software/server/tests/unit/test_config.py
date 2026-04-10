@@ -1,6 +1,3 @@
-import os
-from pathlib import Path
-
 from auralink.config import Settings
 
 

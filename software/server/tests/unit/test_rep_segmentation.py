@@ -1,6 +1,6 @@
 import numpy as np
 
-from auralink.analysis.rep_segmentation import RepBoundary, segment_reps
+from auralink.analysis.rep_segmentation import segment_reps
 
 
 def test_segment_reps_single_rep():
@@ -16,10 +16,12 @@ def test_segment_reps_single_rep():
 
 
 def test_segment_reps_multiple_reps():
-    rep_angles = np.concatenate([
-        np.linspace(180, 90, 10),
-        np.linspace(90, 180, 10),
-    ])
+    rep_angles = np.concatenate(
+        [
+            np.linspace(180, 90, 10),
+            np.linspace(90, 180, 10),
+        ]
+    )
     angles = np.tile(rep_angles, 3)
     boundaries = segment_reps(angles.tolist(), min_amplitude=30.0)
     assert len(boundaries) == 3

@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.api.schemas import Landmark, Frame, SessionMetadata, Session
+from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
 
 
 def test_landmark_valid():
@@ -16,19 +16,13 @@ def test_landmark_rejects_out_of_range_visibility():
 
 
 def test_frame_requires_33_landmarks():
-    landmarks = [
-        Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0)
-        for _ in range(33)
-    ]
+    landmarks = [Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0) for _ in range(33)]
     frame = Frame(timestamp_ms=0, landmarks=landmarks)
     assert len(frame.landmarks) == 33
 
 
 def test_frame_rejects_wrong_landmark_count():
-    landmarks = [
-        Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0)
-        for _ in range(10)
-    ]
+    landmarks = [Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0) for _ in range(10)]
     with pytest.raises(ValidationError):
         Frame(timestamp_ms=0, landmarks=landmarks)
 
@@ -44,10 +38,7 @@ def test_session_metadata():
 
 
 def test_session_round_trip():
-    landmarks = [
-        Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0)
-        for _ in range(33)
-    ]
+    landmarks = [Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0) for _ in range(33)]
     session = Session(
         metadata=SessionMetadata(
             movement="overhead_squat",

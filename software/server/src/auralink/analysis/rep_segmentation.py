@@ -12,8 +12,8 @@ flexion->extension cycle around a single joint angle. Continuous movements
 like rollup use phase_segmentation instead (not in this scaffold).
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 
 @dataclass(frozen=True)
@@ -89,9 +89,7 @@ def segment_reps(
     if not maxima or not minima:
         return []
 
-    events = sorted(
-        [(i, "max") for i in maxima] + [(i, "min") for i in minima]
-    )
+    events = sorted([(i, "max") for i in maxima] + [(i, "min") for i in minima])
 
     reps: list[RepBoundary] = []
     for j in range(len(events) - 2):

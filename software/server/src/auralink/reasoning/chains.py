@@ -6,10 +6,10 @@ anatomical evidence (Wilke 2016, Kalichman 2025) are included.
 """
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class ChainName(str, Enum):
+class ChainName(StrEnum):
     SBL = "superficial_back_line"
     BFL = "back_functional_line"
     FFL = "front_functional_line"
@@ -37,7 +37,9 @@ CHAIN_DEFINITIONS: dict[ChainName, ChainDefinition] = {
     ),
     ChainName.BFL: ChainDefinition(
         name=ChainName.BFL,
-        description="Latissimus dorsi through thoracolumbar fascia to contralateral gluteus maximus.",
+        description=(
+            "Latissimus dorsi through thoracolumbar fascia to contralateral gluteus maximus."
+        ),
         anatomical_path=[
             "latissimus_dorsi",
             "thoracolumbar_fascia",

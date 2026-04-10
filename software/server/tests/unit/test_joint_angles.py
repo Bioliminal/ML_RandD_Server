@@ -1,5 +1,3 @@
-import math
-
 import numpy as np
 import pytest
 
@@ -44,55 +42,67 @@ def test_angle_between_points_45_degrees():
 
 
 def test_knee_flexion_straight_leg():
-    frame = _frame_with_overrides({
-        23: _lm(0.5, 0.3),
-        25: _lm(0.5, 0.5),
-        27: _lm(0.5, 0.7),
-    })
+    frame = _frame_with_overrides(
+        {
+            23: _lm(0.5, 0.3),
+            25: _lm(0.5, 0.5),
+            27: _lm(0.5, 0.7),
+        }
+    )
     assert knee_flexion_angle(frame, side="left") == pytest.approx(180.0, abs=0.5)
 
 
 def test_knee_flexion_90_degrees():
-    frame = _frame_with_overrides({
-        23: _lm(0.5, 0.3),
-        25: _lm(0.5, 0.5),
-        27: _lm(0.7, 0.5),
-    })
+    frame = _frame_with_overrides(
+        {
+            23: _lm(0.5, 0.3),
+            25: _lm(0.5, 0.5),
+            27: _lm(0.7, 0.5),
+        }
+    )
     assert knee_flexion_angle(frame, side="left") == pytest.approx(90.0, abs=0.5)
 
 
 def test_hip_flexion_standing():
-    frame = _frame_with_overrides({
-        11: _lm(0.5, 0.1),
-        23: _lm(0.5, 0.4),
-        25: _lm(0.5, 0.7),
-    })
+    frame = _frame_with_overrides(
+        {
+            11: _lm(0.5, 0.1),
+            23: _lm(0.5, 0.4),
+            25: _lm(0.5, 0.7),
+        }
+    )
     assert hip_flexion_angle(frame, side="left") == pytest.approx(180.0, abs=0.5)
 
 
 def test_hip_flexion_seated():
-    frame = _frame_with_overrides({
-        11: _lm(0.5, 0.1),
-        23: _lm(0.5, 0.4),
-        25: _lm(0.8, 0.4),
-    })
+    frame = _frame_with_overrides(
+        {
+            11: _lm(0.5, 0.1),
+            23: _lm(0.5, 0.4),
+            25: _lm(0.8, 0.4),
+        }
+    )
     assert hip_flexion_angle(frame, side="left") == pytest.approx(90.0, abs=0.5)
 
 
 def test_knee_valgus_neutral():
-    frame = _frame_with_overrides({
-        23: _lm(0.5, 0.3),
-        25: _lm(0.5, 0.5),
-        27: _lm(0.5, 0.7),
-    })
+    frame = _frame_with_overrides(
+        {
+            23: _lm(0.5, 0.3),
+            25: _lm(0.5, 0.5),
+            27: _lm(0.5, 0.7),
+        }
+    )
     assert knee_valgus_angle(frame, side="left") == pytest.approx(0.0, abs=0.5)
 
 
 def test_knee_valgus_inward_collapse():
-    frame = _frame_with_overrides({
-        23: _lm(0.4, 0.3),
-        25: _lm(0.5, 0.5),
-        27: _lm(0.4, 0.7),
-    })
+    frame = _frame_with_overrides(
+        {
+            23: _lm(0.4, 0.3),
+            25: _lm(0.5, 0.5),
+            27: _lm(0.4, 0.7),
+        }
+    )
     angle = knee_valgus_angle(frame, side="left")
     assert angle > 5.0

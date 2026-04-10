@@ -6,10 +6,7 @@ from auralink.pipeline.storage import SessionStorage
 
 @pytest.fixture
 def sample_session() -> Session:
-    landmarks = [
-        Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0)
-        for _ in range(33)
-    ]
+    landmarks = [Landmark(x=0.0, y=0.0, z=0.0, visibility=1.0, presence=1.0) for _ in range(33)]
     return Session(
         metadata=SessionMetadata(
             movement="overhead_squat",

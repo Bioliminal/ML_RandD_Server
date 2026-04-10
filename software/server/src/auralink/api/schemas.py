@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -45,7 +45,7 @@ class SessionMetadata(BaseModel):
     device: str
     model: str  # e.g. "mlkit_pose_detection", "mediapipe_blazepose_full"
     frame_rate: float = Field(gt=0)
-    captured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    captured_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class Session(BaseModel):
