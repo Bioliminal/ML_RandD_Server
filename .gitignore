@@ -37,3 +37,6 @@ hardware/firmware/build/
 # DVC cache
 .dvc/cache/
 .dvc/tmp/
+
+# AI-assisted execution logs (ephemeral task summaries)
+docs/sessions/summaries/
