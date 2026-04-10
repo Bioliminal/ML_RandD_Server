@@ -104,3 +104,25 @@ def knee_valgus_angle(frame: Frame, side: Side) -> float:
     cos_angle = np.dot(hip_to_ankle, hip_to_knee) / (hip_ankle_norm * hip_knee_norm)
     cos_angle = np.clip(cos_angle, -1.0, 1.0)
     return float(np.degrees(np.arccos(cos_angle)))
+
+
+def trunk_lean_angle(frame: Frame) -> float:
+    """Trunk lean — angle between the trunk axis and the image vertical.
+
+    Trunk axis = shoulder midpoint minus hip midpoint. Vertical is (0, -1)
+    because image y increases downward. Returned in degrees, always >= 0.
+    """
+    l_sh = _xy(frame, LandmarkIndex.LEFT_SHOULDER)
+    r_sh = _xy(frame, LandmarkIndex.RIGHT_SHOULDER)
+    l_hip = _xy(frame, LandmarkIndex.LEFT_HIP)
+    r_hip = _xy(frame, LandmarkIndex.RIGHT_HIP)
+    shoulder_mid = (l_sh + r_sh) / 2.0
+    hip_mid = (l_hip + r_hip) / 2.0
+    trunk = shoulder_mid - hip_mid
+    norm = float(np.linalg.norm(trunk))
+    if norm == 0.0:
+        return 0.0
+    vertical = np.array([0.0, -1.0], dtype=np.float64)
+    cos_angle = float(np.dot(trunk, vertical) / norm)
+    cos_angle = max(-1.0, min(1.0, cos_angle))
+    return float(np.degrees(np.arccos(cos_angle)))
