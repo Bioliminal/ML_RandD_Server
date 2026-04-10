@@ -174,7 +174,17 @@ class StageContext:
 class Stage:
     name: str
     run: Callable[[StageContext], Any]
+
+
+STAGE_NAME_QUALITY_GATE = "quality_gate"
+STAGE_NAME_ANGLE_SERIES = "angle_series"
+STAGE_NAME_NORMALIZE = "normalize"
+STAGE_NAME_REP_SEGMENT = "rep_segment"
+STAGE_NAME_PER_REP_METRICS = "per_rep_metrics"
+STAGE_NAME_WITHIN_MOVEMENT_TREND = "within_movement_trend"
 ```
+
+Canonical stage-name constants live in `stages/base.py` so the orchestrator, handlers, and downstream plans all reference the same symbols — no magic strings.
 
 - [ ] **Step 5: Create `tests/unit/pipeline/__init__.py` (empty)**
 
@@ -581,11 +591,13 @@ def test_rejects_low_frame_rate():
 
 
 def test_accepts_normal_frame_rate():
-    session = _session([_frame(i * 33) for i in range(30)], frame_rate=30.0)
+    session = _session([_frame(i * 33) for i in range(40)], frame_rate=30.0)
     report = run_quality_gate(_ctx(session))
     assert report.passed is True
     assert report.issues == []
 ```
+
+Note: 40 frames at 30fps = 1.33s gives comfortable margin above `MIN_DURATION_S = 1.0` once the duration check is added in Cycle 4c; sitting at exactly 1.0s is fragile.
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -633,7 +645,7 @@ git commit -m "feat(pipeline): quality gate - frame rate check"
 Append to `test_quality_gate.py`:
 ```python
 def test_rejects_low_average_visibility():
-    frames = [_frame(i * 33, visibility=0.3) for i in range(30)]
+    frames = [_frame(i * 33, visibility=0.3) for i in range(40)]
     session = _session(frames, frame_rate=30.0)
     report = run_quality_gate(_ctx(session))
     assert report.passed is False
@@ -642,7 +654,7 @@ def test_rejects_low_average_visibility():
 
 
 def test_accepts_good_visibility():
-    frames = [_frame(i * 33, visibility=0.9) for i in range(30)]
+    frames = [_frame(i * 33, visibility=0.9) for i in range(40)]
     session = _session(frames, frame_rate=30.0)
     report = run_quality_gate(_ctx(session))
     assert report.passed is True
@@ -1791,24 +1803,31 @@ from auralink.pipeline.artifacts import PipelineArtifacts
 from auralink.pipeline.errors import PipelineError, QualityGateError, StageError
 from auralink.pipeline.registry import StageRegistry
 from auralink.pipeline.stages.angle_series import run_angle_series
-from auralink.pipeline.stages.base import Stage, StageContext
+from auralink.pipeline.stages.base import (
+    STAGE_NAME_ANGLE_SERIES,
+    STAGE_NAME_NORMALIZE,
+    STAGE_NAME_PER_REP_METRICS,
+    STAGE_NAME_QUALITY_GATE,
+    STAGE_NAME_REP_SEGMENT,
+    STAGE_NAME_WITHIN_MOVEMENT_TREND,
+    Stage,
+    StageContext,
+)
 from auralink.pipeline.stages.normalize import run_normalize
 from auralink.pipeline.stages.per_rep_metrics import run_per_rep_metrics
 from auralink.pipeline.stages.quality_gate import run_quality_gate
 from auralink.pipeline.stages.rep_segment import run_rep_segment
 from auralink.pipeline.stages.within_movement_trend import run_within_movement_trend
 
-_STAGE_NAME_QUALITY_GATE = "quality_gate"
-
 
 def _default_stage_list() -> list[Stage]:
     return [
-        Stage(name=_STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
-        Stage(name="angle_series", run=run_angle_series),
-        Stage(name="normalize", run=run_normalize),
-        Stage(name="rep_segment", run=run_rep_segment),
-        Stage(name="per_rep_metrics", run=run_per_rep_metrics),
-        Stage(name="within_movement_trend", run=run_within_movement_trend),
+        Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
+        Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
+        Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
+        Stage(name=STAGE_NAME_REP_SEGMENT, run=run_rep_segment),
+        Stage(name=STAGE_NAME_PER_REP_METRICS, run=run_per_rep_metrics),
+        Stage(name=STAGE_NAME_WITHIN_MOVEMENT_TREND, run=run_within_movement_trend),
     ]
 
 
@@ -1840,7 +1859,7 @@ def run_pipeline(
 
         ctx.artifacts[stage.name] = result
 
-        if stage.name == _STAGE_NAME_QUALITY_GATE and not result.passed:
+        if stage.name == STAGE_NAME_QUALITY_GATE and not result.passed:
             raise QualityGateError(report=result)
 
     return _assemble_artifacts(ctx)
@@ -1848,14 +1867,20 @@ def run_pipeline(
 
 def _assemble_artifacts(ctx: StageContext) -> PipelineArtifacts:
     return PipelineArtifacts(
-        quality_report=ctx.artifacts[_STAGE_NAME_QUALITY_GATE],
-        angle_series=ctx.artifacts.get("angle_series"),
-        normalized_angle_series=ctx.artifacts.get("normalize"),
-        rep_boundaries=ctx.artifacts.get("rep_segment"),
-        per_rep_metrics=ctx.artifacts.get("per_rep_metrics"),
-        within_movement_trend=ctx.artifacts.get("within_movement_trend"),
+        quality_report=ctx.artifacts[STAGE_NAME_QUALITY_GATE],
+        angle_series=ctx.artifacts.get(STAGE_NAME_ANGLE_SERIES),
+        normalized_angle_series=ctx.artifacts.get(STAGE_NAME_NORMALIZE),
+        rep_boundaries=ctx.artifacts.get(STAGE_NAME_REP_SEGMENT),
+        per_rep_metrics=ctx.artifacts.get(STAGE_NAME_PER_REP_METRICS),
+        within_movement_trend=ctx.artifacts.get(STAGE_NAME_WITHIN_MOVEMENT_TREND),
     )
 ```
+
+**Plan 4 extension contract:** when Plan 4 adds new stage types (e.g., `lift`, `skeleton`, `phase_segment`) that produce new artifact fields, it must do three things in coordinated fashion:
+1. Extend `PipelineArtifacts` in `artifacts.py` with the new optional fields.
+2. Add matching `STAGE_NAME_*` constants in `stages/base.py`.
+3. Extend `_assemble_artifacts()` in `orchestrator.py` to copy the new keys from `ctx.artifacts` into the assembled bundle.
+These three edits are the extension seam — Plan 4 must touch all three, never just one.
 
 - [ ] **Step 4: Run orchestrator + full pipeline suite**
 
@@ -2308,7 +2333,86 @@ Expected: `1 passed`.
 git add software/server/src/auralink/api/errors.py \
         software/server/src/auralink/api/main.py \
         software/server/tests/integration/test_error_handling.py
-git commit -m "feat(api): exception handlers map PipelineError hierarchy to HTTP responses"
+git commit -m "feat(api): quality_gate_rejected handler maps QualityGateError to HTTP 422"
+```
+
+#### Cycle 13b: `StageError` → HTTP 500 handler coverage
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/integration/test_error_handling.py`:
+```python
+from unittest.mock import patch
+
+from auralink.pipeline.errors import StageError
+
+
+def test_stage_error_returns_500_with_stage_detail(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+    payload = build_overhead_squat_payload()
+
+    def _boom(session, registry=None):
+        raise StageError(stage_name="angle_series", detail="simulated failure")
+
+    with patch("auralink.api.routes.sessions.run_pipeline", _boom):
+        response = client.post("/sessions?sync=true", json=payload)
+
+    assert response.status_code == 500
+    body = response.json()
+    assert body["error"] == "stage_failed"
+    assert body["stage"] == "angle_series"
+    assert body["detail"] == "simulated failure"
+```
+
+- [ ] **Step 2: Run and verify the test passes**
+
+`cd software/server && uv run pytest tests/integration/test_error_handling.py::test_stage_error_returns_500_with_stage_detail -v`
+Expected: `1 passed`. (Task 13's handler already maps `StageError` → 500; this cycle adds the missing coverage.)
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add software/server/tests/integration/test_error_handling.py
+git commit -m "test(api): cover StageError → 500 handler with stage name and detail"
+```
+
+#### Cycle 13c: Generic `PipelineError` → HTTP 500 handler coverage
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/integration/test_error_handling.py`:
+```python
+from auralink.pipeline.errors import PipelineError
+
+
+def test_generic_pipeline_error_returns_500(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+    payload = build_overhead_squat_payload()
+
+    def _boom(session, registry=None):
+        raise PipelineError("no stages registered for movement 'mystery'")
+
+    with patch("auralink.api.routes.sessions.run_pipeline", _boom):
+        response = client.post("/sessions?sync=true", json=payload)
+
+    assert response.status_code == 500
+    body = response.json()
+    assert body["error"] == "pipeline_failed"
+    assert "mystery" in body["detail"]
+```
+
+- [ ] **Step 2: Run and verify pass**
+
+`cd software/server && uv run pytest tests/integration/test_error_handling.py::test_generic_pipeline_error_returns_500 -v`
+Expected: `1 passed`.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add software/server/tests/integration/test_error_handling.py
+git commit -m "test(api): cover generic PipelineError → 500 handler"
 ```
 
 ---
@@ -2419,7 +2523,16 @@ def build_overhead_squat_payload(
     }
 ```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Verify helper imports and produces a valid payload**
+
+`cd software/server && uv run python -c "from tests.fixtures.synthetic_overhead_squat import build_overhead_squat_payload; p = build_overhead_squat_payload(rep_count=2, frames_per_rep=30); assert len(p['frames']) == 60; assert p['metadata']['movement'] == 'overhead_squat'; assert all(len(f['landmarks']) == 33 for f in p['frames']); print('fixture helper ok')"`
+Expected output: `fixture helper ok`. This catches import-path issues BEFORE Task 11's integration tests try to import the helper.
+
+Also confirm the fixture round-trips through the pose math:
+`cd software/server && uv run python -c "from auralink.api.schemas import Session; from tests.fixtures.synthetic_overhead_squat import build_overhead_squat_payload; from auralink.pose.joint_angles import knee_flexion_angle; s = Session.model_validate(build_overhead_squat_payload(rep_count=1, frames_per_rep=30)); angles = [knee_flexion_angle(f, 'left') for f in s.frames]; print(f'min={min(angles):.1f} max={max(angles):.1f}'); assert min(angles) < 100 and max(angles) > 170, 'fixture must sweep through full knee flexion range'"`
+Expected output: `min=~90.0 max=~180.0` and no assertion error. If the assertion fails, fix `_frame_for_knee_angle`'s trigonometry before moving on — do NOT weaken the assertion.
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add software/server/tests/fixtures/__init__.py \
@@ -2545,7 +2658,16 @@ git diff --cached --quiet || git commit -m "chore: plan 1 final validation (full
 ## Execution notes
 
 - Execute with `parallel-plan-executor` in sequential-in-main-tree mode. Do NOT use worktrees or parallel subagent dispatch — this repo's memory (`feedback_no_subagent_worktrees.md`) prohibits it.
-- Each TDD cycle yields one commit. Tasks 4, 5, 10, 11, and 14 contain multiple cycles and therefore multiple commits inside a single task.
+- Each TDD cycle yields one commit. Tasks 4, 5, 10, 11, 13, and 14 contain multiple cycles and therefore multiple commits inside a single task.
 - Task ordering for execution: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, **14a (fixture helper)**, 11, 12, 13, **14b (e2e test)**, 15.
 - The `?sync=true` flag is a no-op in this plan; Plan 5 flips the default and reuses the same flag for tests.
 - The `StageRegistry` must remain import-safe from Plan 4: its `register_movement(movement_type, stages)` signature is the public contract.
+- **`DEFAULT_REGISTRY` import-order contract for Plan 4:** `DEFAULT_REGISTRY` is a module-level singleton mutated via `register_movement()`. When Plan 4 adds `push_up` / `rollup` registrations, its registration module MUST be imported before the first request reaches `run_pipeline()`. The safest pattern is to import the Plan 4 registration module from `api/main.py::create_app()` immediately after `register_exception_handlers(app)`. Plan 4's `writing-plans` pass must explicitly wire this import — silent drop-in imports inside downstream modules are forbidden.
+- **Plan 4 extension seam (three-point edit):** when Plan 4 adds new stages that produce new artifact fields, it must (1) extend `PipelineArtifacts` in `artifacts.py` with the new optional fields, (2) add matching `STAGE_NAME_*` constants in `stages/base.py`, and (3) extend `_assemble_artifacts()` in `orchestrator.py` to copy the new keys from `ctx.artifacts`. All three edits land together or the assembled bundle silently drops the new artifact.
+- **Canonical stage-name → artifact-field map** (reference for Plan 4):
+  - `STAGE_NAME_QUALITY_GATE` → `PipelineArtifacts.quality_report: SessionQualityReport`
+  - `STAGE_NAME_ANGLE_SERIES` → `PipelineArtifacts.angle_series: AngleTimeSeries`
+  - `STAGE_NAME_NORMALIZE` → `PipelineArtifacts.normalized_angle_series: NormalizedAngleTimeSeries`
+  - `STAGE_NAME_REP_SEGMENT` → `PipelineArtifacts.rep_boundaries: RepBoundaries`
+  - `STAGE_NAME_PER_REP_METRICS` → `PipelineArtifacts.per_rep_metrics: PerRepMetrics`
+  - `STAGE_NAME_WITHIN_MOVEMENT_TREND` → `PipelineArtifacts.within_movement_trend: WithinMovementTrend`
