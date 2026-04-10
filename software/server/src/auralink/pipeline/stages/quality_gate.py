@@ -46,4 +46,21 @@ def run_quality_gate(ctx: StageContext) -> SessionQualityReport:
             )
         )
 
+    total_landmarks = 0
+    missing_landmarks = 0
+    for frame in ctx.session.frames:
+        for lm in frame.landmarks:
+            total_landmarks += 1
+            if lm.presence < 0.5:
+                missing_landmarks += 1
+    missing_fraction = missing_landmarks / total_landmarks if total_landmarks else 0.0
+    metrics["missing_landmark_fraction"] = missing_fraction
+    if missing_fraction > MAX_MISSING_LANDMARK_FRACTION:
+        issues.append(
+            QualityIssue(
+                code="missing_landmarks",
+                detail=f"{missing_fraction:.1%} missing > {MAX_MISSING_LANDMARK_FRACTION:.0%}",
+            )
+        )
+
     return SessionQualityReport(passed=not issues, issues=issues, metrics=metrics)

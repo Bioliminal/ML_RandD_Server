@@ -73,3 +73,22 @@ def test_accepts_session_with_sufficient_duration():
     session = _session(frames, frame_rate=30.0)
     report = run_quality_gate(_ctx(session))
     assert report.passed is True
+
+
+def test_rejects_many_missing_landmarks():
+    frames = []
+    for i in range(40):
+        landmarks = [_lm(visibility=1.0, presence=1.0) for _ in range(30)]
+        landmarks.extend([_lm(visibility=1.0, presence=0.2) for _ in range(3)])
+        frames.append(Frame(timestamp_ms=i * 33, landmarks=landmarks))
+    session = _session(frames, frame_rate=30.0)
+    report = run_quality_gate(_ctx(session))
+    assert report.passed is False
+    assert any(issue.code == "missing_landmarks" for issue in report.issues)
+
+
+def test_accepts_few_missing_landmarks():
+    frames = [_frame(i * 33, presence=1.0) for i in range(40)]
+    session = _session(frames, frame_rate=30.0)
+    report = run_quality_gate(_ctx(session))
+    assert report.passed is True
