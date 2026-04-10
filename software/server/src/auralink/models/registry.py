@@ -1,21 +1,34 @@
-"""Model checkpoint management — placeholder.
+"""Model registry — tracks ModelLoader instances by name.
 
-Tracks which models are loaded at runtime. Future plans will add
-MotionBERT and HSMR loaders that register themselves here at startup.
+Plan 4 refactor: the placeholder `ModelRegistry(loaded: dict[str, str])` is
+replaced by a real registration API that holds `ModelLoader` instances. Future
+plans register concrete loaders (MotionBERT, HSMR) by calling
+`REGISTRY.register(MotionBERTLoader())` at application startup.
 """
 
-from dataclasses import dataclass, field
+from auralink.ml.loader import ModelLoader
 
 
-@dataclass
 class ModelRegistry:
-    loaded: dict[str, str] = field(default_factory=dict)
+    def __init__(self) -> None:
+        self._loaders: dict[str, ModelLoader] = {}
 
-    def register(self, name: str, version: str) -> None:
-        self.loaded[name] = version
+    def register(self, loader: ModelLoader) -> None:
+        self._loaders[loader.name] = loader
 
-    def info(self) -> dict[str, str]:
-        return dict(self.loaded)
+    def get(self, name: str) -> ModelLoader:
+        if name not in self._loaders:
+            raise KeyError(f"no loader registered with name '{name}'")
+        return self._loaders[name]
+
+    def is_registered(self, name: str) -> bool:
+        return name in self._loaders
+
+    def loaded_models(self) -> list[str]:
+        return [name for name, loader in self._loaders.items() if loader.is_loaded()]
+
+    def info(self) -> dict[str, dict[str, str]]:
+        return {name: loader.info() for name, loader in self._loaders.items()}
 
 
 REGISTRY = ModelRegistry()
