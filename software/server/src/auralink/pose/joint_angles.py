@@ -66,3 +66,41 @@ def hip_flexion_angle(frame: Frame, side: Side) -> float:
         _xy(frame, hip_idx),
         _xy(frame, knee_idx),
     )
+
+
+def knee_valgus_angle(frame: Frame, side: Side) -> float:
+    """Knee valgus — angle between hip->knee and hip->ankle vectors.
+
+    0 degrees = knee lies on the hip-ankle ray (neutral alignment).
+    Positive values indicate the knee has shifted off-line; for a frontal
+    camera view this approximates medial collapse (valgus) for small
+    deviations. Not a true perpendicular-distance measurement.
+
+    This is a 2D approximation in the coronal plane — camera must be positioned
+    frontally for the measurement to be meaningful. The 3D-aware version lands
+    after MotionBERT integration.
+    """
+    if side == "left":
+        hip_idx = LandmarkIndex.LEFT_HIP
+        knee_idx = LandmarkIndex.LEFT_KNEE
+        ankle_idx = LandmarkIndex.LEFT_ANKLE
+    else:
+        hip_idx = LandmarkIndex.RIGHT_HIP
+        knee_idx = LandmarkIndex.RIGHT_KNEE
+        ankle_idx = LandmarkIndex.RIGHT_ANKLE
+
+    hip = _xy(frame, hip_idx)
+    knee = _xy(frame, knee_idx)
+    ankle = _xy(frame, ankle_idx)
+
+    hip_to_ankle = ankle - hip
+    hip_to_knee = knee - hip
+
+    hip_ankle_norm = np.linalg.norm(hip_to_ankle)
+    hip_knee_norm = np.linalg.norm(hip_to_knee)
+    if hip_ankle_norm == 0 or hip_knee_norm == 0:
+        return 0.0
+
+    cos_angle = np.dot(hip_to_ankle, hip_to_knee) / (hip_ankle_norm * hip_knee_norm)
+    cos_angle = np.clip(cos_angle, -1.0, 1.0)
+    return float(np.degrees(np.arccos(cos_angle)))

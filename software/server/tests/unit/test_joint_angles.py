@@ -8,6 +8,7 @@ from auralink.pose.joint_angles import (
     angle_between_points,
     hip_flexion_angle,
     knee_flexion_angle,
+    knee_valgus_angle,
 )
 
 
@@ -76,3 +77,22 @@ def test_hip_flexion_seated():
         25: _lm(0.8, 0.4),
     })
     assert hip_flexion_angle(frame, side="left") == pytest.approx(90.0, abs=0.5)
+
+
+def test_knee_valgus_neutral():
+    frame = _frame_with_overrides({
+        23: _lm(0.5, 0.3),
+        25: _lm(0.5, 0.5),
+        27: _lm(0.5, 0.7),
+    })
+    assert knee_valgus_angle(frame, side="left") == pytest.approx(0.0, abs=0.5)
+
+
+def test_knee_valgus_inward_collapse():
+    frame = _frame_with_overrides({
+        23: _lm(0.4, 0.3),
+        25: _lm(0.5, 0.5),
+        27: _lm(0.4, 0.7),
+    })
+    angle = knee_valgus_angle(frame, side="left")
+    assert angle > 5.0
