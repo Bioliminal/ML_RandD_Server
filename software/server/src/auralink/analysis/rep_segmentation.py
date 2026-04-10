@@ -70,3 +70,44 @@ def _find_local_extrema(
         i = j + 1
 
     return maxima, minima
+
+
+def segment_reps(
+    angle_series: Sequence[float],
+    min_amplitude: float = 30.0,
+) -> list[RepBoundary]:
+    """Segment a scalar angle series into rep boundaries.
+
+    Args:
+        angle_series: Sequence of joint angles in degrees over time.
+        min_amplitude: Minimum amplitude (max - min) to qualify as a rep.
+
+    Returns:
+        List of RepBoundary objects in temporal order.
+    """
+    maxima, minima = _find_local_extrema(angle_series)
+    if not maxima or not minima:
+        return []
+
+    events = sorted(
+        [(i, "max") for i in maxima] + [(i, "min") for i in minima]
+    )
+
+    reps: list[RepBoundary] = []
+    for j in range(len(events) - 2):
+        e1, e2, e3 = events[j], events[j + 1], events[j + 2]
+        if e1[1] == "max" and e2[1] == "min" and e3[1] == "max":
+            start, bottom, end = e1[0], e2[0], e3[0]
+            amplitude = max(angle_series[start], angle_series[end]) - angle_series[bottom]
+            if amplitude >= min_amplitude:
+                reps.append(
+                    RepBoundary(
+                        start_index=start,
+                        bottom_index=bottom,
+                        end_index=end,
+                        start_angle=angle_series[start],
+                        bottom_angle=angle_series[bottom],
+                        end_angle=angle_series[end],
+                    )
+                )
+    return reps
