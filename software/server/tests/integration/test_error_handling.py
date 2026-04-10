@@ -1,8 +1,10 @@
 import copy
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
 from auralink.api.main import create_app
+from auralink.pipeline.errors import PipelineError, StageError
 from tests.fixtures.synthetic_overhead_squat import build_overhead_squat_payload
 
 
@@ -17,11 +19,6 @@ def test_quality_gate_rejection_returns_422(tmp_path, monkeypatch):
     body = response.json()
     assert body["error"] == "quality_gate_rejected"
     assert any(issue["code"] == "low_frame_rate" for issue in body["issues"])
-
-
-from unittest.mock import patch
-
-from auralink.pipeline.errors import StageError
 
 
 def test_stage_error_returns_500_with_stage_detail(tmp_path, monkeypatch):
@@ -40,9 +37,6 @@ def test_stage_error_returns_500_with_stage_detail(tmp_path, monkeypatch):
     assert body["error"] == "stage_failed"
     assert body["stage"] == "angle_series"
     assert body["detail"] == "simulated failure"
-
-
-from auralink.pipeline.errors import PipelineError
 
 
 def test_generic_pipeline_error_returns_500(tmp_path, monkeypatch):
