@@ -50,7 +50,7 @@ tests/
 6. `PipelineEvent` hierarchy + event emitter
 7. Orchestrator refactor to emit events + update `PipelineRun` status
 8. Async pipeline execution via FastAPI `BackgroundTasks`
-9. Modify `POST /sessions`: create `PipelineRun`, schedule background task, return run ID in response body
+9. Flip the default `POST /sessions` behavior to async: create `PipelineRun`, schedule background task, return run ID in response body. **Sync mode remains available via `?sync=true`** (already shipped as a no-op flag in Plan 1). Audit every integration test added by Plans 1 and 2 that assumes sync POST → GET semantics and migrate them to pass `?sync=true` explicitly as part of this task. The test suite must be green after the flip.
 10. New `GET /runs/{id}/status` endpoint
 11. New `GET /runs/{id}/events` endpoint (stream of events for debugging)
 12. Integration test: POST returns run ID immediately, status polls transition pending → running → complete
@@ -84,5 +84,5 @@ tests/
 - FastAPI `BackgroundTasks` run in-process. For a real production deployment we'd need a proper task queue, but for a capstone demo in-process is fine. Document this explicitly.
 - Correlation IDs should propagate from HTTP headers into background tasks. Python `contextvars` supports this, but test it carefully — async context propagation has sharp edges.
 - Don't over-engineer structured logging. Start with `python-json-logger` or manual JSON formatter. Reject any plan iteration that pulls in `structlog`-level machinery unless justified.
-- Consider whether `POST /sessions` should ALSO support a `sync=true` query param for tests / debugging. Default async, opt-in sync.
+- `?sync=true` is a **hard requirement, not optional** — Plan 1 already shipped it as a recognized no-op flag. This plan flips the default to async; existing tests opt back into sync via `?sync=true`. Preserve the exact query param spelling used in Plan 1. The task is not done until every test that relied on sync semantics has been audited and migrated, and the full suite is green after the flip.
 - Events endpoint is debug-only — not part of the public API. Document that.

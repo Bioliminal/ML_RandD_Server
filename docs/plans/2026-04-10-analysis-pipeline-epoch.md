@@ -34,7 +34,7 @@ The key design property: when ML models are ready, landing them is a config swap
 - **Wellness positioning** — report language follows Capstone CLAUDE.md rules (no "diagnosis", "dysfunction", "drivers of pain"; use "movement patterns", "body connections").
 - **Chain scope: SBL, BFL, FFL only.** Spiral, Lateral, and SFL chains excluded per the research integration report §6.2.
 - **Rollup movement is interface-only.** The `PhaseSegmenter` protocol plugs in, but the real phase-segmentation implementation is deferred (research gap §7.3).
-- **Stack:** Python 3.11+, FastAPI, pydantic v2, numpy, pytest, ruff, black, uv — the scaffold stack. No new runtime dependencies unless explicitly justified in the L2 plan.
+- **Stack:** Python 3.11+, FastAPI, pydantic v2, numpy, pytest, ruff, black, uv — the scaffold stack. No new runtime dependencies unless explicitly justified in the L2 plan. **Plan 3 is the known exception to this rule**: it adds a DTW library (`fastdtw` or `tslearn`, decided via library check during Plan 3's `writing-plans` pass). This is the only sanctioned runtime dependency added in this epoch.
 - **TDD throughout.** Every L2 plan executes via `parallel-plan-executor` (sequential-in-main-tree) with `task-executor` per task.
 - **Every L2 plan gets `plan-review` before execution.**
 - **Thresholds, rules, reference reps live in config files**, not code. Tuning without redeployment is a baked-in property.
@@ -67,7 +67,7 @@ This epoch is composed of 5 L2 plans. **Execution order: 1 → 4 → 2 → 3 →
 Rationale for the 1 → 4 → 2 → 3 → 5 ordering:
 
 - **Plan 1 first** — nothing runs without the stage framework.
-- **Plan 4 second** — ships the synthetic fixture generator and ML protocols. Plans 2 and 3 then consume those fixtures as their primary test data, avoiding drift between hand-built test data in each plan.
+- **Plan 4 second** — ships the synthetic fixture generator and ML protocols. **Plan 4 owns BOTH session-fixture generation AND reference-rep generation** via a single shared module (`tests/fixtures/synthetic/generator.py`) exposing two entry points: `generate_session()` (for end-to-end pipeline tests) and `generate_reference_rep()` (consumed by Plan 3). Plans 2 and 3 consume these fixtures as their primary test data; neither plan builds its own generator, avoiding drift between hand-built test data.
 - **Plan 2 third** — once fixtures exist, chain reasoning can TDD against realistic compensation signals (e.g., the overhead-squat valgus variant from Plan 4).
 - **Plan 3 fourth** — extends Plan 2's report schema and depends on Plan 4's reference rep library.
 - **Plan 5 last** — operations hardening is the final production layer; doesn't affect the earlier logic but benefits from having the full pipeline in place to observe.
@@ -80,7 +80,7 @@ Each L2 stub is a starting point only. Before execution, the chosen plan is fles
 - **HSMR / SKEL integration** — biomechanical skeleton fitting. Needs GPU inference endpoint.
 - **GCN chain reasoning** — needs labeled training data.
 - **Real rollup phase segmentation** — blocked on research gap §7.3.
-- **Population-specific threshold validation** — blocked on research gap §7.6; Plan 2 uses the Hewett 2005 defaults only.
+- **Population-specific threshold validation** — blocked on research gap §7.6; Plan 2 uses the Hewett 2005 defaults only. Plan 2 ships the body-type adjustment *mechanism* with placeholder lookup data; the deferred item is the empirical *validation* of the adjustment values. The mechanism can be rerun against validated thresholds once they exist.
 - **Video Beighton scoring** — post-launch per research report §5.3.
 - **Model serving infrastructure** — Replicate vs Modal vs self-hosted decision. Epoch-scope choice, not tactical.
 - **Flutter mobile app** — teammate's domain.
@@ -100,6 +100,8 @@ If any of these fire during execution, pause and revise this L1 document:
 - `PhaseSegmenter` protocol for rollup cannot be defined without knowing the real segmentation shape (affects Plan 4; may need to defer rollup entirely).
 - Quality gate thresholds cannot be validated without golden captures (affects Plan 1; may need to gate epoch completion on Flutter fixture delivery).
 - Plan 1's stage framework turns out to be over-abstracted for the actual set of stages we need (affects the whole epoch; may need to flatten the design).
+- FastAPI `BackgroundTasks` proves inadequate for pipeline runtime (background thread starvation under load, shared event-loop issues, etc.) — Plan 5 may need to adopt TaskIQ or Celery instead.
+- Async context propagation of correlation IDs breaks tests — Python `contextvars` combined with `BackgroundTasks` has sharp edges that may force a rework of Plan 5's correlation ID design.
 
 ## Completion Signal
 

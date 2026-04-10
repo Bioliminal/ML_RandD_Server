@@ -56,8 +56,8 @@ tests/
 7. Rep segmentation stage (wraps `segment_reps`, takes `NormalizedAngleTimeSeries`, returns `RepBoundaries`)
 8. Per-rep metrics stage (amplitude, velocity profile, ROM, compensation angles per rep)
 9. Within-movement trend stage (monotonic change detection)
-10. Orchestrator with stage registry + per-movement pipeline composition (config-driven: which stages apply to which `MovementType`)
-11. Wire `POST /sessions` to run the pipeline after `storage.save()`, persist artifacts alongside the raw session
+10. Orchestrator with stage registry + per-movement pipeline composition (config-driven: which stages apply to which `MovementType`). **The registry must expose a post-initialization extension API** (e.g. `registry.register_movement(movement_type, stage_list)`) so Plan 4 can add rollup's phase-based composition without touching `orchestrator.py`. Plan 1 owns the dispatch mechanism; Plan 4 only adds entries through this API.
+11. Wire `POST /sessions` to run the pipeline synchronously after `storage.save()` and persist artifacts alongside the raw session. **Ship `?sync=true` as a recognized (no-op) query parameter in this plan**, even though sync is the default here. This ensures Plan 5 can later flip the default to async while existing tests continue to work by passing `?sync=true` explicitly. Every integration test in this plan passes `?sync=true` to stay green across the Plan 5 transition.
 12. New `GET /sessions/{id}/report` endpoint returning the artifact bundle as JSON
 13. FastAPI exception handlers for `PipelineError` hierarchy
 14. End-to-end integration test: POST a synthetic overhead_squat → GET returns populated artifacts
@@ -88,4 +88,4 @@ tests/
 - Each stage gets its own TDD cycle with 2-4 tests. Watch for tests that only check "no exception thrown" — require value assertions per `task-executor` Path A.
 - Stage composition order matters: quality_gate → angle_series → normalize → rep_segment → per_rep_metrics → within_movement_trend. Document this order in `orchestrator.py` as data, not control flow.
 - The orchestrator should raise `PipelineError` on quality gate failure and allow upstream code to map to HTTP 422.
-- Consider whether `POST /sessions` runs synchronously or asynchronously. Default: sync for this plan, async in Plan 5 (Operations).
+- `POST /sessions` runs **synchronously by default** in this plan AND accepts `?sync=true` as a recognized no-op query parameter upfront. Plan 5 later flips the default to async while preserving `?sync=true` behavior; every test added by this plan must pass `?sync=true` explicitly so the suite remains stable across the Plan 5 transition.

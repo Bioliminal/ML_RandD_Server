@@ -68,7 +68,7 @@ tests/
 9. FFL rule set (pec / adductor coupling signals)
 10. Body-type adjustment lookup (modifies thresholds based on profile)
 11. Chain reasoning stage (wraps `RuleBasedChainReasoner`)
-12. `Report` pydantic model
+12. `Report` pydantic model **with named extension slots**: `temporal_section: TemporalSection | None = None` and `cross_movement_section: CrossMovementSection | None = None`. Stub `TemporalSection` and `CrossMovementSection` as empty pydantic models in `report/schemas.py` (placeholder shapes). Plan 3 swaps in real schemas for these stubs — Plan 3 **populates** these slots and does **not** restructure the `Report`. This decouples Plan 2 and Plan 3 ownership of the report schema.
 13. Report assembler module
 14. Report assembly stage
 15. Wire both new stages into the orchestrator (after Plan 1's stages)

@@ -55,7 +55,7 @@ tests/
 1. DTW implementation (wrapping `tslearn.metrics.dtw` or `fastdtw`; pick during library check)
 2. NCC implementation (numpy-native, no external dep)
 3. `ReferenceRep` schema + loader (JSON config files)
-4. Synthetic reference reps for overhead_squat, single_leg_squat, push_up
+4. Load reference reps via Plan 4's shared generator (`tests/fixtures/synthetic/generator.py` → `generate_reference_rep()`). Plan 3 **does not** implement its own generator. Persist the generated reps to `config/reference_reps/{movement}.json` for runtime consumption. If Plan 4 has not landed the `generate_reference_rep()` entry point yet, block Plan 3 execution until it does.
 5. Per-rep comparison module (`rep vs reference → RepComparison`)
 6. Rep comparison stage (wraps per-rep comparison, consumes Plan 1 artifacts)
 7. Within-movement trend module (monotonic change detection over rep comparisons)
@@ -64,7 +64,7 @@ tests/
 10. `Protocol` + `ProtocolReport` pydantic schemas
 11. Protocol aggregator (combines session reports; invoked by protocol endpoint)
 12. `POST /protocols` endpoint (accepts a list of session IDs, runs aggregation, returns `ProtocolReport`)
-13. Extend `Report` schema with temporal + cross-movement sections
+13. Populate `Report.temporal_section` and `Report.cross_movement_section` by defining the real `TemporalSection` and `CrossMovementSection` pydantic models and replacing Plan 2's placeholder stubs with them. **Do not restructure the `Report` schema** — Plan 2 established the extension slots and this task only fills them in.
 14. Update Plan 2's report assembler to include temporal outputs
 15. Integration test: 4 synthetic fixtures → `POST /protocols` → protocol report with cross-movement fatigue signal
 16. Final validation
@@ -96,5 +96,5 @@ tests/
 
 - This is the only plan in the epoch that adds a runtime dependency. Justify the choice in the plan doc and confirm via `context7` during library check.
 - DTW has multiple API conventions (cost matrix vs warp path vs distance-only). Pick one and document.
-- Synthetic reference reps must be realistic enough that real reps would actually compare well. Generate them from the same synthetic fixture generator as Plan 4 — don't invent separate hand-tuned shapes.
+- Reference reps **must** be sourced from Plan 4's `tests/fixtures/synthetic/generator.py` via the `generate_reference_rep()` entry point. Plan 3 does NOT implement its own generator and does NOT duplicate the rep synthesis logic in `temporal/`. Plan 4 owns fixture generation; Plan 3 consumes. If `generate_reference_rep()` is not yet exported when this plan begins `writing-plans`, block this plan until Plan 4's generator is landed.
 - The protocol endpoint is a new API surface. Consider rate limiting / auth hooks but defer implementation to Plan 5 or a follow-on.

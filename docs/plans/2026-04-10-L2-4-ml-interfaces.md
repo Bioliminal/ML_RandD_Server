@@ -62,8 +62,8 @@ tests/
 6. Lifter stage (wraps `Lifter`; sits between normalization and rep/phase segmentation)
 7. SkeletonFitter stage (wraps `SkeletonFitter`; sits between lifter and rep/phase segmentation)
 8. PhaseSegment stage (alternative to Plan 1's rep_segment stage; dispatches via `MovementType`)
-9. Orchestrator dispatch: movement type → pipeline composition (rep-based vs phase-based)
-10. Synthetic fixture generator (parameterized: movement, rep count, injected compensations)
+9. Register the phase-based stage set in Plan 1's orchestrator registry for the rollup `MovementType` via the registry's post-initialization extension API (`registry.register_movement(...)`). **Plan 1 owns the dispatch mechanism; Plan 4 only adds entries.** Zero modifications to `orchestrator.py` from Plan 1 — this task is purely additive through the registration API.
+10. Shared synthetic fixture generator at `tests/fixtures/synthetic/generator.py` exposing **two first-class entry points**: `generate_session(movement, rep_count, injected_compensations=...)` for end-to-end pipeline session fixtures, and `generate_reference_rep(movement)` for the reference reps consumed by Plan 3. Both entry points share the underlying rep synthesis code — there is exactly one generator in the codebase, and Plan 3 imports from this module. Plan 4 **owns** both flavors of synthetic data generation.
 11. Generate synthetic fixtures for overhead_squat (clean + valgus variant)
 12. Generate synthetic fixtures for single_leg_squat, push_up, rollup (clean)
 13. Fixture loader helper (discovers fixtures by pattern, loads into `Session` pydantic)
@@ -94,7 +94,7 @@ tests/
 
 ## Notes for writing-plans
 
-- The synthetic generator is the critical piece. It must produce fixtures that exercise every downstream stage. Coordinate with Plan 3's reference-rep generator — they might share code.
+- The synthetic generator is the critical piece. It must produce fixtures that exercise every downstream stage. **Plan 4 owns this generator and exports `generate_reference_rep()` as a first-class entry point**, not a private helper — Plan 3 imports from this module to get its reference reps. There is exactly one generator in the codebase; Plan 3 does not build its own.
 - When real models land, `IdentityLifter` / `NoOpSkeletonFitter` stay in place as test doubles for CI and local dev. Don't delete them.
 - Consider whether the ML stages should be optional (skipped when no model is loaded) or mandatory (identity impls run always). Default: mandatory — keeps the pipeline composition uniform.
 - Rollup's phase segmentation stub is the epoch's biggest fiction. Document clearly that this is scaffolding and real rollup analysis requires research gap §7.3 to close.
