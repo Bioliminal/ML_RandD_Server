@@ -41,3 +41,23 @@ def test_stage_error_returns_500_with_stage_detail(tmp_path, monkeypatch):
     assert body["error"] == "stage_failed"
     assert body["stage"] == "angle_series"
     assert body["detail"] == "simulated failure"
+
+
+from auralink.pipeline.errors import PipelineError
+
+
+def test_generic_pipeline_error_returns_500(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+    payload = build_overhead_squat_payload()
+
+    def _boom(session, registry=None):
+        raise PipelineError("no stages registered for movement 'mystery'")
+
+    with patch("auralink.api.routes.sessions.run_pipeline", _boom):
+        response = client.post("/sessions?sync=true", json=payload)
+
+    assert response.status_code == 500
+    body = response.json()
+    assert body["error"] == "pipeline_failed"
+    assert "mystery" in body["detail"]
