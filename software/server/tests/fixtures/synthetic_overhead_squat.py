@@ -37,12 +37,12 @@ def _frame_for_knee_angle(
     landmarks: list[dict] = [_landmark(0.0, 0.0) for _ in range(33)]
     landmarks[11] = _landmark(shoulder_x - 0.05, shoulder_y)  # LEFT_SHOULDER
     landmarks[12] = _landmark(shoulder_x + 0.05, shoulder_y)  # RIGHT_SHOULDER
-    landmarks[23] = _landmark(hip[0] - 0.05, hip[1])          # LEFT_HIP
-    landmarks[24] = _landmark(hip[0] + 0.05, hip[1])          # RIGHT_HIP
-    landmarks[25] = _landmark(knee[0] - 0.05, knee[1])        # LEFT_KNEE
-    landmarks[26] = _landmark(knee[0] + 0.05, knee[1])        # RIGHT_KNEE
-    landmarks[27] = _landmark(ankle_x - 0.05, ankle_y)        # LEFT_ANKLE
-    landmarks[28] = _landmark(ankle_x + 0.05, ankle_y)        # RIGHT_ANKLE
+    landmarks[23] = _landmark(hip[0] - 0.05, hip[1])  # LEFT_HIP
+    landmarks[24] = _landmark(hip[0] + 0.05, hip[1])  # RIGHT_HIP
+    landmarks[25] = _landmark(knee[0] - 0.05, knee[1])  # LEFT_KNEE
+    landmarks[26] = _landmark(knee[0] + 0.05, knee[1])  # RIGHT_KNEE
+    landmarks[27] = _landmark(ankle_x - 0.05, ankle_y)  # LEFT_ANKLE
+    landmarks[28] = _landmark(ankle_x + 0.05, ankle_y)  # RIGHT_ANKLE
 
     for i in range(33):
         if landmarks[i]["x"] == 0.0 and landmarks[i]["y"] == 0.0:

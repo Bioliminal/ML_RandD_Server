@@ -15,9 +15,7 @@ def _ctx(knee_flex: list[float], trunk: list[float], valgus_l: list[float], valg
     lm = Landmark(x=0.5, y=0.5, z=0.0, visibility=1.0, presence=1.0)
     frames = [Frame(timestamp_ms=i * 33, landmarks=[lm] * 33) for i in range(n)]
     session = Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=frames,
     )
     ctx = StageContext(session=session)
@@ -36,7 +34,9 @@ def _ctx(knee_flex: list[float], trunk: list[float], valgus_l: list[float], valg
         by_angle={
             "left_knee_flexion": [
                 RepBoundaryModel(
-                    start_index=0, bottom_index=n // 2, end_index=n - 1,
+                    start_index=0,
+                    bottom_index=n // 2,
+                    end_index=n - 1,
                     start_angle=knee_flex[0],
                     bottom_angle=knee_flex[n // 2],
                     end_angle=knee_flex[n - 1],

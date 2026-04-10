@@ -40,6 +40,7 @@ class SessionStorage:
 
     def load_artifacts(self, session_id: str) -> "PipelineArtifacts":
         from auralink.pipeline.artifacts import PipelineArtifacts
+
         path = self._artifacts_path_for(session_id)
         if not path.exists():
             raise FileNotFoundError(f"artifacts for session {session_id} not found at {path}")

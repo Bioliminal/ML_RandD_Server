@@ -10,7 +10,9 @@ def _lm(visibility: float = 1.0, presence: float = 1.0) -> Landmark:
 
 
 def _frame(timestamp_ms: int, visibility: float = 1.0, presence: float = 1.0) -> Frame:
-    return Frame(timestamp_ms=timestamp_ms, landmarks=[_lm(visibility, presence) for _ in range(33)])
+    return Frame(
+        timestamp_ms=timestamp_ms, landmarks=[_lm(visibility, presence) for _ in range(33)]
+    )
 
 
 def _session(frames: list[Frame], frame_rate: float = 30.0) -> Session:

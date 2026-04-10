@@ -1,7 +1,6 @@
 from fastapi.testclient import TestClient
 
 from auralink.api.main import create_app
-
 from tests.fixtures.synthetic_overhead_squat import build_overhead_squat_payload
 
 

@@ -49,14 +49,22 @@ def test_normalized_angle_time_series_requires_scale_factor():
 
 def test_rep_boundary_model_indices_must_be_non_negative():
     rep = RepBoundaryModel(
-        start_index=0, bottom_index=14, end_index=29,
-        start_angle=180.0, bottom_angle=90.0, end_angle=180.0,
+        start_index=0,
+        bottom_index=14,
+        end_index=29,
+        start_angle=180.0,
+        bottom_angle=90.0,
+        end_angle=180.0,
     )
     assert rep.end_index == 29
     with pytest.raises(ValidationError):
         RepBoundaryModel(
-            start_index=-1, bottom_index=5, end_index=10,
-            start_angle=180.0, bottom_angle=90.0, end_angle=180.0,
+            start_index=-1,
+            bottom_index=5,
+            end_index=10,
+            start_angle=180.0,
+            bottom_angle=90.0,
+            end_angle=180.0,
         )
 
 
@@ -65,8 +73,12 @@ def test_rep_boundaries_keyed_by_angle_name():
         by_angle={
             "left_knee_flexion": [
                 RepBoundaryModel(
-                    start_index=0, bottom_index=14, end_index=29,
-                    start_angle=180.0, bottom_angle=90.0, end_angle=180.0,
+                    start_index=0,
+                    bottom_index=14,
+                    end_index=29,
+                    start_angle=180.0,
+                    bottom_angle=90.0,
+                    end_angle=180.0,
                 )
             ]
         }

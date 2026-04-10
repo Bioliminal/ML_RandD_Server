@@ -9,9 +9,7 @@ def _session() -> Session:
     lm = Landmark(x=0.5, y=0.5, z=0.0, visibility=1.0, presence=1.0)
     frame = Frame(timestamp_ms=0, landmarks=[lm for _ in range(33)])
     return Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=[frame],
     )
 

@@ -13,11 +13,11 @@ def _lm(vis: float = 1.0, pres: float = 1.0) -> Landmark:
 
 
 def _good_session(frame_count: int = 60) -> Session:
-    frames = [Frame(timestamp_ms=i * 33, landmarks=[_lm() for _ in range(33)]) for i in range(frame_count)]
+    frames = [
+        Frame(timestamp_ms=i * 33, landmarks=[_lm() for _ in range(33)]) for i in range(frame_count)
+    ]
     return Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=frames,
     )
 
@@ -40,9 +40,7 @@ def test_run_pipeline_produces_pipeline_artifacts_for_good_session():
 
 def test_run_pipeline_raises_quality_gate_error_on_bad_session():
     bad = Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=10.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=10.0),
         frames=_good_session(30).frames,
     )
     with pytest.raises(QualityGateError) as exc:
@@ -52,9 +50,14 @@ def test_run_pipeline_raises_quality_gate_error_on_bad_session():
 
 def test_run_pipeline_wraps_unexpected_stage_failure_as_stage_error():
     reg = StageRegistry()
+
     def _boom(_ctx):
         raise RuntimeError("boom")
-    reg.register_movement("overhead_squat", [Stage(name="quality_gate", run=lambda c: _pass()), Stage(name="angle_series", run=_boom)])
+
+    reg.register_movement(
+        "overhead_squat",
+        [Stage(name="quality_gate", run=lambda c: _pass()), Stage(name="angle_series", run=_boom)],
+    )
     with pytest.raises(StageError) as exc:
         run_pipeline(_good_session(), registry=reg)
     assert exc.value.stage_name == "angle_series"
@@ -62,6 +65,7 @@ def test_run_pipeline_wraps_unexpected_stage_failure_as_stage_error():
 
 def _pass():
     from auralink.pipeline.artifacts import SessionQualityReport
+
     return SessionQualityReport(passed=True, issues=[], metrics={})
 
 

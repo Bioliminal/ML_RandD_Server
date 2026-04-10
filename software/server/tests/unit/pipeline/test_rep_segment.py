@@ -11,7 +11,10 @@ from auralink.pipeline.stages.rep_segment import (
 
 def _ctx_with_angles(movement: str, angle_lookup: dict[str, list[float]]) -> StageContext:
     lm = Landmark(x=0.5, y=0.5, z=0.0, visibility=1.0, presence=1.0)
-    frames = [Frame(timestamp_ms=i * 33, landmarks=[lm for _ in range(33)]) for i in range(len(next(iter(angle_lookup.values()))))]
+    frames = [
+        Frame(timestamp_ms=i * 33, landmarks=[lm for _ in range(33)])
+        for i in range(len(next(iter(angle_lookup.values()))))
+    ]
     session = Session(
         metadata=SessionMetadata(movement=movement, device="t", model="t", frame_rate=30.0),
         frames=frames,
@@ -32,7 +35,11 @@ def test_rep_segment_identifies_two_reps_in_squat_pattern():
     series = one_rep + one_rep
     ctx = _ctx_with_angles(
         "overhead_squat",
-        {"left_knee_flexion": series, "right_knee_flexion": series, "trunk_lean": [0.0] * len(series)},
+        {
+            "left_knee_flexion": series,
+            "right_knee_flexion": series,
+            "trunk_lean": [0.0] * len(series),
+        },
     )
     result = run_rep_segment(ctx)
     assert "left_knee_flexion" in result.by_angle
@@ -51,5 +58,11 @@ def test_rep_segment_returns_empty_for_flat_signal():
 
 
 def test_primary_angles_table_covers_squat_movements():
-    assert PRIMARY_REP_ANGLES_BY_MOVEMENT["overhead_squat"] == ("left_knee_flexion", "right_knee_flexion")
-    assert PRIMARY_REP_ANGLES_BY_MOVEMENT["single_leg_squat"] == ("left_knee_flexion", "right_knee_flexion")
+    assert PRIMARY_REP_ANGLES_BY_MOVEMENT["overhead_squat"] == (
+        "left_knee_flexion",
+        "right_knee_flexion",
+    )
+    assert PRIMARY_REP_ANGLES_BY_MOVEMENT["single_leg_squat"] == (
+        "left_knee_flexion",
+        "right_knee_flexion",
+    )

@@ -17,9 +17,7 @@ def _frame(shoulder_y: float, hip_y: float) -> Frame:
 
 def _session() -> Session:
     return Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=[_frame(0.3, 0.6)],
     )
 
@@ -38,9 +36,7 @@ def test_normalize_emits_scale_factor_from_hip_shoulder_distance():
 
 def test_normalize_zero_distance_falls_back_to_small_positive():
     session = Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=[_frame(0.5, 0.5)],
     )
     ctx = StageContext(session=session)

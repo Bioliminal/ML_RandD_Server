@@ -10,9 +10,7 @@ def _frame(timestamp_ms: int) -> Frame:
 
 def _session(frame_count: int) -> Session:
     return Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=[_frame(i * 33) for i in range(frame_count)],
     )
 

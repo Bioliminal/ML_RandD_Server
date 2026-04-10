@@ -7,9 +7,7 @@ from auralink.pipeline.stages.within_movement_trend import run_within_movement_t
 def _ctx_with_reps(reps: list[RepMetric]) -> StageContext:
     lm = Landmark(x=0.5, y=0.5, z=0.0, visibility=1.0, presence=1.0)
     session = Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=[Frame(timestamp_ms=0, landmarks=[lm] * 33)],
     )
     ctx = StageContext(session=session)
