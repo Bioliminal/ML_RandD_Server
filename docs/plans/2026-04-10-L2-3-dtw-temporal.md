@@ -2,7 +2,7 @@
 
 **Status:** Stub — flesh out with `writing-plans` before execution.
 **Parent:** `2026-04-10-analysis-pipeline-epoch.md`
-**Depends on:** Plan 1 (pipeline framework), Plan 2 (report schema)
+**Depends on:** Plan 1 (pipeline framework), Plan 2 (report schema), Plan 4 (synthetic fixtures + reference rep library)
 
 ## Goal
 

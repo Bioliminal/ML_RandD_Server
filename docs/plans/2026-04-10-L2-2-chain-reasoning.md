@@ -2,7 +2,7 @@
 
 **Status:** Stub — flesh out with `writing-plans` before execution.
 **Parent:** `2026-04-10-analysis-pipeline-epoch.md`
-**Depends on:** Plan 1 (Pipeline Framework + Core Analysis Stages)
+**Depends on:** Plan 1 (Pipeline Framework + Core Analysis Stages), Plan 4 (synthetic fixture generator for TDD test data)
 
 ## Goal
 

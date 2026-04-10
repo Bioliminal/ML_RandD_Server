@@ -54,15 +54,23 @@ Every L2 plan in this epoch must honor the following (violations are grounds for
 
 ## Composition — L2 Plans
 
-This epoch is composed of 5 L2 plans. Default execution order is 1 → 2 → 3 → 4 → 5. Plans 2, 3, 4, 5 all depend only on Plan 1 and can be reshuffled based on team priorities.
+This epoch is composed of 5 L2 plans. **Execution order: 1 → 4 → 2 → 3 → 5.** Plan 4 runs second so that Plans 2 and 3 can write their tests against the real synthetic fixture generator from the start rather than hand-building divergent test data. Plans 2-5 all depend only on Plan 1 structurally; the sequencing below optimizes for TDD data reuse and product-story coherence.
 
-| # | Plan | File | Depends On | Status |
-|---|------|------|------------|--------|
-| 1 | Pipeline Framework + Core Analysis Stages | `2026-04-10-L2-1-pipeline-framework.md` | Scaffold | Stub |
-| 2 | Chain Reasoning v1 + Report Assembly | `2026-04-10-L2-2-chain-reasoning.md` | Plan 1 | Stub |
-| 3 | DTW + Temporal Analysis | `2026-04-10-L2-3-dtw-temporal.md` | Plan 1, Plan 2 | Stub |
-| 4 | ML Interfaces + Fixture Harness | `2026-04-10-L2-4-ml-interfaces.md` | Plan 1 | Stub |
-| 5 | Operations + Observability | `2026-04-10-L2-5-operations.md` | Plan 1 | Stub |
+| Order | # | Plan | File | Depends On | Status |
+|-------|---|------|------|------------|--------|
+| 1st | 1 | Pipeline Framework + Core Analysis Stages | `2026-04-10-L2-1-pipeline-framework.md` | Scaffold | Stub |
+| 2nd | 4 | ML Interfaces + Fixture Harness | `2026-04-10-L2-4-ml-interfaces.md` | Plan 1 | Stub |
+| 3rd | 2 | Chain Reasoning v1 + Report Assembly | `2026-04-10-L2-2-chain-reasoning.md` | Plan 1, Plan 4 fixtures | Stub |
+| 4th | 3 | DTW + Temporal Analysis | `2026-04-10-L2-3-dtw-temporal.md` | Plan 1, Plan 2, Plan 4 fixtures | Stub |
+| 5th | 5 | Operations + Observability | `2026-04-10-L2-5-operations.md` | Plan 1 | Stub |
+
+Rationale for the 1 → 4 → 2 → 3 → 5 ordering:
+
+- **Plan 1 first** — nothing runs without the stage framework.
+- **Plan 4 second** — ships the synthetic fixture generator and ML protocols. Plans 2 and 3 then consume those fixtures as their primary test data, avoiding drift between hand-built test data in each plan.
+- **Plan 2 third** — once fixtures exist, chain reasoning can TDD against realistic compensation signals (e.g., the overhead-squat valgus variant from Plan 4).
+- **Plan 3 fourth** — extends Plan 2's report schema and depends on Plan 4's reference rep library.
+- **Plan 5 last** — operations hardening is the final production layer; doesn't affect the earlier logic but benefits from having the full pipeline in place to observe.
 
 Each L2 stub is a starting point only. Before execution, the chosen plan is fleshed out with full TDD-step detail via the `writing-plans` skill and then reviewed via `plan-review`.
 
