@@ -2,7 +2,7 @@
 
 **Status:** Planning
 **Created:** 2026-04-10
-**Parent:** docs/research-integration-report.md (architectural context)
+**Parent:** docs/operations/comms/research-integration-report.md (architectural context)
 **Predecessor:** docs/plans/2026-04-09-server-scaffold.md (completed)
 
 ## Epoch Goal

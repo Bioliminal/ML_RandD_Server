@@ -20,4 +20,4 @@ uv run pytest
 
 ## Project Layout
 
-See `docs/research-integration-report.md` section 6 for architectural context. Pipeline stages live under `src/auralink/` organized by domain (pose, analysis, reasoning, etc.).
+See `docs/operations/comms/research-integration-report.md` section 6 for architectural context. Pipeline stages live under `src/auralink/` organized by domain (pose, analysis, reasoning, etc.).
