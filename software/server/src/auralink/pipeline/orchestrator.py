@@ -5,29 +5,62 @@ from auralink.pipeline.registry import StageRegistry
 from auralink.pipeline.stages.angle_series import run_angle_series
 from auralink.pipeline.stages.base import (
     STAGE_NAME_ANGLE_SERIES,
+    STAGE_NAME_LIFT,
     STAGE_NAME_NORMALIZE,
     STAGE_NAME_PER_REP_METRICS,
+    STAGE_NAME_PHASE_SEGMENT,
     STAGE_NAME_QUALITY_GATE,
     STAGE_NAME_REP_SEGMENT,
+    STAGE_NAME_SKELETON,
     STAGE_NAME_WITHIN_MOVEMENT_TREND,
     Stage,
     StageContext,
 )
+from auralink.pipeline.stages.lift import run_lift
 from auralink.pipeline.stages.normalize import run_normalize
 from auralink.pipeline.stages.per_rep_metrics import run_per_rep_metrics
+from auralink.pipeline.stages.phase_segment import run_phase_segment
 from auralink.pipeline.stages.quality_gate import run_quality_gate
 from auralink.pipeline.stages.rep_segment import run_rep_segment
+from auralink.pipeline.stages.skeleton import run_skeleton
 from auralink.pipeline.stages.within_movement_trend import run_within_movement_trend
 
 
 def _default_stage_list() -> list[Stage]:
+    """Rep-based pipeline for knee-flexion movements: overhead_squat, single_leg_squat."""
     return [
         Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
         Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
         Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
+        Stage(name=STAGE_NAME_LIFT, run=run_lift),
+        Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
         Stage(name=STAGE_NAME_REP_SEGMENT, run=run_rep_segment),
         Stage(name=STAGE_NAME_PER_REP_METRICS, run=run_per_rep_metrics),
         Stage(name=STAGE_NAME_WITHIN_MOVEMENT_TREND, run=run_within_movement_trend),
+    ]
+
+
+def _push_up_stage_list() -> list[Stage]:
+    """Push-up pipeline: stops at skeleton. Rep-based stages require
+    elbow_flexion angles which are deferred to a follow-on epoch."""
+    return [
+        Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
+        Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
+        Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
+        Stage(name=STAGE_NAME_LIFT, run=run_lift),
+        Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
+    ]
+
+
+def _rollup_stage_list() -> list[Stage]:
+    """Phase-based pipeline: rollup. Uses phase_segment instead of rep_segment."""
+    return [
+        Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
+        Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
+        Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
+        Stage(name=STAGE_NAME_LIFT, run=run_lift),
+        Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
+        Stage(name=STAGE_NAME_PHASE_SEGMENT, run=run_phase_segment),
     ]
 
 
@@ -35,6 +68,8 @@ def _build_default_registry() -> StageRegistry:
     registry = StageRegistry()
     registry.register_movement("overhead_squat", _default_stage_list())
     registry.register_movement("single_leg_squat", _default_stage_list())
+    registry.register_movement("push_up", _push_up_stage_list())
+    registry.register_movement("rollup", _rollup_stage_list())
     return registry
 
 
@@ -73,4 +108,7 @@ def _assemble_artifacts(ctx: StageContext) -> PipelineArtifacts:
         rep_boundaries=ctx.artifacts.get(STAGE_NAME_REP_SEGMENT),
         per_rep_metrics=ctx.artifacts.get(STAGE_NAME_PER_REP_METRICS),
         within_movement_trend=ctx.artifacts.get(STAGE_NAME_WITHIN_MOVEMENT_TREND),
+        lift_result=ctx.artifacts.get(STAGE_NAME_LIFT),
+        skeleton_result=ctx.artifacts.get(STAGE_NAME_SKELETON),
+        phase_boundaries=ctx.artifacts.get(STAGE_NAME_PHASE_SEGMENT),
     )

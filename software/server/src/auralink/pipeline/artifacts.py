@@ -58,6 +58,29 @@ class WithinMovementTrend(BaseModel):
     fatigue_detected: bool
 
 
+class LiftedAngleTimeSeries(BaseModel):
+    angles: dict[str, list[float]]
+    timestamps_ms: list[int]
+    scale_factor: float = Field(gt=0)
+    is_3d: bool
+
+
+class SkeletonBundle(BaseModel):
+    params: dict[str, float] = Field(default_factory=dict)
+    fitted: bool
+
+
+class Phase(BaseModel):
+    index: int = Field(ge=0)
+    start_timestamp_ms: int = Field(ge=0)
+    end_timestamp_ms: int = Field(ge=0)
+    label: str
+
+
+class PhaseBoundaries(BaseModel):
+    phases: list[Phase] = Field(default_factory=list)
+
+
 class PipelineArtifacts(BaseModel):
     quality_report: SessionQualityReport
     angle_series: AngleTimeSeries | None = None
@@ -65,3 +88,6 @@ class PipelineArtifacts(BaseModel):
     rep_boundaries: RepBoundaries | None = None
     per_rep_metrics: PerRepMetrics | None = None
     within_movement_trend: WithinMovementTrend | None = None
+    lift_result: LiftedAngleTimeSeries | None = None
+    skeleton_result: SkeletonBundle | None = None
+    phase_boundaries: PhaseBoundaries | None = None

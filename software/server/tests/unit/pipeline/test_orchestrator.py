@@ -73,3 +73,60 @@ def test_run_pipeline_unknown_movement_raises_pipeline_error():
     reg = StageRegistry()
     with pytest.raises(PipelineError):
         run_pipeline(_good_session(), registry=reg)
+
+
+def test_default_registry_has_push_up_and_rollup():
+    assert DEFAULT_REGISTRY.has_movement("push_up")
+    assert DEFAULT_REGISTRY.has_movement("rollup")
+
+
+def test_run_pipeline_populates_lift_and_skeleton_for_overhead_squat():
+    artifacts = run_pipeline(_good_session())
+    assert artifacts.lift_result is not None
+    assert artifacts.lift_result.is_3d is False
+    assert artifacts.skeleton_result is not None
+    assert artifacts.skeleton_result.fitted is False
+    assert artifacts.per_rep_metrics is not None  # rep path still runs
+    assert artifacts.phase_boundaries is None
+
+
+def test_run_pipeline_populates_lift_skeleton_for_push_up():
+    session = Session(
+        metadata=SessionMetadata(
+            movement="push_up", device="t", model="t", frame_rate=30.0
+        ),
+        frames=_good_session(60).frames,
+    )
+    artifacts = run_pipeline(session)
+    assert artifacts.lift_result is not None
+    assert artifacts.skeleton_result is not None
+    # push_up pipeline stops at skeleton — rep-based stages require
+    # elbow_flexion angle which will be added in a follow-on epoch.
+    # Registering push_up with _default_stage_list() would silently
+    # produce empty reps because rep_segment's PRIMARY_REP_ANGLES_BY_MOVEMENT
+    # dict only covers knee-flexion movements. Per L1 principle 4
+    # (movement-type dispatch via strategy pattern) push_up gets its
+    # own stage list rather than hiding the gap behind default registration.
+    assert artifacts.rep_boundaries is None
+    assert artifacts.per_rep_metrics is None
+    assert artifacts.within_movement_trend is None
+    assert artifacts.phase_boundaries is None
+
+
+def test_run_pipeline_rollup_uses_phase_segment_not_rep_segment():
+    session = Session(
+        metadata=SessionMetadata(
+            movement="rollup", device="t", model="t", frame_rate=30.0
+        ),
+        frames=_good_session(60).frames,
+    )
+    artifacts = run_pipeline(session)
+    assert artifacts.lift_result is not None
+    assert artifacts.skeleton_result is not None
+    assert artifacts.phase_boundaries is not None
+    assert len(artifacts.phase_boundaries.phases) == 1
+    assert artifacts.phase_boundaries.phases[0].label == "full_movement"
+    # rollup pipeline skips rep-based stages
+    assert artifacts.rep_boundaries is None
+    assert artifacts.per_rep_metrics is None
+    assert artifacts.within_movement_trend is None
