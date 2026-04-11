@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from auralink.api.main import create_app
 from auralink.pipeline.errors import PipelineError, StageError
-from tests.fixtures.synthetic_overhead_squat import build_overhead_squat_payload
+from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_quality_gate_rejection_returns_422(tmp_path, monkeypatch):

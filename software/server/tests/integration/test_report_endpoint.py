@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from auralink.api.main import create_app
-from tests.fixtures.synthetic_overhead_squat import build_overhead_squat_payload
+from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_get_report_returns_artifacts_after_post(tmp_path, monkeypatch):
