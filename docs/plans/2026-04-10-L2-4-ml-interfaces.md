@@ -2422,3 +2422,519 @@ Wave K (sequential):        T17                      ← needs everything
 - **Wave K** — T17 (0–1 commits depending on lint)
 
 Expected commit count: 3 + 2 + 1 + 1 + 1 + 1 + 1 + 1 + 2 + 3 + 0 = **16 commits** to finish Plan 4, landing on `main`.
+
+---
+
+## Plan Revision 2026-04-11 — Narrow Wave Restructure (supersedes T11–T17)
+
+Tasks T11 through T17 are replaced by a narrower 11-task structure across 3 waves, consumed by the updated `parallel-plan-executor` (concurrent dispatch up to 6 per wave, barrier between waves). All tasks within each wave own disjoint files.
+
+**Restructured waves:**
+
+```
+Wave H (parallel, 6 tasks): H1, H2, H3, H4, H5, H6    ← fixture script + 4 JSON-pair tasks + loader
+Wave I (parallel, 4 tasks): I1, I2, I3, I4            ← 4 e2e fixture-driven integration tests
+Wave J (sequential):        J1                        ← final validation
+```
+
+**Max parallelism:** 6 (Wave H). **Waves remaining after T10:** 3.
+
+### Wave H — Fixtures + loader (6 parallel)
+
+All six tasks own disjoint files. Loader uses an optional `search_dir` argument so its tests can use `tmp_path` and do not depend on the JSON fixture tasks completing first.
+
+#### Task H1: `scripts/regenerate_fixtures.py`
+
+**Files (create):**
+- `scripts/regenerate_fixtures.py`
+
+**Label:** skip-tdd (helper script; coverage comes from the fixture tasks that use `generate_session` directly).
+
+**Verbatim content:**
+```python
+"""Regenerate all synthetic JSON fixtures deterministically.
+
+Run from repo root:
+    uv run python scripts/regenerate_fixtures.py
+
+This script is intentionally minimal — all realism lives in generator.py.
+"""
+
+import json
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "software" / "server"))
+
+from tests.fixtures.synthetic.generator import generate_session  # noqa: E402
+
+OUT_DIR = REPO_ROOT / "software" / "server" / "tests" / "fixtures" / "synthetic"
+
+FIXTURES = [
+    ("overhead_squat_clean.json", {"movement": "overhead_squat", "rep_count": 2, "frames_per_rep": 30}),
+    (
+        "overhead_squat_valgus.json",
+        {
+            "movement": "overhead_squat",
+            "rep_count": 2,
+            "frames_per_rep": 30,
+            "injected_compensations": {"knee_valgus_deg": 12.0, "trunk_lean_deg": 4.0},
+        },
+    ),
+    ("single_leg_squat_clean.json", {"movement": "single_leg_squat", "rep_count": 2, "frames_per_rep": 30}),
+    ("push_up_clean.json", {"movement": "push_up", "rep_count": 2, "frames_per_rep": 30}),
+    ("rollup_clean.json", {"movement": "rollup", "rep_count": 1, "frames_per_rep": 60}),
+]
+
+
+def main() -> None:
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for filename, kwargs in FIXTURES:
+        payload = generate_session(**kwargs)
+        out = OUT_DIR / filename
+        out.write_text(json.dumps(payload, indent=2))
+        print(f"wrote {out.relative_to(REPO_ROOT)}  ({len(payload['frames'])} frames)")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Verify:** `uv run python scripts/regenerate_fixtures.py` should be importable (syntax check via `python -c "import py_compile; py_compile.compile('scripts/regenerate_fixtures.py')"`). Do NOT execute the script — the JSON fixtures are produced by H2–H5 in parallel.
+
+**Commit:** `chore(fixtures): add regenerate_fixtures.py helper script`
+
+#### Task H2: Overhead squat fixtures
+
+**Files (create):**
+- `software/server/tests/fixtures/synthetic/overhead_squat_clean.json`
+- `software/server/tests/fixtures/synthetic/overhead_squat_valgus.json`
+- `software/server/tests/fixtures/test_overhead_squat_fixtures.py`
+
+**Label:** skip-tdd for the JSON files (generated content), TDD for the test file.
+
+**Fixture generation command:**
+```bash
+cd /home/context/olorin/projects/Capstone && uv run python -c "
+import sys, json
+sys.path.insert(0, 'software/server')
+from tests.fixtures.synthetic.generator import generate_session
+from pathlib import Path
+out = Path('software/server/tests/fixtures/synthetic')
+out.mkdir(parents=True, exist_ok=True)
+(out / 'overhead_squat_clean.json').write_text(json.dumps(generate_session('overhead_squat', rep_count=2, frames_per_rep=30), indent=2))
+(out / 'overhead_squat_valgus.json').write_text(json.dumps(generate_session('overhead_squat', rep_count=2, frames_per_rep=30, injected_compensations={'knee_valgus_deg': 12.0, 'trunk_lean_deg': 4.0}), indent=2))
+print('ok')
+"
+```
+
+**Test file `software/server/tests/fixtures/test_overhead_squat_fixtures.py`:**
+```python
+import json
+from pathlib import Path
+
+from auralink.api.schemas import Session
+
+FIXTURE_DIR = Path(__file__).parent / "synthetic"
+
+
+def _load(name: str) -> Session:
+    path = FIXTURE_DIR / name
+    assert path.exists(), f"missing fixture: {path}"
+    return Session.model_validate(json.loads(path.read_text()))
+
+
+def test_overhead_squat_clean_fixture_loads_as_session():
+    session = _load("overhead_squat_clean.json")
+    assert session.metadata.movement == "overhead_squat"
+    assert len(session.frames) == 60
+
+
+def test_overhead_squat_valgus_fixture_loads_as_session():
+    session = _load("overhead_squat_valgus.json")
+    assert session.metadata.movement == "overhead_squat"
+    assert len(session.frames) == 60
+```
+
+**Focused test:** `cd software/server && uv run pytest tests/fixtures/test_overhead_squat_fixtures.py -v` → `2 passed`.
+
+**Commit:** `test(fixtures): overhead_squat clean + valgus JSON fixtures and validator`
+
+#### Task H3: Single-leg-squat fixture
+
+**Files (create):**
+- `software/server/tests/fixtures/synthetic/single_leg_squat_clean.json`
+- `software/server/tests/fixtures/test_single_leg_squat_fixture.py`
+
+**Fixture generation command:**
+```bash
+cd /home/context/olorin/projects/Capstone && uv run python -c "
+import sys, json
+sys.path.insert(0, 'software/server')
+from tests.fixtures.synthetic.generator import generate_session
+from pathlib import Path
+out = Path('software/server/tests/fixtures/synthetic')
+out.mkdir(parents=True, exist_ok=True)
+(out / 'single_leg_squat_clean.json').write_text(json.dumps(generate_session('single_leg_squat', rep_count=2, frames_per_rep=30), indent=2))
+print('ok')
+"
+```
+
+**Test file `software/server/tests/fixtures/test_single_leg_squat_fixture.py`:**
+```python
+import json
+from pathlib import Path
+
+from auralink.api.schemas import Session
+
+FIXTURE_DIR = Path(__file__).parent / "synthetic"
+
+
+def test_single_leg_squat_clean_fixture_loads_as_session():
+    path = FIXTURE_DIR / "single_leg_squat_clean.json"
+    assert path.exists(), f"missing fixture: {path}"
+    session = Session.model_validate(json.loads(path.read_text()))
+    assert session.metadata.movement == "single_leg_squat"
+    assert len(session.frames) == 60
+```
+
+**Focused test:** `cd software/server && uv run pytest tests/fixtures/test_single_leg_squat_fixture.py -v` → `1 passed`.
+
+**Commit:** `test(fixtures): single_leg_squat clean JSON fixture`
+
+#### Task H4: Push-up fixture
+
+**Files (create):**
+- `software/server/tests/fixtures/synthetic/push_up_clean.json`
+- `software/server/tests/fixtures/test_push_up_fixture.py`
+
+**Fixture generation command:**
+```bash
+cd /home/context/olorin/projects/Capstone && uv run python -c "
+import sys, json
+sys.path.insert(0, 'software/server')
+from tests.fixtures.synthetic.generator import generate_session
+from pathlib import Path
+out = Path('software/server/tests/fixtures/synthetic')
+out.mkdir(parents=True, exist_ok=True)
+(out / 'push_up_clean.json').write_text(json.dumps(generate_session('push_up', rep_count=2, frames_per_rep=30), indent=2))
+print('ok')
+"
+```
+
+**Test file `software/server/tests/fixtures/test_push_up_fixture.py`:**
+```python
+import json
+from pathlib import Path
+
+from auralink.api.schemas import Session
+
+FIXTURE_DIR = Path(__file__).parent / "synthetic"
+
+
+def test_push_up_clean_fixture_loads_as_session():
+    path = FIXTURE_DIR / "push_up_clean.json"
+    assert path.exists(), f"missing fixture: {path}"
+    session = Session.model_validate(json.loads(path.read_text()))
+    assert session.metadata.movement == "push_up"
+    assert len(session.frames) == 60
+```
+
+**Focused test:** `cd software/server && uv run pytest tests/fixtures/test_push_up_fixture.py -v` → `1 passed`.
+
+**Commit:** `test(fixtures): push_up clean JSON fixture`
+
+#### Task H5: Rollup fixture
+
+**Files (create):**
+- `software/server/tests/fixtures/synthetic/rollup_clean.json`
+- `software/server/tests/fixtures/test_rollup_fixture.py`
+
+**Fixture generation command:**
+```bash
+cd /home/context/olorin/projects/Capstone && uv run python -c "
+import sys, json
+sys.path.insert(0, 'software/server')
+from tests.fixtures.synthetic.generator import generate_session
+from pathlib import Path
+out = Path('software/server/tests/fixtures/synthetic')
+out.mkdir(parents=True, exist_ok=True)
+(out / 'rollup_clean.json').write_text(json.dumps(generate_session('rollup', rep_count=1, frames_per_rep=60), indent=2))
+print('ok')
+"
+```
+
+**Test file `software/server/tests/fixtures/test_rollup_fixture.py`:**
+```python
+import json
+from pathlib import Path
+
+from auralink.api.schemas import Session
+
+FIXTURE_DIR = Path(__file__).parent / "synthetic"
+
+
+def test_rollup_clean_fixture_loads_as_session():
+    path = FIXTURE_DIR / "rollup_clean.json"
+    assert path.exists(), f"missing fixture: {path}"
+    session = Session.model_validate(json.loads(path.read_text()))
+    assert session.metadata.movement == "rollup"
+    assert len(session.frames) == 60
+```
+
+**Focused test:** `cd software/server && uv run pytest tests/fixtures/test_rollup_fixture.py -v` → `1 passed`.
+
+**Commit:** `test(fixtures): rollup clean JSON fixture`
+
+#### Task H6: Fixture loader helper
+
+**Files (create):**
+- `software/server/tests/fixtures/loader.py`
+- `software/server/tests/fixtures/test_loader.py`
+
+**Label:** TDD (logic + error path).
+
+**Design change from original T13:** `load_fixture()` accepts an optional `search_dir` parameter so its tests use `tmp_path` and do NOT depend on the fixture JSON files created by H2–H5. This decouples H6 from H2–H5 and lets all six Wave H tasks run in parallel.
+
+**Test file `software/server/tests/fixtures/test_loader.py`:**
+```python
+import json
+
+import pytest
+
+from auralink.api.schemas import Session
+
+from tests.fixtures.loader import load_fixture
+from tests.fixtures.synthetic.generator import generate_session
+
+
+def _write(tmp_path, movement: str, variant: str) -> None:
+    syn = tmp_path / "synthetic"
+    syn.mkdir(exist_ok=True)
+    payload = generate_session(movement, rep_count=1, frames_per_rep=30)
+    (syn / f"{movement}_{variant}.json").write_text(json.dumps(payload))
+
+
+def test_load_fixture_discovers_by_pattern(tmp_path):
+    _write(tmp_path, "overhead_squat", "clean")
+    session = load_fixture("overhead_squat", variant="clean", search_dir=tmp_path / "synthetic")
+    assert isinstance(session, Session)
+    assert session.metadata.movement == "overhead_squat"
+
+
+def test_load_fixture_defaults_to_clean_variant(tmp_path):
+    _write(tmp_path, "overhead_squat", "clean")
+    a = load_fixture("overhead_squat", search_dir=tmp_path / "synthetic")
+    b = load_fixture("overhead_squat", variant="clean", search_dir=tmp_path / "synthetic")
+    assert a.metadata.movement == b.metadata.movement
+    assert len(a.frames) == len(b.frames)
+
+
+def test_load_fixture_unknown_variant_raises_file_not_found(tmp_path):
+    (tmp_path / "synthetic").mkdir()
+    with pytest.raises(FileNotFoundError):
+        load_fixture("overhead_squat", variant="does_not_exist", search_dir=tmp_path / "synthetic")
+```
+
+**Implementation `software/server/tests/fixtures/loader.py`:**
+```python
+"""Fixture loader — discovers synthetic + golden captures by filename pattern.
+
+Pattern: `{movement}_{variant}.json`. Variant defaults to `clean`. Searches
+`tests/fixtures/synthetic/` first; future Flutter golden captures will be
+discovered from `tests/fixtures/golden/` by adding a second search root.
+"""
+
+import json
+from pathlib import Path
+from typing import Literal
+
+from auralink.api.schemas import Session
+
+MovementType = Literal["overhead_squat", "single_leg_squat", "push_up", "rollup"]
+
+_SYNTHETIC_DIR = Path(__file__).parent / "synthetic"
+
+
+def load_fixture(
+    movement: MovementType,
+    variant: str = "clean",
+    search_dir: Path | None = None,
+) -> Session:
+    base = search_dir if search_dir is not None else _SYNTHETIC_DIR
+    path = base / f"{movement}_{variant}.json"
+    if not path.exists():
+        raise FileNotFoundError(f"fixture not found: {path}")
+    return Session.model_validate(json.loads(path.read_text()))
+```
+
+**Focused test:** `cd software/server && uv run pytest tests/fixtures/test_loader.py -v` → `3 passed`.
+
+**Commit:** `feat(fixtures): add load_fixture helper with tmp_path-friendly search_dir`
+
+### Wave I — End-to-end fixture-driven integration tests (4 parallel)
+
+All four tasks own disjoint files (one new test file each). Each loads its JSON via `load_fixture(...)` without a `search_dir` (hits `_SYNTHETIC_DIR`). Each POSTs to `/sessions?sync=true`, GETs the report, and asserts the movement-specific artifacts.
+
+#### Task I1: Overhead squat e2e
+
+**Files (create):**
+- `software/server/tests/integration/test_overhead_squat_e2e_fixture.py`
+
+```python
+from fastapi.testclient import TestClient
+
+from auralink.api.main import create_app
+
+from tests.fixtures.loader import load_fixture
+
+
+def test_overhead_squat_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+
+    session = load_fixture("overhead_squat", variant="clean")
+    payload = session.model_dump(mode="json")
+    post = client.post("/sessions?sync=true", json=payload)
+    assert post.status_code == 201
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+
+    assert body["quality_report"]["passed"] is True
+    assert body["lift_result"] is not None
+    assert body["lift_result"]["is_3d"] is False
+    assert body["skeleton_result"] is not None
+    assert body["skeleton_result"]["fitted"] is False
+    assert body["per_rep_metrics"] is not None
+    assert len(body["per_rep_metrics"]["reps"]) == 2
+    assert body["phase_boundaries"] is None
+```
+
+**Commit:** `test(pipeline): overhead_squat clean fixture end-to-end integration test`
+
+#### Task I2: Single-leg-squat e2e
+
+**Files (create):**
+- `software/server/tests/integration/test_single_leg_squat_e2e.py`
+
+```python
+from fastapi.testclient import TestClient
+
+from auralink.api.main import create_app
+
+from tests.fixtures.loader import load_fixture
+
+
+def test_single_leg_squat_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+
+    session = load_fixture("single_leg_squat", variant="clean")
+    post = client.post("/sessions?sync=true", json=session.model_dump(mode="json"))
+    assert post.status_code == 201
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+
+    assert body["quality_report"]["passed"] is True
+    assert body["lift_result"] is not None
+    assert body["skeleton_result"] is not None
+    assert body["per_rep_metrics"] is not None
+    assert body["phase_boundaries"] is None
+```
+
+**Commit:** `test(pipeline): single_leg_squat e2e fixture integration test`
+
+#### Task I3: Push-up e2e
+
+**Files (create):**
+- `software/server/tests/integration/test_push_up_e2e.py`
+
+```python
+from fastapi.testclient import TestClient
+
+from auralink.api.main import create_app
+
+from tests.fixtures.loader import load_fixture
+
+
+def test_push_up_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+
+    session = load_fixture("push_up", variant="clean")
+    post = client.post("/sessions?sync=true", json=session.model_dump(mode="json"))
+    assert post.status_code == 201
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+
+    assert body["quality_report"]["passed"] is True
+    assert body["lift_result"] is not None
+    assert body["skeleton_result"] is not None
+    # push_up pipeline stops at skeleton — rep-based stages require
+    # elbow_flexion (deferred). See Task 9 and the stage composition matrix.
+    assert body["rep_boundaries"] is None
+    assert body["per_rep_metrics"] is None
+    assert body["within_movement_trend"] is None
+    assert body["phase_boundaries"] is None
+```
+
+**Commit:** `test(pipeline): push_up e2e fixture integration test`
+
+#### Task I4: Rollup e2e
+
+**Files (create):**
+- `software/server/tests/integration/test_rollup_e2e.py`
+
+```python
+from fastapi.testclient import TestClient
+
+from auralink.api.main import create_app
+
+from tests.fixtures.loader import load_fixture
+
+
+def test_rollup_clean_fixture_runs_end_to_end_with_single_phase(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+
+    session = load_fixture("rollup", variant="clean")
+    post = client.post("/sessions?sync=true", json=session.model_dump(mode="json"))
+    assert post.status_code == 201
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+
+    assert body["quality_report"]["passed"] is True
+    assert body["lift_result"] is not None
+    assert body["skeleton_result"] is not None
+
+    assert body["phase_boundaries"] is not None
+    assert len(body["phase_boundaries"]["phases"]) == 1
+    assert body["phase_boundaries"]["phases"][0]["label"] == "full_movement"
+
+    assert body["rep_boundaries"] is None
+    assert body["per_rep_metrics"] is None
+    assert body["within_movement_trend"] is None
+```
+
+**Commit:** `test(pipeline): rollup stub e2e — lift+skeleton+single_phase, no rep fields`
+
+### Wave J — Final validation (1 task)
+
+#### Task J1: Full suite + lint + dev-server smoke
+
+Single task, runs alone. Same content as the original T17 (full pytest, ruff, black, dev-server rollup + push_up smoke tests, optional cleanup commit via `git add -u software/server/` if lint applies fixes).
+
+Commit message if lint changes anything: `chore(server): ruff/black cleanup after plan 4`.
