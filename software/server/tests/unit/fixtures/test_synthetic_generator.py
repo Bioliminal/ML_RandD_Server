@@ -1,6 +1,5 @@
 from auralink.api.schemas import Session
 from auralink.pose.joint_angles import knee_flexion_angle
-
 from tests.fixtures.synthetic.generator import (
     build_overhead_squat_payload,
     generate_reference_rep,

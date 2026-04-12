@@ -1,7 +1,6 @@
 from fastapi.testclient import TestClient
 
 from auralink.api.main import create_app
-
 from tests.fixtures.loader import load_fixture
 
 

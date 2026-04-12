@@ -13,9 +13,7 @@ def _ctx_with_normalized(
     n = len(next(iter(angles.values())))
     frames = [Frame(timestamp_ms=i * 33, landmarks=[lm for _ in range(33)]) for i in range(n)]
     session = Session(
-        metadata=SessionMetadata(
-            movement="overhead_squat", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="overhead_squat", device="t", model="t", frame_rate=30.0),
         frames=frames,
     )
     ctx = StageContext(session=session)

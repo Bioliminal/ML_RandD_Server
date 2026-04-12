@@ -12,7 +12,9 @@ from auralink.pipeline.stages.base import StageContext
 
 def _session(frame_count: int) -> Session:
     lm = Landmark(x=0.5, y=0.5, z=0.0, visibility=1.0, presence=1.0)
-    frames = [Frame(timestamp_ms=i * 33, landmarks=[lm for _ in range(33)]) for i in range(frame_count)]
+    frames = [
+        Frame(timestamp_ms=i * 33, landmarks=[lm for _ in range(33)]) for i in range(frame_count)
+    ]
     return Session(
         metadata=SessionMetadata(movement="rollup", device="t", model="t", frame_rate=30.0),
         frames=frames,

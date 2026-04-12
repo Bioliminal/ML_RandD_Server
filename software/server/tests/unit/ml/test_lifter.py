@@ -1,4 +1,4 @@
-from auralink.ml.lifter import IdentityLifter, Lifter, LiftedAngleTimeSeries
+from auralink.ml.lifter import IdentityLifter, LiftedAngleTimeSeries, Lifter
 from auralink.pipeline.artifacts import NormalizedAngleTimeSeries
 
 

@@ -92,9 +92,7 @@ def test_run_pipeline_populates_lift_and_skeleton_for_overhead_squat():
 
 def test_run_pipeline_populates_lift_skeleton_for_push_up():
     session = Session(
-        metadata=SessionMetadata(
-            movement="push_up", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="push_up", device="t", model="t", frame_rate=30.0),
         frames=_good_session(60).frames,
     )
     artifacts = run_pipeline(session)
@@ -115,9 +113,7 @@ def test_run_pipeline_populates_lift_skeleton_for_push_up():
 
 def test_run_pipeline_rollup_uses_phase_segment_not_rep_segment():
     session = Session(
-        metadata=SessionMetadata(
-            movement="rollup", device="t", model="t", frame_rate=30.0
-        ),
+        metadata=SessionMetadata(movement="rollup", device="t", model="t", frame_rate=30.0),
         frames=_good_session(60).frames,
     )
     artifacts = run_pipeline(session)
