@@ -1,0 +1,29 @@
+from fastapi.testclient import TestClient
+
+from auralink.api.main import create_app
+
+from tests.fixtures.loader import load_fixture
+
+
+def test_overhead_squat_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    client = TestClient(create_app())
+
+    session = load_fixture("overhead_squat", variant="clean")
+    payload = session.model_dump(mode="json")
+    post = client.post("/sessions?sync=true", json=payload)
+    assert post.status_code == 201
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+
+    assert body["quality_report"]["passed"] is True
+    assert body["lift_result"] is not None
+    assert body["lift_result"]["is_3d"] is False
+    assert body["skeleton_result"] is not None
+    assert body["skeleton_result"]["fitted"] is False
+    assert body["per_rep_metrics"] is not None
+    assert len(body["per_rep_metrics"]["reps"]) == 2
+    assert body["phase_boundaries"] is None
