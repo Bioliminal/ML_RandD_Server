@@ -1,0 +1,21 @@
+rules:
+  - rule_id: sbl_knee_valgus_concern
+    chain: superficial_back_line
+    applies_to_movements: [overhead_squat, single_leg_squat]
+    metric_key: mean_knee_valgus_deg
+    aggregation: max
+    threshold_concern_ref: knee_valgus_concern
+    threshold_flag_ref: knee_valgus_flag
+    involved_joints: [ankle, knee, hip]
+    narrative_template: "Your knee tracking shows {value:.1f} degrees of inward movement — an opportunity to explore the ankle-to-hip body connection along the back line."
+    confidence: 0.75
+  - rule_id: sbl_trunk_lean_concern
+    chain: superficial_back_line
+    applies_to_movements: [overhead_squat]
+    metric_key: mean_trunk_lean_deg
+    aggregation: max
+    threshold_concern_ref: trunk_lean_concern
+    threshold_flag_ref: trunk_lean_flag
+    involved_joints: [ankle, hip, spine]
+    narrative_template: "Your trunk lean measured {value:.1f} degrees during the squat — the back-line chain from calves to spine may be an area to explore."
+    confidence: 0.7
