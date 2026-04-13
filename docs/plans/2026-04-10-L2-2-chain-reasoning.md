@@ -1682,25 +1682,34 @@ def test_assemble_artifacts_populates_chain_observations():
 def test_chain_reasoning_return_value_reaches_assemble_artifacts():
     """End-to-end contract: the executor loop must store run_chain_reasoning's
     return value under ctx.artifacts[STAGE_NAME_CHAIN_REASONING], and
-    _assemble_artifacts must read it back. This test exercises the real
-    orchestrator loop against a stub stage list so it breaks loudly if the
-    auto-store convention ever regresses.
+    _assemble_artifacts must read it back onto PipelineArtifacts.chain_observations.
+    This test exercises the real orchestrator loop against a minimal stub stage
+    list (quality_gate + chain_reasoning only — the other assemble_artifacts
+    fields default to None because they are optional) so it breaks loudly if
+    the auto-store convention ever regresses.
     """
     from datetime import UTC, datetime
 
     from auralink.api.schemas import Session, SessionMetadata
+    from auralink.pipeline.artifacts import SessionQualityReport
     from auralink.pipeline.orchestrator import run_pipeline
     from auralink.pipeline.registry import StageRegistry
+    from auralink.reasoning.chains import ChainName
+    from auralink.reasoning.observations import ChainObservation, ObservationSeverity
 
-    sentinel = ["sentinel-obs"]
+    sentinel_obs = ChainObservation(
+        chain=ChainName.SBL,
+        severity=ObservationSeverity.CONCERN,
+        confidence=0.9,
+        trigger_rule="sentinel_rule",
+        narrative="n",
+    )
 
     def _quality(ctx):
-        class _QR:
-            passed = True
-        return _QR()
+        return SessionQualityReport(passed=True)
 
     def _chain(ctx):
-        return sentinel
+        return [sentinel_obs]
 
     registry = StageRegistry()
     registry.register_movement(
@@ -1721,7 +1730,7 @@ def test_chain_reasoning_return_value_reaches_assemble_artifacts():
         frames=[],
     )
     artifacts = run_pipeline(session, registry=registry)
-    assert artifacts.chain_observations == sentinel
+    assert artifacts.chain_observations == [sentinel_obs]
 ```
 
 **Focused test command:** `cd software/server && uv run pytest tests/unit/pipeline/test_orchestrator_chain_wiring.py -v`
