@@ -1,14 +1,40 @@
 # OS
 .DS_Store
 Thumbs.db
+*.swp
+*~
 
 # Python / ML
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 .venv/
+.venv-*/
+venv/
 *.egg-info/
 dist/
 build/
+pip-wheel-metadata/
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.ipynb_checkpoints/
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Logs
+*.log
+logs/
 
 # ML artifacts (use DVC for large files)
 ml/datasets/raw/
@@ -17,9 +43,12 @@ ml/models/*.tflite
 ml/models/*.pt
 ml/models/*.h5
 *.checkpoint
+*.ckpt
 
 # Node
 node_modules/
+.next/
+.turbo/
 
 # Build outputs
 software/build/
@@ -28,11 +57,16 @@ hardware/firmware/build/
 # IDE
 .vscode/
 .idea/
-*.swp
+*.sublime-*
 
-# Environment
+# Environment / secrets
 .env
-.env.local
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials.json
 
 # DVC cache
 .dvc/cache/
