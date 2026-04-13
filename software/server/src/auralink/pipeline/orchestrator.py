@@ -5,6 +5,7 @@ from auralink.pipeline.registry import StageRegistry
 from auralink.pipeline.stages.angle_series import run_angle_series
 from auralink.pipeline.stages.base import (
     STAGE_NAME_ANGLE_SERIES,
+    STAGE_NAME_CHAIN_REASONING,
     STAGE_NAME_LIFT,
     STAGE_NAME_NORMALIZE,
     STAGE_NAME_PER_REP_METRICS,
@@ -16,6 +17,7 @@ from auralink.pipeline.stages.base import (
     Stage,
     StageContext,
 )
+from auralink.pipeline.stages.chain_reasoning import run_chain_reasoning
 from auralink.pipeline.stages.lift import run_lift
 from auralink.pipeline.stages.normalize import run_normalize
 from auralink.pipeline.stages.per_rep_metrics import run_per_rep_metrics
@@ -37,6 +39,7 @@ def _default_stage_list() -> list[Stage]:
         Stage(name=STAGE_NAME_REP_SEGMENT, run=run_rep_segment),
         Stage(name=STAGE_NAME_PER_REP_METRICS, run=run_per_rep_metrics),
         Stage(name=STAGE_NAME_WITHIN_MOVEMENT_TREND, run=run_within_movement_trend),
+        Stage(name=STAGE_NAME_CHAIN_REASONING, run=run_chain_reasoning),
     ]
 
 
@@ -49,6 +52,7 @@ def _push_up_stage_list() -> list[Stage]:
         Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
         Stage(name=STAGE_NAME_LIFT, run=run_lift),
         Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
+        Stage(name=STAGE_NAME_CHAIN_REASONING, run=run_chain_reasoning),
     ]
 
 
@@ -111,4 +115,5 @@ def _assemble_artifacts(ctx: StageContext) -> PipelineArtifacts:
         lift_result=ctx.artifacts.get(STAGE_NAME_LIFT),
         skeleton_result=ctx.artifacts.get(STAGE_NAME_SKELETON),
         phase_boundaries=ctx.artifacts.get(STAGE_NAME_PHASE_SEGMENT),
+        chain_observations=ctx.artifacts.get(STAGE_NAME_CHAIN_REASONING),
     )
