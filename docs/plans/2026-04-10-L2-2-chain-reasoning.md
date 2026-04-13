@@ -1,104 +1,2175 @@
-# L2 Plan 2 — Chain Reasoning v1 + Report Assembly (Stub)
+# L2 Plan 2 — Chain Reasoning v1 + Report Assembly
 
-**Status:** Stub — flesh out with `writing-plans` before execution.
+**Status:** Ready for execution via parallel-plan-executor
 **Parent:** `2026-04-10-analysis-pipeline-epoch.md`
-**Depends on:** Plan 1 (Pipeline Framework + Core Analysis Stages), Plan 4 (synthetic fixture generator for TDD test data)
+**Depends on:** Plan 1 (pipeline framework, PerRepMetrics, WithinMovementTrend), Plan 4 (synthetic fixtures, load_fixture helper)
+**Supersedes:** Stub version of this file from 2026-04-10
+**Created:** 2026-04-11
+**Execution:** parallel-plan-executor, 14 tasks, 7 waves, max parallelism 6
 
 ## Goal
 
-Turn the raw pipeline artifact bundle from Plan 1 into a human-readable structured report. Implement the first-version rule-based chain reasoner operating over `PerRepMetrics` + `WithinMovementTrend`, applying the threshold table to SBL, BFL, and FFL chains. Emit `ChainObservation` per flagged pattern. Assemble the final `Report` pydantic model and serve it via `GET /sessions/{id}/report` (replacing Plan 1's raw artifact response).
+Turn the raw `PipelineArtifacts` produced by Plan 1 into a structured, human-readable `Report` with rule-based chain reasoning over the Superficial Back Line (SBL), Back Functional Line (BFL), and Front Functional Line (FFL). Ship the free-tier end-to-end value: `POST /sessions` → `GET /sessions/{id}/report` returns a wellness-positioned report with chain observations.
 
-This plan delivers the free-tier product value end-to-end: capture a session, receive a chain-reasoned report.
+## Design Decisions (Locked)
+
+1. **Report is assembled on-demand in the endpoint**, NOT as a pipeline stage. The `GET /sessions/{id}/report` handler loads `PipelineArtifacts` from storage, calls `assemble_report(artifacts, session_metadata)`, and returns the result.
+2. **Chain reasoning IS a pipeline stage.** It reads artifacts, produces `list[ChainObservation]`, and stores them back on `PipelineArtifacts.chain_observations`.
+3. **Rules and thresholds are YAML-driven.** Pydantic models (`RuleConfig`, `ThresholdSetConfig`) validate loaded YAML. Pure `pyyaml` + pydantic — no `pydantic-yaml` dependency.
+4. **Threshold adjustments via body-type profile.** `BodyTypeProfile` drives `adjust_for_body_type(base, profile, adjustments) -> ThresholdSetConfig`.
+5. **Temporal / cross-movement slots are empty stubs.** Plan 3 fills them.
+6. **Wellness language enforcement is a pytest scan** over `config/rules/*.yaml` narrative templates (regex against forbidden terms).
+7. **No new runtime deps** beyond confirming `pyyaml` is importable. If not present, add to `software/server/pyproject.toml`.
+8. **Wellness positioning:** All narrative text uses "your movement shows X pattern", "body connection from A to B", "opportunity to explore". NEVER "diagnosis", "dysfunction", "drivers of pain", "injury", "damage", "pathology".
 
 ## File Tree Delta
 
 ```
 software/server/src/auralink/
 ├── reasoning/
-│   ├── engine.py              # NEW — ChainReasoner protocol + base
-│   ├── rule_engine.py         # NEW — RuleBasedChainReasoner (v1)
-│   ├── observations.py        # NEW — ChainObservation pydantic schema
-│   ├── body_type.py           # NEW — questionnaire intake + adjustment lookup
-│   └── rules/
-│       ├── __init__.py        # NEW
-│       ├── sbl.py             # NEW — Superficial Back Line rules
-│       ├── bfl.py             # NEW — Back Functional Line rules
-│       └── ffl.py             # NEW — Front Functional Line rules
+│   ├── observations.py         # NEW — ChainObservation schema
+│   ├── body_type.py            # NEW — BodyTypeProfile schema
+│   ├── config_schemas.py       # NEW — pydantic models for YAML config
+│   ├── thresholds.py           # MODIFIED — ThresholdSet re-exports ThresholdSetConfig
+│   ├── threshold_loader.py     # NEW — YAML loaders + body-type adjustment
+│   ├── rule_loader.py          # NEW — YAML rule loader
+│   └── rule_engine.py          # NEW — ChainReasoner protocol + RuleBasedChainReasoner
 ├── report/
-│   ├── __init__.py            # NEW
-│   ├── schemas.py             # NEW — Report pydantic model
-│   └── assembler.py           # NEW — Report assembler stage
-├── pipeline/stages/
-│   ├── chain_reasoning.py     # NEW — wraps ChainReasoner as a Stage
-│   └── report_assembly.py     # NEW — wraps report.assembler as a Stage
-└── api/routes/reports.py      # MODIFIED — returns Report not raw artifacts
+│   ├── __init__.py             # NEW (empty)
+│   ├── schemas.py              # NEW — Report pydantic model + stubs
+│   └── assembler.py            # NEW — assemble_report()
+├── pipeline/
+│   ├── artifacts.py            # MODIFIED — adds chain_observations field
+│   ├── orchestrator.py         # MODIFIED — wires chain_reasoning stage
+│   └── stages/
+│       └── chain_reasoning.py  # NEW — ChainReasoningStage
+└── api/routes/reports.py       # MODIFIED — returns Report not raw artifacts
 
 software/server/config/
 ├── thresholds/
-│   ├── default.yaml           # NEW — Hewett 2005 baseline table
-│   └── body_type_adjustments.yaml  # NEW — population lookup (placeholder)
+│   ├── default.yaml                     # NEW
+│   └── body_type_adjustments.yaml       # NEW
 └── rules/
-    ├── sbl.yaml               # NEW — SBL rule definitions
-    ├── bfl.yaml               # NEW — BFL rule definitions
-    └── ffl.yaml               # NEW — FFL rule definitions
+    ├── sbl.yaml                         # NEW
+    ├── bfl.yaml                         # NEW
+    └── ffl.yaml                         # NEW
 
-tests/
-├── unit/reasoning/            # NEW — rule set unit tests
-├── unit/report/               # NEW — assembler tests
-└── integration/test_full_report.py  # NEW — fixture → full report with ChainObservations
+software/server/tests/
+├── unit/reasoning/                      # NEW — per-module tests
+├── unit/report/                         # NEW — schema + assembler tests
+└── integration/test_full_report.py      # NEW — fixture → full report
 ```
-
-## Schemas (rough)
-
-- **`ChainObservation`** — `chain: ChainName`, `severity: Literal["info", "concern", "flag"]`, `confidence: float`, `trigger_rule: str`, `involved_joints: list[str]`, `evidence: dict[str, float]`, `narrative: str`
-- **`BodyTypeProfile`** — intake questionnaire fields (sex, hypermobility flag, age range, etc.)
-- **`Report`** — session metadata + quality report + per-movement sections (metrics + trend + chain observations) + top-level narrative
-- **Rule config (YAML)** — structured declarative rules: `threshold`, `applies_to_movement`, `metric_key`, `chain`, `severity_mapping`
 
 ## Task List
 
-1. `ChainObservation` schema
-2. `BodyTypeProfile` schema + questionnaire intake
-3. Threshold config loader (YAML → pydantic `ThresholdSet`)
-4. Rule config loader (YAML → runtime rule objects)
-5. `ChainReasoner` protocol
-6. `RuleBasedChainReasoner` base implementation (rule evaluation engine)
-7. SBL rule set (YAML + code binding: knee valgus, hamstring tightness proxies)
-8. BFL rule set (lat / glute coupling signals)
-9. FFL rule set (pec / adductor coupling signals)
-10. Body-type adjustment lookup (modifies thresholds based on profile)
-11. Chain reasoning stage (wraps `RuleBasedChainReasoner`)
-12. `Report` pydantic model **with named extension slots**: `temporal_section: TemporalSection | None = None` and `cross_movement_section: CrossMovementSection | None = None`. Stub `TemporalSection` and `CrossMovementSection` as empty pydantic models in `report/schemas.py` (placeholder shapes). Plan 3 swaps in real schemas for these stubs — Plan 3 **populates** these slots and does **not** restructure the `Report`. This decouples Plan 2 and Plan 3 ownership of the report schema.
-13. Report assembler module
-14. Report assembly stage
-15. Wire both new stages into the orchestrator (after Plan 1's stages)
-16. Update `GET /sessions/{id}/report` to return the `Report` model
-17. Integration test: overhead_squat fixture with injected valgus → Report contains SBL `ChainObservation` flagging knee valgus
-18. Final validation
+---
 
-## Dependencies
+#### Task A1: ChainObservation schema
 
-- Plan 1 must be complete (orchestrator, per-rep metrics, within-movement trend artifacts all exist).
-- Default thresholds come from Hewett 2005 — already placeholder values in `reasoning.thresholds.DEFAULT_THRESHOLDS`, to be moved into YAML config.
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/reasoning/observations.py`
+- `software/server/tests/unit/reasoning/test_observations.py`
+
+**Depends on:** nothing
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/reasoning/observations.py`:
+```python
+from enum import StrEnum
+
+from pydantic import BaseModel, Field
+
+from auralink.reasoning.chains import ChainName
+
+
+class ObservationSeverity(StrEnum):
+    INFO = "info"
+    CONCERN = "concern"
+    FLAG = "flag"
+
+
+class ChainObservation(BaseModel):
+    chain: ChainName
+    severity: ObservationSeverity
+    confidence: float = Field(ge=0.0, le=1.0)
+    trigger_rule: str
+    involved_joints: list[str] = Field(default_factory=list)
+    evidence: dict[str, float] = Field(default_factory=dict)
+    narrative: str
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_observations.py`:
+```python
+import pytest
+from pydantic import ValidationError
+
+from auralink.reasoning.chains import ChainName
+from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+
+
+def test_creates_observation():
+    obs = ChainObservation(
+        chain=ChainName.SBL,
+        severity=ObservationSeverity.CONCERN,
+        confidence=0.8,
+        trigger_rule="sbl_knee_valgus_concern",
+        involved_joints=["ankle", "knee", "hip"],
+        evidence={"mean_knee_valgus_deg": 9.5},
+        narrative="Your knee tracking shows 9.5 degrees of inward movement.",
+    )
+    assert obs.chain == ChainName.SBL
+    assert obs.severity == ObservationSeverity.CONCERN
+    assert obs.involved_joints == ["ankle", "knee", "hip"]
+
+
+def test_rejects_confidence_above_one():
+    with pytest.raises(ValidationError):
+        ChainObservation(
+            chain=ChainName.SBL,
+            severity=ObservationSeverity.INFO,
+            confidence=1.5,
+            trigger_rule="x",
+            narrative="n",
+        )
+
+
+def test_serializes_to_dict_with_chain_value():
+    obs = ChainObservation(
+        chain=ChainName.BFL,
+        severity=ObservationSeverity.FLAG,
+        confidence=0.9,
+        trigger_rule="bfl_test",
+        narrative="n",
+    )
+    data = obs.model_dump(mode="json")
+    assert data["chain"] == "back_functional_line"
+    assert data["severity"] == "flag"
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_observations.py -v`
+
+**Expected result:** `3 passed`
+
+**Commit message:** `feat(reasoning): add ChainObservation pydantic schema`
+
+---
+
+#### Task A2: BodyTypeProfile schema
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/reasoning/body_type.py`
+- `software/server/tests/unit/reasoning/test_body_type.py`
+
+**Depends on:** nothing
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/reasoning/body_type.py`:
+```python
+from enum import StrEnum
+from typing import Literal
+
+from pydantic import BaseModel
+
+
+class Sex(StrEnum):
+    FEMALE = "female"
+    MALE = "male"
+    UNSPECIFIED = "unspecified"
+
+
+class BodyTypeProfile(BaseModel):
+    sex: Sex = Sex.UNSPECIFIED
+    hypermobile: bool = False
+    age_range: Literal["youth", "adult", "senior"] = "adult"
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_body_type.py`:
+```python
+from auralink.reasoning.body_type import BodyTypeProfile, Sex
+
+
+def test_default_profile():
+    profile = BodyTypeProfile()
+    assert profile.sex == Sex.UNSPECIFIED
+    assert profile.hypermobile is False
+    assert profile.age_range == "adult"
+
+
+def test_hypermobile_profile():
+    profile = BodyTypeProfile(sex=Sex.FEMALE, hypermobile=True, age_range="youth")
+    assert profile.sex == Sex.FEMALE
+    assert profile.hypermobile is True
+    assert profile.age_range == "youth"
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_body_type.py -v`
+
+**Expected result:** `2 passed`
+
+**Commit message:** `feat(reasoning): add BodyTypeProfile schema`
+
+---
+
+#### Task A3: Config schemas (ThresholdSetConfig, BodyTypeAdjustment, RuleConfig)
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/reasoning/config_schemas.py`
+- `software/server/tests/unit/reasoning/test_config_schemas.py`
+
+**Depends on:** nothing
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/reasoning/config_schemas.py`:
+```python
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+from auralink.reasoning.chains import ChainName
+
+
+class ThresholdSetConfig(BaseModel):
+    knee_valgus_concern: float
+    knee_valgus_flag: float
+    hip_drop_concern: float
+    hip_drop_flag: float
+    trunk_lean_concern: float
+    trunk_lean_flag: float
+
+
+class BodyTypeAdjustment(BaseModel):
+    applies_to_sex: list[str] = Field(default_factory=list)
+    applies_to_hypermobile: bool | None = None
+    applies_to_age_range: list[str] = Field(default_factory=list)
+    threshold_overrides: dict[str, float] = Field(default_factory=dict)
+
+
+class BodyTypeAdjustmentsConfig(BaseModel):
+    adjustments: list[BodyTypeAdjustment] = Field(default_factory=list)
+
+
+class RuleConfig(BaseModel):
+    rule_id: str
+    chain: ChainName
+    applies_to_movements: list[str] = Field(min_length=1)
+    metric_key: Literal[
+        "mean_knee_valgus_deg",
+        "mean_trunk_lean_deg",
+        "rom_deg",
+        "peak_velocity_deg_per_s",
+    ]
+    aggregation: Literal["max", "min", "mean"]
+    threshold_concern_ref: str
+    threshold_flag_ref: str
+    involved_joints: list[str] = Field(default_factory=list)
+    narrative_template: str
+    confidence: float = Field(ge=0.0, le=1.0, default=0.8)
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_config_schemas.py`:
+```python
+import pytest
+from pydantic import ValidationError
+
+from auralink.reasoning.chains import ChainName
+from auralink.reasoning.config_schemas import (
+    BodyTypeAdjustment,
+    RuleConfig,
+    ThresholdSetConfig,
+)
+
+
+def test_threshold_set_config_validates():
+    cfg = ThresholdSetConfig(
+        knee_valgus_concern=8.0,
+        knee_valgus_flag=12.0,
+        hip_drop_concern=5.0,
+        hip_drop_flag=10.0,
+        trunk_lean_concern=6.0,
+        trunk_lean_flag=10.0,
+    )
+    assert cfg.knee_valgus_flag == 12.0
+
+
+def test_rule_config_validates():
+    rule = RuleConfig(
+        rule_id="sbl_test",
+        chain=ChainName.SBL,
+        applies_to_movements=["overhead_squat"],
+        metric_key="mean_knee_valgus_deg",
+        aggregation="max",
+        threshold_concern_ref="knee_valgus_concern",
+        threshold_flag_ref="knee_valgus_flag",
+        involved_joints=["knee"],
+        narrative_template="value {value:.1f}",
+    )
+    assert rule.confidence == 0.8
+    assert rule.chain == ChainName.SBL
+
+
+def test_rule_config_rejects_bad_metric_key():
+    with pytest.raises(ValidationError):
+        RuleConfig(
+            rule_id="bad",
+            chain=ChainName.SBL,
+            applies_to_movements=["overhead_squat"],
+            metric_key="not_a_real_metric",
+            aggregation="max",
+            threshold_concern_ref="x",
+            threshold_flag_ref="y",
+            narrative_template="n",
+        )
+
+
+def test_body_type_adjustment_defaults():
+    adj = BodyTypeAdjustment()
+    assert adj.applies_to_sex == []
+    assert adj.applies_to_hypermobile is None
+    assert adj.applies_to_age_range == []
+    assert adj.threshold_overrides == {}
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_config_schemas.py -v`
+
+**Expected result:** `4 passed`
+
+**Commit message:** `feat(reasoning): add pydantic config schemas for thresholds and rules`
+
+---
+
+#### Task A4: Threshold YAML config files
+
+**Label:** skip-tdd
+
+**Files owned (exclusive to this task):**
+- `software/server/config/thresholds/default.yaml`
+- `software/server/config/thresholds/body_type_adjustments.yaml`
+
+**Depends on:** nothing
+
+**Exact file contents (verbatim):**
+
+`software/server/config/thresholds/default.yaml`:
+```yaml
+knee_valgus_concern: 8.0
+knee_valgus_flag: 12.0
+hip_drop_concern: 5.0
+hip_drop_flag: 10.0
+trunk_lean_concern: 6.0
+trunk_lean_flag: 10.0
+```
+
+`software/server/config/thresholds/body_type_adjustments.yaml`:
+```yaml
+adjustments:
+  - applies_to_hypermobile: true
+    threshold_overrides:
+      knee_valgus_concern: 10.0
+      knee_valgus_flag: 15.0
+      hip_drop_concern: 7.0
+      hip_drop_flag: 12.0
+  - applies_to_age_range: [youth]
+    threshold_overrides:
+      trunk_lean_concern: 8.0
+      trunk_lean_flag: 12.0
+```
+
+**Verification command (no tests — loader tests in B1 validate schema):**
+```
+python -c "import yaml; yaml.safe_load(open('software/server/config/thresholds/default.yaml')); yaml.safe_load(open('software/server/config/thresholds/body_type_adjustments.yaml'))"
+```
+
+**Expected result:** runs clean (exit 0, no output)
+
+**Commit message:** `feat(config): add threshold YAML config for chain reasoning`
+
+---
+
+#### Task A5: SBL rule YAML
+
+**Label:** skip-tdd
+
+**Files owned (exclusive to this task):**
+- `software/server/config/rules/sbl.yaml`
+
+**Depends on:** nothing
+
+**Exact file contents (verbatim):**
+
+`software/server/config/rules/sbl.yaml`:
+```yaml
+rules:
+  - rule_id: sbl_knee_valgus_concern
+    chain: superficial_back_line
+    applies_to_movements: [overhead_squat, single_leg_squat]
+    metric_key: mean_knee_valgus_deg
+    aggregation: max
+    threshold_concern_ref: knee_valgus_concern
+    threshold_flag_ref: knee_valgus_flag
+    involved_joints: [ankle, knee, hip]
+    narrative_template: "Your knee tracking shows {value:.1f} degrees of inward movement — an opportunity to explore the ankle-to-hip body connection along the back line."
+    confidence: 0.75
+  - rule_id: sbl_trunk_lean_concern
+    chain: superficial_back_line
+    applies_to_movements: [overhead_squat]
+    metric_key: mean_trunk_lean_deg
+    aggregation: max
+    threshold_concern_ref: trunk_lean_concern
+    threshold_flag_ref: trunk_lean_flag
+    involved_joints: [ankle, hip, spine]
+    narrative_template: "Your trunk lean measured {value:.1f} degrees during the squat — the back-line chain from calves to spine may be an area to explore."
+    confidence: 0.7
+```
+
+**Verification command:**
+```
+python -c "import yaml; yaml.safe_load(open('software/server/config/rules/sbl.yaml'))"
+```
+
+**Expected result:** runs clean (exit 0)
+
+**Commit message:** `feat(config): add SBL rule definitions`
+
+---
+
+#### Task A6: BFL + FFL rule YAML
+
+**Label:** skip-tdd
+
+**Files owned (exclusive to this task):**
+- `software/server/config/rules/bfl.yaml`
+- `software/server/config/rules/ffl.yaml`
+
+**Depends on:** nothing
+
+**Exact file contents (verbatim):**
+
+`software/server/config/rules/bfl.yaml`:
+```yaml
+rules:
+  - rule_id: bfl_hip_drop_concern
+    chain: back_functional_line
+    applies_to_movements: [single_leg_squat]
+    metric_key: mean_trunk_lean_deg
+    aggregation: max
+    threshold_concern_ref: hip_drop_concern
+    threshold_flag_ref: hip_drop_flag
+    involved_joints: [hip, contralateral_shoulder]
+    narrative_template: "Your lateral trunk shift of {value:.1f} degrees suggests an opportunity to explore the lat-to-glute body connection."
+    confidence: 0.7
+```
+
+`software/server/config/rules/ffl.yaml`:
+```yaml
+rules:
+  - rule_id: ffl_trunk_shift_concern
+    chain: front_functional_line
+    applies_to_movements: [overhead_squat]
+    metric_key: mean_trunk_lean_deg
+    aggregation: max
+    threshold_concern_ref: trunk_lean_concern
+    threshold_flag_ref: trunk_lean_flag
+    involved_joints: [contralateral_shoulder, hip, opposite_knee]
+    narrative_template: "Your front-line movement pattern shows {value:.1f} degrees of trunk movement — exploring the pec-to-adductor connection may be helpful."
+    confidence: 0.65
+```
+
+**Verification command:**
+```
+python -c "import yaml; yaml.safe_load(open('software/server/config/rules/bfl.yaml')); yaml.safe_load(open('software/server/config/rules/ffl.yaml'))"
+```
+
+**Expected result:** runs clean (exit 0)
+
+**Commit message:** `feat(config): add BFL and FFL rule definitions`
+
+---
+
+#### Task B1: Threshold loader + body-type adjustment
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/reasoning/threshold_loader.py`
+- `software/server/src/auralink/reasoning/thresholds.py` (MODIFIED — re-exports `ThresholdSetConfig` as `ThresholdSet`)
+- `software/server/tests/unit/reasoning/test_threshold_loader.py`
+
+**Depends on:** A2 (BodyTypeProfile), A3 (config schemas)
+
+**Pre-step:** Subagent MUST first read `software/server/src/auralink/reasoning/thresholds.py` to see the current dataclass-based `ThresholdSet` + `DEFAULT_THRESHOLDS`. Replace that file's contents with a re-export from `config_schemas` so existing imports of `ThresholdSet` still work.
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/reasoning/thresholds.py`:
+```python
+"""Backwards-compatible re-exports. Canonical models live in config_schemas."""
+
+from auralink.reasoning.config_schemas import ThresholdSetConfig as ThresholdSet
+
+__all__ = ["ThresholdSet"]
+```
+
+`software/server/src/auralink/reasoning/threshold_loader.py`:
+```python
+from pathlib import Path
+
+import yaml
+
+from auralink.reasoning.body_type import BodyTypeProfile
+from auralink.reasoning.config_schemas import (
+    BodyTypeAdjustmentsConfig,
+    ThresholdSetConfig,
+)
+
+_DEFAULT_PATH = Path(__file__).resolve().parents[3] / "config" / "thresholds" / "default.yaml"
+_ADJUSTMENTS_PATH = Path(__file__).resolve().parents[3] / "config" / "thresholds" / "body_type_adjustments.yaml"
+
+
+def load_default_thresholds(path: Path | None = None) -> ThresholdSetConfig:
+    p = path or _DEFAULT_PATH
+    raw = yaml.safe_load(p.read_text())
+    return ThresholdSetConfig.model_validate(raw)
+
+
+def load_body_type_adjustments(path: Path | None = None) -> BodyTypeAdjustmentsConfig:
+    p = path or _ADJUSTMENTS_PATH
+    raw = yaml.safe_load(p.read_text())
+    return BodyTypeAdjustmentsConfig.model_validate(raw)
+
+
+def adjust_for_body_type(
+    base: ThresholdSetConfig,
+    profile: BodyTypeProfile,
+    adjustments: BodyTypeAdjustmentsConfig,
+) -> ThresholdSetConfig:
+    merged = base.model_dump()
+    for adj in adjustments.adjustments:
+        if adj.applies_to_sex and profile.sex.value not in adj.applies_to_sex:
+            continue
+        if adj.applies_to_hypermobile is not None and adj.applies_to_hypermobile != profile.hypermobile:
+            continue
+        if adj.applies_to_age_range and profile.age_range not in adj.applies_to_age_range:
+            continue
+        merged.update(adj.threshold_overrides)
+    return ThresholdSetConfig.model_validate(merged)
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_threshold_loader.py`:
+```python
+from pathlib import Path
+
+import pytest
+
+from auralink.reasoning.body_type import BodyTypeProfile
+from auralink.reasoning.config_schemas import (
+    BodyTypeAdjustmentsConfig,
+    ThresholdSetConfig,
+)
+from auralink.reasoning.threshold_loader import (
+    adjust_for_body_type,
+    load_body_type_adjustments,
+    load_default_thresholds,
+)
+
+
+@pytest.fixture
+def default_yaml(tmp_path: Path) -> Path:
+    p = tmp_path / "default.yaml"
+    p.write_text(
+        "knee_valgus_concern: 8.0\n"
+        "knee_valgus_flag: 12.0\n"
+        "hip_drop_concern: 5.0\n"
+        "hip_drop_flag: 10.0\n"
+        "trunk_lean_concern: 6.0\n"
+        "trunk_lean_flag: 10.0\n"
+    )
+    return p
+
+
+@pytest.fixture
+def adjustments_yaml(tmp_path: Path) -> Path:
+    p = tmp_path / "body_type_adjustments.yaml"
+    p.write_text(
+        "adjustments:\n"
+        "  - applies_to_hypermobile: true\n"
+        "    threshold_overrides:\n"
+        "      knee_valgus_concern: 10.0\n"
+        "      knee_valgus_flag: 15.0\n"
+    )
+    return p
+
+
+def test_load_default_thresholds(default_yaml: Path):
+    cfg = load_default_thresholds(default_yaml)
+    assert isinstance(cfg, ThresholdSetConfig)
+    assert cfg.knee_valgus_flag == 12.0
+
+
+def test_load_body_type_adjustments(adjustments_yaml: Path):
+    cfg = load_body_type_adjustments(adjustments_yaml)
+    assert isinstance(cfg, BodyTypeAdjustmentsConfig)
+    assert len(cfg.adjustments) == 1
+    assert cfg.adjustments[0].applies_to_hypermobile is True
+
+
+def test_adjust_for_body_type_hypermobile_overrides(
+    default_yaml: Path, adjustments_yaml: Path
+):
+    base = load_default_thresholds(default_yaml)
+    adjustments = load_body_type_adjustments(adjustments_yaml)
+    profile = BodyTypeProfile(hypermobile=True)
+    adjusted = adjust_for_body_type(base, profile, adjustments)
+    assert adjusted.knee_valgus_concern == 10.0
+    assert adjusted.knee_valgus_flag == 15.0
+    assert adjusted.trunk_lean_concern == 6.0
+
+
+def test_adjust_for_body_type_no_match_returns_base(
+    default_yaml: Path, adjustments_yaml: Path
+):
+    base = load_default_thresholds(default_yaml)
+    adjustments = load_body_type_adjustments(adjustments_yaml)
+    profile = BodyTypeProfile(hypermobile=False)
+    adjusted = adjust_for_body_type(base, profile, adjustments)
+    assert adjusted.knee_valgus_concern == 8.0
+    assert adjusted.knee_valgus_flag == 12.0
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_threshold_loader.py -v`
+
+**Expected result:** `4 passed`
+
+**Commit message:** `feat(reasoning): add threshold YAML loader with body-type adjustment`
+
+---
+
+#### Task B2: Rule loader
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/reasoning/rule_loader.py`
+- `software/server/tests/unit/reasoning/test_rule_loader.py`
+
+**Depends on:** A3 (config schemas)
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/reasoning/rule_loader.py`:
+```python
+from pathlib import Path
+
+import yaml
+from pydantic import TypeAdapter
+
+from auralink.reasoning.config_schemas import RuleConfig
+
+_RULES_DIR = Path(__file__).resolve().parents[3] / "config" / "rules"
+
+_RuleListAdapter = TypeAdapter(list[RuleConfig])
+
+
+def load_rules(rules_dir: Path | None = None) -> list[RuleConfig]:
+    d = rules_dir or _RULES_DIR
+    all_rules: list[RuleConfig] = []
+    seen_ids: set[str] = set()
+    for yaml_path in sorted(d.glob("*.yaml")):
+        raw = yaml.safe_load(yaml_path.read_text())
+        rules = _RuleListAdapter.validate_python(raw["rules"])
+        for rule in rules:
+            if rule.rule_id in seen_ids:
+                raise ValueError(
+                    f"duplicate rule_id {rule.rule_id!r} found in {yaml_path.name}"
+                )
+            seen_ids.add(rule.rule_id)
+        all_rules.extend(rules)
+    return all_rules
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_rule_loader.py`:
+```python
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
+from auralink.reasoning.rule_loader import load_rules
+
+
+def _write_rule_file(path: Path, rule_id: str, chain: str) -> None:
+    path.write_text(
+        "rules:\n"
+        f"  - rule_id: {rule_id}\n"
+        f"    chain: {chain}\n"
+        "    applies_to_movements: [overhead_squat]\n"
+        "    metric_key: mean_knee_valgus_deg\n"
+        "    aggregation: max\n"
+        "    threshold_concern_ref: knee_valgus_concern\n"
+        "    threshold_flag_ref: knee_valgus_flag\n"
+        "    involved_joints: [knee]\n"
+        '    narrative_template: "value {value:.1f}"\n'
+        "    confidence: 0.8\n"
+    )
+
+
+def test_loads_multi_file_rules_directory(tmp_path: Path):
+    _write_rule_file(tmp_path / "sbl.yaml", "sbl_x", "superficial_back_line")
+    _write_rule_file(tmp_path / "bfl.yaml", "bfl_y", "back_functional_line")
+    rules = load_rules(tmp_path)
+    rule_ids = {r.rule_id for r in rules}
+    assert rule_ids == {"sbl_x", "bfl_y"}
+
+
+def test_loads_sorts_files_alphabetically(tmp_path: Path):
+    _write_rule_file(tmp_path / "z.yaml", "z_rule", "superficial_back_line")
+    _write_rule_file(tmp_path / "a.yaml", "a_rule", "superficial_back_line")
+    rules = load_rules(tmp_path)
+    assert [r.rule_id for r in rules] == ["a_rule", "z_rule"]
+
+
+def test_rejects_malformed_rule(tmp_path: Path):
+    (tmp_path / "bad.yaml").write_text(
+        "rules:\n"
+        "  - rule_id: bad\n"
+        "    chain: not_a_real_chain\n"
+        "    applies_to_movements: [overhead_squat]\n"
+        "    metric_key: mean_knee_valgus_deg\n"
+        "    aggregation: max\n"
+        "    threshold_concern_ref: x\n"
+        "    threshold_flag_ref: y\n"
+        '    narrative_template: "n"\n'
+    )
+    with pytest.raises(ValidationError):
+        load_rules(tmp_path)
+
+
+def test_rejects_duplicate_rule_id_across_files(tmp_path: Path):
+    _write_rule_file(tmp_path / "sbl.yaml", "shared_id", "superficial_back_line")
+    _write_rule_file(tmp_path / "bfl.yaml", "shared_id", "back_functional_line")
+    with pytest.raises(ValueError, match="duplicate rule_id"):
+        load_rules(tmp_path)
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_rule_loader.py -v`
+
+**Expected result:** `4 passed`
+
+**Commit message:** `feat(reasoning): add rule YAML loader`
+
+---
+
+#### Task B3: Report schemas (with empty Plan-3 slots)
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/report/__init__.py`
+- `software/server/src/auralink/report/schemas.py`
+- `software/server/tests/unit/report/test_schemas.py`
+
+**Depends on:** A1 (ChainObservation)
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/report/__init__.py`:
+```python
+```
+
+`software/server/src/auralink/report/schemas.py`:
+```python
+from pydantic import BaseModel, Field
+
+from auralink.pipeline.artifacts import (
+    AngleTimeSeries,
+    LiftedAngleTimeSeries,
+    NormalizedAngleTimeSeries,
+    PerRepMetrics,
+    PhaseBoundaries,
+    RepBoundaries,
+    SessionQualityReport,
+    SkeletonBundle,
+    WithinMovementTrend,
+)
+from auralink.reasoning.observations import ChainObservation
+
+
+class TemporalSection(BaseModel):
+    """Placeholder slot — Plan 3 populates with DTW/temporal analysis."""
+
+
+class CrossMovementSection(BaseModel):
+    """Placeholder slot — Plan 3 populates with cross-movement aggregation."""
+
+
+class ReportMetadata(BaseModel):
+    session_id: str
+    movement: str
+    captured_at_ms: int | None = None
+
+
+class MovementSection(BaseModel):
+    movement: str
+    quality_report: SessionQualityReport
+    angle_series: AngleTimeSeries | None = None
+    normalized_angle_series: NormalizedAngleTimeSeries | None = None
+    rep_boundaries: RepBoundaries | None = None
+    per_rep_metrics: PerRepMetrics | None = None
+    within_movement_trend: WithinMovementTrend | None = None
+    lift_result: LiftedAngleTimeSeries | None = None
+    skeleton_result: SkeletonBundle | None = None
+    phase_boundaries: PhaseBoundaries | None = None
+    chain_observations: list[ChainObservation] = Field(default_factory=list)
+
+
+class Report(BaseModel):
+    metadata: ReportMetadata
+    movement_section: MovementSection
+    overall_narrative: str
+    temporal_section: TemporalSection | None = None
+    cross_movement_section: CrossMovementSection | None = None
+```
+
+**Design note — maximally inclusive MovementSection:** The section exposes every artifact field rather than pre-pruning. Rationale: Reports are a live view on top of artifacts, the phone client ignores fields it does not render, and downstream consumers (analytics, debug UIs, future DTW visualizations) get raw data without a separate endpoint. If payload size becomes a real issue we add a `?compact=true` query param at the endpoint boundary, not by narrowing the schema. Subagent must verify all imported symbols exist in `auralink.pipeline.artifacts` — if any name differs, STATUS: CHECKPOINT.
+
+Note: the subagent must verify that `PerRepMetrics`, `PhaseBoundaries`, `SessionQualityReport`, `WithinMovementTrend`, `AngleTimeSeries`, `NormalizedAngleTimeSeries`, `RepBoundaries`, `LiftedAngleTimeSeries`, and `SkeletonBundle` are importable from `auralink.pipeline.artifacts`. If any name differs, report STATUS: CHECKPOINT.
+
+**Test file:**
+
+`software/server/tests/unit/report/test_schemas.py`:
+```python
+from auralink.pipeline.artifacts import SessionQualityReport
+from auralink.report.schemas import (
+    CrossMovementSection,
+    MovementSection,
+    Report,
+    ReportMetadata,
+    TemporalSection,
+)
+
+
+def _minimal_quality_report() -> SessionQualityReport:
+    return SessionQualityReport.model_construct()
+
+
+def test_temporal_section_instantiable():
+    t = TemporalSection()
+    assert t is not None
+
+
+def test_cross_movement_section_instantiable():
+    c = CrossMovementSection()
+    assert c is not None
+
+
+def test_report_round_trips():
+    report = Report(
+        metadata=ReportMetadata(session_id="s1", movement="overhead_squat"),
+        movement_section=MovementSection(
+            movement="overhead_squat",
+            quality_report=_minimal_quality_report(),
+        ),
+        overall_narrative="Your movement shows a clean overall pattern.",
+    )
+    data = report.model_dump()
+    restored = Report.model_validate(data)
+    assert restored.metadata.session_id == "s1"
+    assert restored.movement_section.movement == "overhead_squat"
+```
+
+Note: `SessionQualityReport.model_construct()` bypasses validation so tests do not need to fabricate the full internal structure. If `SessionQualityReport` requires fields at construction, subagent should adjust by passing minimal kwargs from the actual schema (read `pipeline/artifacts.py` first).
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/report/test_schemas.py -v`
+
+**Expected result:** `3 passed`
+
+**Commit message:** `feat(report): add Report pydantic schema with Plan-3 slot stubs`
+
+---
+
+#### Task C1: ChainReasoner protocol + RuleBasedChainReasoner
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/reasoning/rule_engine.py`
+- `software/server/tests/unit/reasoning/test_rule_engine.py`
+
+**Depends on:** A1 (observations), A2 (body_type), A3 (config_schemas), B1 (threshold_loader.adjust_for_body_type)
+
+**Convention note:** Plan 4's `ml/` modules (loader.py, lifter.py, skeleton.py, phase_segmenter.py) put each Protocol and its default implementation in the SAME file. Plan 2 follows that convention — `ChainReasoner` Protocol and `RuleBasedChainReasoner` implementation live together in `rule_engine.py`. Do not create a separate `engine.py`.
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/reasoning/rule_engine.py`:
+```python
+from typing import Protocol
+
+from auralink.pipeline.artifacts import PerRepMetrics, PipelineArtifacts
+from auralink.reasoning.body_type import BodyTypeProfile
+from auralink.reasoning.config_schemas import (
+    BodyTypeAdjustmentsConfig,
+    RuleConfig,
+    ThresholdSetConfig,
+)
+from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+from auralink.reasoning.threshold_loader import adjust_for_body_type
+
+
+class ChainReasoner(Protocol):
+    def reason(
+        self,
+        artifacts: PipelineArtifacts,
+        movement: str,
+        body_type: BodyTypeProfile | None = None,
+    ) -> list[ChainObservation]: ...
+
+
+def _aggregate(values: list[float], aggregation: str) -> float:
+    if not values:
+        return 0.0
+    if aggregation == "max":
+        return max(values)
+    if aggregation == "min":
+        return min(values)
+    if aggregation == "mean":
+        return sum(values) / len(values)
+    raise ValueError(f"unknown aggregation: {aggregation}")
+
+
+def _extract_metric(metrics: PerRepMetrics, metric_key: str) -> list[float]:
+    return [getattr(rep, metric_key) for rep in metrics.reps]
+
+
+class RuleBasedChainReasoner:
+    def __init__(
+        self,
+        rules: list[RuleConfig],
+        base_thresholds: ThresholdSetConfig,
+        adjustments: BodyTypeAdjustmentsConfig,
+    ) -> None:
+        self._rules = rules
+        self._base = base_thresholds
+        self._adjustments = adjustments
+
+    def reason(
+        self,
+        artifacts: PipelineArtifacts,
+        movement: str,
+        body_type: BodyTypeProfile | None = None,
+    ) -> list[ChainObservation]:
+        if artifacts.per_rep_metrics is None:
+            return []
+        thresholds = self._base
+        if body_type is not None:
+            thresholds = adjust_for_body_type(self._base, body_type, self._adjustments)
+        threshold_dict = thresholds.model_dump()
+        observations: list[ChainObservation] = []
+        for rule in self._rules:
+            if movement not in rule.applies_to_movements:
+                continue
+            values = _extract_metric(artifacts.per_rep_metrics, rule.metric_key)
+            if not values:
+                continue
+            aggregated = _aggregate(values, rule.aggregation)
+            concern = threshold_dict.get(rule.threshold_concern_ref)
+            flag = threshold_dict.get(rule.threshold_flag_ref)
+            if concern is None or flag is None:
+                continue
+            severity: ObservationSeverity | None = None
+            if aggregated >= flag:
+                severity = ObservationSeverity.FLAG
+            elif aggregated >= concern:
+                severity = ObservationSeverity.CONCERN
+            if severity is None:
+                continue
+            narrative = rule.narrative_template.format(value=aggregated)
+            observations.append(
+                ChainObservation(
+                    chain=rule.chain,
+                    severity=severity,
+                    confidence=rule.confidence,
+                    trigger_rule=rule.rule_id,
+                    involved_joints=rule.involved_joints,
+                    evidence={rule.metric_key: aggregated},
+                    narrative=narrative,
+                )
+            )
+        return observations
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_rule_engine.py`:
+```python
+import pytest
+
+from auralink.pipeline.artifacts import PerRepMetrics, PipelineArtifacts, RepMetric
+from auralink.reasoning.body_type import BodyTypeProfile
+from auralink.reasoning.chains import ChainName
+from auralink.reasoning.config_schemas import (
+    BodyTypeAdjustment,
+    BodyTypeAdjustmentsConfig,
+    RuleConfig,
+    ThresholdSetConfig,
+)
+from auralink.reasoning.observations import ObservationSeverity
+from auralink.reasoning.rule_engine import RuleBasedChainReasoner
+
+
+def _rep(valgus: float = 0.0, trunk_lean: float = 0.0) -> RepMetric:
+    return RepMetric(
+        rep_index=0,
+        amplitude_deg=90.0,
+        peak_velocity_deg_per_s=180.0,
+        rom_deg=90.0,
+        mean_trunk_lean_deg=trunk_lean,
+        mean_knee_valgus_deg=valgus,
+    )
+
+
+def _artifacts(reps: list[RepMetric]) -> PipelineArtifacts:
+    per_rep = PerRepMetrics(primary_angle="knee_flexion", reps=reps)
+    return PipelineArtifacts.model_construct(per_rep_metrics=per_rep)
+
+
+def _thresholds() -> ThresholdSetConfig:
+    return ThresholdSetConfig(
+        knee_valgus_concern=8.0,
+        knee_valgus_flag=12.0,
+        hip_drop_concern=5.0,
+        hip_drop_flag=10.0,
+        trunk_lean_concern=6.0,
+        trunk_lean_flag=10.0,
+    )
+
+
+def _valgus_rule() -> RuleConfig:
+    return RuleConfig(
+        rule_id="sbl_knee_valgus_concern",
+        chain=ChainName.SBL,
+        applies_to_movements=["overhead_squat"],
+        metric_key="mean_knee_valgus_deg",
+        aggregation="max",
+        threshold_concern_ref="knee_valgus_concern",
+        threshold_flag_ref="knee_valgus_flag",
+        involved_joints=["ankle", "knee", "hip"],
+        narrative_template="knee valgus {value:.1f}",
+        confidence=0.75,
+    )
+
+
+def test_returns_empty_when_no_per_rep_metrics():
+    artifacts = PipelineArtifacts.model_construct(per_rep_metrics=None)
+    reasoner = RuleBasedChainReasoner(
+        rules=[_valgus_rule()],
+        base_thresholds=_thresholds(),
+        adjustments=BodyTypeAdjustmentsConfig(),
+    )
+    assert reasoner.reason(artifacts, "overhead_squat") == []
+
+
+def test_rule_fires_at_concern_severity():
+    artifacts = _artifacts([_rep(valgus=9.5)])
+    reasoner = RuleBasedChainReasoner(
+        rules=[_valgus_rule()],
+        base_thresholds=_thresholds(),
+        adjustments=BodyTypeAdjustmentsConfig(),
+    )
+    obs = reasoner.reason(artifacts, "overhead_squat")
+    assert len(obs) == 1
+    assert obs[0].severity == ObservationSeverity.CONCERN
+    assert obs[0].chain == ChainName.SBL
+
+
+def test_rule_fires_at_flag_severity():
+    artifacts = _artifacts([_rep(valgus=13.0)])
+    reasoner = RuleBasedChainReasoner(
+        rules=[_valgus_rule()],
+        base_thresholds=_thresholds(),
+        adjustments=BodyTypeAdjustmentsConfig(),
+    )
+    obs = reasoner.reason(artifacts, "overhead_squat")
+    assert len(obs) == 1
+    assert obs[0].severity == ObservationSeverity.FLAG
+
+
+def test_rule_skipped_when_movement_does_not_match():
+    artifacts = _artifacts([_rep(valgus=13.0)])
+    reasoner = RuleBasedChainReasoner(
+        rules=[_valgus_rule()],
+        base_thresholds=_thresholds(),
+        adjustments=BodyTypeAdjustmentsConfig(),
+    )
+    assert reasoner.reason(artifacts, "push_up") == []
+
+
+def test_body_type_adjustment_raises_threshold_so_rule_does_not_fire():
+    artifacts = _artifacts([_rep(valgus=9.5)])
+    adjustments = BodyTypeAdjustmentsConfig(
+        adjustments=[
+            BodyTypeAdjustment(
+                applies_to_hypermobile=True,
+                threshold_overrides={
+                    "knee_valgus_concern": 10.0,
+                    "knee_valgus_flag": 15.0,
+                },
+            )
+        ]
+    )
+    reasoner = RuleBasedChainReasoner(
+        rules=[_valgus_rule()],
+        base_thresholds=_thresholds(),
+        adjustments=adjustments,
+    )
+    profile = BodyTypeProfile(hypermobile=True)
+    assert reasoner.reason(artifacts, "overhead_squat", body_type=profile) == []
+
+
+def test_narrative_template_formats_value():
+    artifacts = _artifacts([_rep(valgus=9.5)])
+    reasoner = RuleBasedChainReasoner(
+        rules=[_valgus_rule()],
+        base_thresholds=_thresholds(),
+        adjustments=BodyTypeAdjustmentsConfig(),
+    )
+    obs = reasoner.reason(artifacts, "overhead_squat")
+    assert obs[0].narrative == "knee valgus 9.5"
+```
+
+Note: test uses `PipelineArtifacts.model_construct(...)` to bypass validation of required fields from Plan 1. If `PerRepMetrics` or `RepMetric` field names differ in the installed code, subagent reads `pipeline/artifacts.py` and adjusts the test helpers — the field names `rep_index`, `amplitude_deg`, `peak_velocity_deg_per_s`, `rom_deg`, `mean_trunk_lean_deg`, `mean_knee_valgus_deg` are the contract this plan was written against.
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_rule_engine.py -v`
+
+**Expected result:** `6 passed`
+
+**Commit message:** `feat(reasoning): add RuleBasedChainReasoner rule-evaluation engine`
+
+---
+
+#### Task D1: ChainReasoningStage + PipelineArtifacts field
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/pipeline/stages/chain_reasoning.py`
+- `software/server/src/auralink/pipeline/artifacts.py` (MODIFIED — add one field)
+- `software/server/tests/unit/reasoning/test_chain_reasoning_stage.py`
+
+**Depends on:** A1 (observations), A2 (body_type), C1 (ChainReasoner protocol)
+
+**Pre-step:** Subagent MUST first read `software/server/src/auralink/pipeline/stages/base.py` to see the exact `Stage` pattern used by existing stages. If the existing pattern differs from the class-based shape below (e.g., Stage is a `@dataclass(frozen=True)` with `run: Callable`), adapt the implementation to match the existing pattern — construct a `Stage(name=STAGE_NAME_CHAIN_REASONING, run=<closure>)` factory function instead of a class. The tests below are written against a class with a `.run(artifacts)` method; if the Stage pattern is callable-based, the subagent adjusts the test to call the returned Stage's `.run(ctx)` with the right argument shape. If the existing orchestrator passes `StageContext` (not `PipelineArtifacts`) to stages, the chain reasoning stage must read `ctx.artifacts["..."]` — subagent inspects and matches.
+
+If the adaptation requires a design decision (e.g., how to store `artifacts` in the existing `StageContext.artifacts` dict), report STATUS: CHECKPOINT.
+
+**Artifacts field addition (edit to `pipeline/artifacts.py`):**
+
+Add this import at the top if not present:
+```python
+from auralink.reasoning.observations import ChainObservation
+```
+
+And add this field to the `PipelineArtifacts` class body (near the other optional fields):
+```python
+    chain_observations: list[ChainObservation] | None = None
+```
+
+Note: subagent must guard against circular import between `pipeline/artifacts.py` and `reasoning/observations.py`. Since `observations.py` only imports from `reasoning/chains.py`, the import should be safe — but verify by running tests.
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/pipeline/stages/chain_reasoning.py`:
+```python
+from auralink.pipeline.artifacts import PipelineArtifacts
+from auralink.reasoning.body_type import BodyTypeProfile
+from auralink.reasoning.rule_engine import ChainReasoner
+
+STAGE_NAME_CHAIN_REASONING = "chain_reasoning"
+
+
+class ChainReasoningStage:
+    name = STAGE_NAME_CHAIN_REASONING
+
+    def __init__(
+        self,
+        reasoner: ChainReasoner,
+        movement: str,
+        body_type: BodyTypeProfile | None = None,
+    ) -> None:
+        self._reasoner = reasoner
+        self._movement = movement
+        self._body_type = body_type
+
+    def run(self, artifacts: PipelineArtifacts) -> PipelineArtifacts:
+        observations = self._reasoner.reason(artifacts, self._movement, self._body_type)
+        return artifacts.model_copy(update={"chain_observations": observations})
+```
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_chain_reasoning_stage.py`:
+```python
+from auralink.pipeline.artifacts import PipelineArtifacts
+from auralink.pipeline.stages.chain_reasoning import (
+    STAGE_NAME_CHAIN_REASONING,
+    ChainReasoningStage,
+)
+from auralink.reasoning.chains import ChainName
+from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+
+
+class _FakeReasoner:
+    def __init__(self, observations: list[ChainObservation]):
+        self._observations = observations
+
+    def reason(self, artifacts, movement, body_type=None):
+        return list(self._observations)
+
+
+def test_stage_name_is_chain_reasoning():
+    assert STAGE_NAME_CHAIN_REASONING == "chain_reasoning"
+    stage = ChainReasoningStage(reasoner=_FakeReasoner([]), movement="overhead_squat")
+    assert stage.name == "chain_reasoning"
+
+
+def test_stage_run_with_empty_observations():
+    artifacts = PipelineArtifacts.model_construct()
+    stage = ChainReasoningStage(reasoner=_FakeReasoner([]), movement="overhead_squat")
+    result = stage.run(artifacts)
+    assert result.chain_observations == []
+
+
+def test_stage_run_with_two_observations():
+    obs_a = ChainObservation(
+        chain=ChainName.SBL,
+        severity=ObservationSeverity.CONCERN,
+        confidence=0.8,
+        trigger_rule="sbl_a",
+        narrative="a",
+    )
+    obs_b = ChainObservation(
+        chain=ChainName.BFL,
+        severity=ObservationSeverity.FLAG,
+        confidence=0.7,
+        trigger_rule="bfl_b",
+        narrative="b",
+    )
+    artifacts = PipelineArtifacts.model_construct()
+    stage = ChainReasoningStage(
+        reasoner=_FakeReasoner([obs_a, obs_b]),
+        movement="overhead_squat",
+    )
+    result = stage.run(artifacts)
+    assert len(result.chain_observations) == 2
+    assert result.chain_observations[0].trigger_rule == "sbl_a"
+    assert result.chain_observations[1].trigger_rule == "bfl_b"
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_chain_reasoning_stage.py -v`
+
+**Expected result:** `3 passed`
+
+**Commit message:** `feat(pipeline): add ChainReasoningStage + chain_observations artifact field`
+
+---
+
+#### Task D2: Report assembler
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/report/assembler.py`
+- `software/server/tests/unit/report/test_assembler.py`
+
+**Depends on:** A1 (observations), B3 (Report schemas)
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/report/assembler.py`:
+```python
+from auralink.pipeline.artifacts import PipelineArtifacts
+from auralink.report.schemas import (
+    MovementSection,
+    Report,
+    ReportMetadata,
+)
+
+
+def _build_overall_narrative(section: MovementSection) -> str:
+    if not section.quality_report.passed:
+        return (
+            "We could not generate a complete movement read from this session. "
+            "See the quality report for details on what to adjust for the next capture."
+        )
+    obs = section.chain_observations
+    if not obs:
+        return "Your movement shows a clean overall pattern — no notable compensations detected."
+    flagged = [o for o in obs if o.severity.value == "flag"]
+    concern = [o for o in obs if o.severity.value == "concern"]
+    parts: list[str] = []
+    if flagged:
+        parts.append(f"Your movement shows {len(flagged)} notable pattern(s) worth exploring further.")
+    if concern:
+        parts.append(f"There are {len(concern)} area(s) of early-stage variation in your body connections.")
+    return " ".join(parts)
+
+
+def assemble_report(
+    artifacts: PipelineArtifacts,
+    session_id: str,
+    movement: str,
+    captured_at_ms: int | None = None,
+) -> Report:
+    movement_section = MovementSection(
+        movement=movement,
+        quality_report=artifacts.quality_report,
+        angle_series=artifacts.angle_series,
+        normalized_angle_series=artifacts.normalized_angle_series,
+        rep_boundaries=artifacts.rep_boundaries,
+        per_rep_metrics=artifacts.per_rep_metrics,
+        within_movement_trend=artifacts.within_movement_trend,
+        lift_result=artifacts.lift_result,
+        skeleton_result=artifacts.skeleton_result,
+        phase_boundaries=artifacts.phase_boundaries,
+        chain_observations=artifacts.chain_observations or [],
+    )
+    return Report(
+        metadata=ReportMetadata(
+            session_id=session_id,
+            movement=movement,
+            captured_at_ms=captured_at_ms,
+        ),
+        movement_section=movement_section,
+        overall_narrative=_build_overall_narrative(movement_section),
+    )
+```
+
+**Test file:**
+
+`software/server/tests/unit/report/test_assembler.py`:
+```python
+from auralink.pipeline.artifacts import PipelineArtifacts, SessionQualityReport
+from auralink.reasoning.chains import ChainName
+from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+from auralink.report.assembler import assemble_report
+
+
+def _artifacts(chain_observations=None) -> PipelineArtifacts:
+    return PipelineArtifacts.model_construct(
+        quality_report=SessionQualityReport.model_construct(),
+        chain_observations=chain_observations,
+    )
+
+
+def _flag_obs() -> ChainObservation:
+    return ChainObservation(
+        chain=ChainName.SBL,
+        severity=ObservationSeverity.FLAG,
+        confidence=0.8,
+        trigger_rule="sbl_flag",
+        narrative="n",
+    )
+
+
+def _concern_obs() -> ChainObservation:
+    return ChainObservation(
+        chain=ChainName.BFL,
+        severity=ObservationSeverity.CONCERN,
+        confidence=0.7,
+        trigger_rule="bfl_concern",
+        narrative="n",
+    )
+
+
+def test_assemble_with_no_observations_produces_clean_narrative():
+    report = assemble_report(
+        artifacts=_artifacts([]),
+        session_id="s1",
+        movement="overhead_squat",
+    )
+    assert "clean overall pattern" in report.overall_narrative
+    assert report.movement_section.chain_observations == []
+
+
+def test_assemble_with_one_flag_observation():
+    report = assemble_report(
+        artifacts=_artifacts([_flag_obs()]),
+        session_id="s1",
+        movement="overhead_squat",
+    )
+    assert "notable pattern" in report.overall_narrative
+    assert len(report.movement_section.chain_observations) == 1
+
+
+def test_assemble_copies_artifacts_fields_into_movement_section():
+    artifacts = _artifacts([])
+    report = assemble_report(
+        artifacts=artifacts,
+        session_id="s1",
+        movement="overhead_squat",
+        captured_at_ms=1234,
+    )
+    assert report.metadata.session_id == "s1"
+    assert report.metadata.movement == "overhead_squat"
+    assert report.metadata.captured_at_ms == 1234
+    assert report.movement_section.movement == "overhead_squat"
+
+
+def test_assemble_with_concern_and_flag_produces_compound_narrative():
+    report = assemble_report(
+        artifacts=_artifacts([_flag_obs(), _concern_obs()]),
+        session_id="s1",
+        movement="overhead_squat",
+    )
+    assert "notable pattern" in report.overall_narrative
+    assert "early-stage variation" in report.overall_narrative
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/report/test_assembler.py -v`
+
+**Expected result:** `4 passed`
+
+**Commit message:** `feat(report): add report assembler with wellness-positioned narrative`
+
+---
+
+#### Task E1: Orchestrator wiring — chain_reasoning stage appended to default + push_up lists
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/pipeline/orchestrator.py` (MODIFIED)
+- `software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py`
+
+**Depends on:** D1 (ChainReasoningStage), B1 (threshold_loader), B2 (rule_loader), A2 (BodyTypeProfile)
+
+**Pre-step:** Subagent MUST first read `software/server/src/auralink/pipeline/orchestrator.py` to see the exact shape of `_default_stage_list()`, `_push_up_stage_list()`, `_rollup_stage_list()`, and how other stages are constructed and appended. Match that construction style exactly.
+
+**Implementation guidance:**
+1. Add a module-level helper `_build_chain_reasoner()` that loads rules, default thresholds, and adjustments once (module-level cache acceptable for v1). Example shape:
+   ```python
+   _CHAIN_REASONER: RuleBasedChainReasoner | None = None
+
+   def _build_chain_reasoner() -> RuleBasedChainReasoner:
+       global _CHAIN_REASONER
+       if _CHAIN_REASONER is None:
+           from auralink.reasoning.rule_engine import RuleBasedChainReasoner
+           from auralink.reasoning.rule_loader import load_rules
+           from auralink.reasoning.threshold_loader import (
+               load_body_type_adjustments,
+               load_default_thresholds,
+           )
+           _CHAIN_REASONER = RuleBasedChainReasoner(
+               rules=load_rules(),
+               base_thresholds=load_default_thresholds(),
+               adjustments=load_body_type_adjustments(),
+           )
+       return _CHAIN_REASONER
+   ```
+2. In `_default_stage_list()` and `_push_up_stage_list()`, after the existing stages, append a `ChainReasoningStage(reasoner=_build_chain_reasoner(), movement=<movement-name>, body_type=None)`. The movement name to pass depends on how each list is scoped — `_default_stage_list` is `"overhead_squat"` (default), `_push_up_stage_list` is `"push_up"`. If these names differ in the existing code, use the existing names.
+3. `_rollup_stage_list()` is NOT modified — chain reasoning is skipped for rollup because rollup has no rep metrics.
+4. If the existing `Stage` is a `@dataclass(frozen=True)` with `run: Callable[[StageContext], Any]`, the subagent wraps `ChainReasoningStage` into a `Stage` using a closure:
+   ```python
+   def _chain_reasoning_stage_factory(movement: str) -> Stage:
+       impl = ChainReasoningStage(reasoner=_build_chain_reasoner(), movement=movement)
+       def _run(ctx: StageContext):
+           artifacts = ctx.artifacts["pipeline_artifacts"]  # or whatever key Plan 1 uses
+           ctx.artifacts["pipeline_artifacts"] = impl.run(artifacts)
+           return ctx.artifacts["pipeline_artifacts"]
+       return Stage(name="chain_reasoning", run=_run)
+   ```
+   If Plan 1 stores artifacts under a different key (or reshapes them differently), subagent reports STATUS: CHECKPOINT with the actual key so the plan can be revised.
+
+**Test file:**
+
+`software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py`:
+```python
+from auralink.pipeline.orchestrator import (
+    _default_stage_list,
+    _push_up_stage_list,
+    _rollup_stage_list,
+)
+
+
+def _stage_names(stages) -> list[str]:
+    return [s.name for s in stages]
+
+
+def test_default_stage_list_contains_chain_reasoning():
+    names = _stage_names(_default_stage_list())
+    assert "chain_reasoning" in names
+    assert names[-1] == "chain_reasoning"
+
+
+def test_push_up_stage_list_contains_chain_reasoning():
+    names = _stage_names(_push_up_stage_list())
+    assert "chain_reasoning" in names
+    assert names[-1] == "chain_reasoning"
+
+
+def test_rollup_stage_list_does_not_contain_chain_reasoning():
+    names = _stage_names(_rollup_stage_list())
+    assert "chain_reasoning" not in names
+```
+
+Note: if `_default_stage_list`, `_push_up_stage_list`, and `_rollup_stage_list` are private module-level names that don't exist (e.g., they're methods on a class or named differently in the installed code), subagent reports STATUS: CHECKPOINT with the actual names.
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/pipeline/test_orchestrator_chain_wiring.py -v`
+
+**Expected result:** `3 passed`
+
+**Commit message:** `feat(pipeline): wire ChainReasoningStage into default and push_up stage lists`
+
+---
+
+#### Task E2: Update GET /sessions/{id}/report to return Report
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/api/routes/reports.py` (MODIFIED)
+- `software/server/tests/unit/api/test_reports_route.py`
+
+**Depends on:** D2 (assemble_report)
+
+**Pre-step:** Subagent MUST first read `software/server/src/auralink/pipeline/storage.py` to check whether `SessionStorage` has a method for loading the original `Session` (carrying session metadata like `movement`). The template below assumes `storage.load_session(session_id)`. If no such method exists (e.g., the actual method is `storage.load(session_id)` or similar), subagent reports STATUS: CHECKPOINT so the plan can be revised with the correct method name. Do NOT improvise.
+
+Also read the current `api/routes/reports.py` to see the exact dependency injection pattern (`Settings`, `SessionStorage` provider) and match it.
+
+**Exact file contents (verbatim):**
+
+`software/server/src/auralink/api/routes/reports.py`:
+```python
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from auralink.config import Settings, get_settings
+from auralink.pipeline.storage import SessionStorage
+from auralink.report.assembler import assemble_report
+from auralink.report.schemas import Report
+
+router = APIRouter(prefix="/sessions", tags=["reports"])
+
+
+def _get_storage(settings: Settings = Depends(get_settings)) -> SessionStorage:
+    return SessionStorage(base_dir=settings.sessions_dir)
+
+
+@router.get("/{session_id}/report", response_model=Report)
+def get_report(
+    session_id: str,
+    storage: SessionStorage = Depends(_get_storage),
+) -> Report:
+    try:
+        artifacts = storage.load_artifacts(session_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"no report for session {session_id}",
+        ) from exc
+
+    session_record = storage.load_session(session_id)
+    return assemble_report(
+        artifacts=artifacts,
+        session_id=session_id,
+        movement=session_record.metadata.movement,
+        captured_at_ms=getattr(session_record.metadata, "captured_at_ms", None),
+    )
+```
+
+**Test file:**
+
+`software/server/tests/unit/api/test_reports_route.py`:
+```python
+from fastapi.testclient import TestClient
+
+from auralink.api.app import create_app
+
+
+def test_get_report_returns_404_for_missing_session(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_SESSIONS_DIR", str(tmp_path))
+    app = create_app()
+    client = TestClient(app)
+    response = client.get("/sessions/does-not-exist/report")
+    assert response.status_code == 404
+
+
+def test_get_report_returns_report_with_metadata_and_movement_section(
+    tmp_path, monkeypatch
+):
+    """Given a stored session + artifacts, GET /report returns a Report JSON
+    with metadata.session_id and movement_section.movement populated."""
+    monkeypatch.setenv("AURALINK_SESSIONS_DIR", str(tmp_path))
+    app = create_app()
+    client = TestClient(app)
+    # POST a minimal synthetic session using fixture loader, then GET the report.
+    from tests.fixtures.loader import load_fixture
+
+    session = load_fixture("overhead_squat", variant="clean")
+    post = client.post("/sessions", json=session.model_dump(mode="json"))
+    assert post.status_code in (200, 201)
+    session_id = post.json()["session_id"]
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+    assert body["metadata"]["session_id"] == session_id
+    assert body["movement_section"]["movement"] == "overhead_squat"
+```
+
+Note: the integration test here depends on the `POST /sessions` flow running the full pipeline synchronously and persisting artifacts. If the existing flow is async or returns a different shape, subagent reports STATUS: CHECKPOINT. The fixture loader path assumes Plan 4's `tests/fixtures/loader.py::load_fixture` is importable.
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/api/test_reports_route.py -v`
+
+**Expected result:** `2 passed`
+
+**Commit message:** `feat(api): GET /sessions/{id}/report returns structured Report`
+
+---
+
+#### Task F1: Integration test — fixture → full report
+
+**Label:** TDD (integration)
+
+**Files owned (exclusive to this task):**
+- `software/server/tests/integration/test_full_report.py`
+
+**Depends on:** E1 (orchestrator wiring), E2 (reports route)
+
+**Test file:**
+
+`software/server/tests/integration/test_full_report.py`:
+```python
+from fastapi.testclient import TestClient
+
+from auralink.api.app import create_app
+from tests.fixtures.loader import load_fixture
+
+
+def test_overhead_squat_valgus_produces_sbl_observation(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_SESSIONS_DIR", str(tmp_path))
+    app = create_app()
+    client = TestClient(app)
+
+    session = load_fixture("overhead_squat", variant="valgus")
+    post = client.post("/sessions", json=session.model_dump(mode="json"))
+    assert post.status_code in (200, 201)
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+    observations = body["movement_section"]["chain_observations"]
+    sbl_obs = [
+        o
+        for o in observations
+        if o["chain"] == "superficial_back_line"
+        and o["severity"] in {"concern", "flag"}
+    ]
+    assert len(sbl_obs) >= 1, (
+        f"expected at least one SBL concern/flag observation, got {observations}"
+    )
+
+
+def test_overhead_squat_clean_produces_no_observations(tmp_path, monkeypatch):
+    monkeypatch.setenv("AURALINK_SESSIONS_DIR", str(tmp_path))
+    app = create_app()
+    client = TestClient(app)
+
+    session = load_fixture("overhead_squat", variant="clean")
+    post = client.post("/sessions", json=session.model_dump(mode="json"))
+    assert post.status_code in (200, 201)
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+    assert body["movement_section"]["chain_observations"] == []
+    assert "clean overall pattern" in body["overall_narrative"]
+
+
+def test_single_leg_squat_clean_runs_end_to_end_with_bfl_rule_loaded(tmp_path, monkeypatch):
+    """BFL rule coverage — single_leg_squat is the movement the BFL rule applies to.
+
+    Note: the synthetic `single_leg_squat_clean` fixture does not inject a
+    compensation, so it may or may not produce an observation depending on
+    baseline pose values. The assertion is structural: a successful e2e run
+    with BFL rules loaded, no 5xx, and either 0 observations or any
+    observation that (if present) belongs to a recognized chain.
+    """
+    monkeypatch.setenv("AURALINK_SESSIONS_DIR", str(tmp_path))
+    app = create_app()
+    client = TestClient(app)
+
+    session = load_fixture("single_leg_squat", variant="clean")
+    post = client.post("/sessions", json=session.model_dump(mode="json"))
+    assert post.status_code in (200, 201)
+    session_id = post.json()["session_id"]
+
+    report = client.get(f"/sessions/{session_id}/report")
+    assert report.status_code == 200
+    body = report.json()
+    assert body["movement_section"]["movement"] == "single_leg_squat"
+    recognized_chains = {
+        "superficial_back_line",
+        "back_functional_line",
+        "front_functional_line",
+    }
+    for obs in body["movement_section"]["chain_observations"]:
+        assert obs["chain"] in recognized_chains
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/integration/test_full_report.py -v`
+
+**Expected result:** `3 passed`
+
+**Commit message:** `test(integration): end-to-end report generation from synthetic fixtures`
+
+---
+
+#### Task F2: Wellness language lint test
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/tests/unit/reasoning/test_wellness_language.py`
+
+**Depends on:** A5, A6 (rule YAML files must exist)
+
+**Test file:**
+
+`software/server/tests/unit/reasoning/test_wellness_language.py`:
+```python
+import re
+from pathlib import Path
+
+import yaml
+
+_FORBIDDEN_TERMS = [
+    "diagnosis",
+    "dysfunction",
+    "drivers of pain",
+    "injury",
+    "damage",
+    "pathology",
+]
+
+_RULES_DIR = Path(__file__).resolve().parents[3] / "config" / "rules"
+
+
+def test_no_forbidden_wellness_terms_in_rule_narratives():
+    violations: list[str] = []
+    for yaml_path in sorted(_RULES_DIR.glob("*.yaml")):
+        data = yaml.safe_load(yaml_path.read_text())
+        for rule in data.get("rules", []):
+            narrative = rule.get("narrative_template", "")
+            for term in _FORBIDDEN_TERMS:
+                if re.search(rf"\b{re.escape(term)}\b", narrative, re.IGNORECASE):
+                    violations.append(
+                        f"{yaml_path.name}:{rule.get('rule_id')} contains forbidden term '{term}': {narrative!r}"
+                    )
+    assert not violations, "wellness-language violations:\n" + "\n".join(violations)
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_wellness_language.py -v`
+
+**Expected result:** `1 passed`
+
+**Commit message:** `test(reasoning): enforce wellness-language lint on rule narratives`
+
+---
+
+#### Task G1: Final validation (single-task wave)
+
+**Label:** skip-tdd
+
+**Files owned:** none (verification + optional lint cleanup commit)
+
+**Depends on:** F1, F2 (all prior waves complete)
+
+**Steps (execute in order):**
+
+1. **Full test suite:**
+   ```
+   cd software/server && uv run pytest -q
+   ```
+   Expected: ~42 new tests on top of the 136 baseline (~178 total). All pass.
+
+2. **Ruff auto-fix:**
+   ```
+   cd software/server && uv run ruff check . --fix
+   cd software/server && uv run ruff check .
+   ```
+   Expected: final check exits clean (0 issues).
+
+3. **Black format:**
+   ```
+   cd software/server && uv run black .
+   cd software/server && uv run black --check .
+   ```
+   Expected: `--check` exits clean.
+
+4. **Re-run full test suite:**
+   ```
+   cd software/server && uv run pytest -q
+   ```
+   Expected: same ~178 tests pass.
+
+5. **Dev-server smoke test:**
+   ```
+   cd software/server && uv run uvicorn auralink.api.app:create_app --factory --port 8765 &
+   SERVER_PID=$!
+   sleep 2
+   python - <<'PY'
+   import json, urllib.request, sys
+   from tests.fixtures.loader import load_fixture
+   session = load_fixture("overhead_squat", variant="valgus")
+   req = urllib.request.Request(
+       "http://127.0.0.1:8765/sessions",
+       data=session.model_dump_json().encode(),
+       headers={"Content-Type": "application/json"},
+       method="POST",
+   )
+   session_id = json.loads(urllib.request.urlopen(req).read())["session_id"]
+   report = json.loads(urllib.request.urlopen(f"http://127.0.0.1:8765/sessions/{session_id}/report").read())
+   obs = report["movement_section"]["chain_observations"]
+   sbl = [o for o in obs if o["chain"] == "superficial_back_line" and o["severity"] in {"concern", "flag"}]
+   assert sbl, f"expected SBL observation, got {obs}"
+   print("SMOKE OK:", len(sbl), "SBL observation(s)")
+   PY
+   kill $SERVER_PID
+   ```
+   Expected: prints `SMOKE OK: N SBL observation(s)` where N >= 1. Server cleanly killed.
+
+6. **If ruff/black changed anything, commit the cleanup:**
+   ```
+   git add -u software/server/
+   git commit -m "chore(server): ruff/black cleanup after plan 2"
+   ```
+   Only commit files under `software/server/` — never `git add -A`.
+
+**Expected result:** All five verification steps pass. If any step fails, subagent reports STATUS: FAILED with the failing step and the last 50 lines of output.
+
+**Commit message (if cleanup needed):** `chore(server): ruff/black cleanup after plan 2`
+
+---
+
+## Plan Revision 2026-04-11 — Wave Structure
+
+Wave groupings enforce parallelism and dependency barriers. Subagents within a wave run concurrently (max 6). Barriers between waves.
+
+```
+Wave A (parallel, 6): A1, A2, A3, A4, A5, A6
+Wave B (parallel, 3): B1, B2, B3
+Wave C (1):           C1
+Wave D (parallel, 2): D1, D2
+Wave E (parallel, 2): E1, E2
+Wave F (parallel, 2): F1, F2
+Wave G (1):           G1
+```
+
+### Task State (JSON)
+
+```json
+{
+  "plan_id": "2026-04-10-L2-2-chain-reasoning",
+  "waves": [
+    {
+      "wave": "A",
+      "max_parallel": 6,
+      "tasks": [
+        {
+          "id": "A1",
+          "title": "ChainObservation schema",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/reasoning/observations.py",
+            "software/server/tests/unit/reasoning/test_observations.py"
+          ],
+          "depends_on": [],
+          "expected_tests": 3,
+          "commit_msg": "feat(reasoning): add ChainObservation pydantic schema"
+        },
+        {
+          "id": "A2",
+          "title": "BodyTypeProfile schema",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/reasoning/body_type.py",
+            "software/server/tests/unit/reasoning/test_body_type.py"
+          ],
+          "depends_on": [],
+          "expected_tests": 2,
+          "commit_msg": "feat(reasoning): add BodyTypeProfile schema"
+        },
+        {
+          "id": "A3",
+          "title": "Config schemas (ThresholdSetConfig, BodyTypeAdjustment, RuleConfig)",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/reasoning/config_schemas.py",
+            "software/server/tests/unit/reasoning/test_config_schemas.py"
+          ],
+          "depends_on": [],
+          "expected_tests": 4,
+          "commit_msg": "feat(reasoning): add pydantic config schemas for thresholds and rules"
+        },
+        {
+          "id": "A4",
+          "title": "Threshold YAML config files",
+          "label": "skip-tdd",
+          "files_owned": [
+            "software/server/config/thresholds/default.yaml",
+            "software/server/config/thresholds/body_type_adjustments.yaml"
+          ],
+          "depends_on": [],
+          "expected_tests": 0,
+          "commit_msg": "feat(config): add threshold YAML config for chain reasoning"
+        },
+        {
+          "id": "A5",
+          "title": "SBL rule YAML",
+          "label": "skip-tdd",
+          "files_owned": [
+            "software/server/config/rules/sbl.yaml"
+          ],
+          "depends_on": [],
+          "expected_tests": 0,
+          "commit_msg": "feat(config): add SBL rule definitions"
+        },
+        {
+          "id": "A6",
+          "title": "BFL + FFL rule YAML",
+          "label": "skip-tdd",
+          "files_owned": [
+            "software/server/config/rules/bfl.yaml",
+            "software/server/config/rules/ffl.yaml"
+          ],
+          "depends_on": [],
+          "expected_tests": 0,
+          "commit_msg": "feat(config): add BFL and FFL rule definitions"
+        }
+      ]
+    },
+    {
+      "wave": "B",
+      "max_parallel": 3,
+      "tasks": [
+        {
+          "id": "B1",
+          "title": "Threshold loader + body-type adjustment",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/reasoning/threshold_loader.py",
+            "software/server/src/auralink/reasoning/thresholds.py",
+            "software/server/tests/unit/reasoning/test_threshold_loader.py"
+          ],
+          "depends_on": ["A2", "A3"],
+          "expected_tests": 4,
+          "commit_msg": "feat(reasoning): add threshold YAML loader with body-type adjustment"
+        },
+        {
+          "id": "B2",
+          "title": "Rule loader",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/reasoning/rule_loader.py",
+            "software/server/tests/unit/reasoning/test_rule_loader.py"
+          ],
+          "depends_on": ["A3"],
+          "expected_tests": 4,
+          "commit_msg": "feat(reasoning): add rule YAML loader"
+        },
+        {
+          "id": "B3",
+          "title": "Report schemas (with empty Plan-3 slots)",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/report/__init__.py",
+            "software/server/src/auralink/report/schemas.py",
+            "software/server/tests/unit/report/test_schemas.py"
+          ],
+          "depends_on": ["A1"],
+          "expected_tests": 3,
+          "commit_msg": "feat(report): add Report pydantic schema with Plan-3 slot stubs"
+        }
+      ]
+    },
+    {
+      "wave": "C",
+      "max_parallel": 1,
+      "tasks": [
+        {
+          "id": "C1",
+          "title": "ChainReasoner protocol + RuleBasedChainReasoner",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/reasoning/rule_engine.py",
+            "software/server/tests/unit/reasoning/test_rule_engine.py"
+          ],
+          "depends_on": ["A1", "A2", "A3", "B1"],
+          "expected_tests": 6,
+          "commit_msg": "feat(reasoning): add RuleBasedChainReasoner rule-evaluation engine"
+        }
+      ]
+    },
+    {
+      "wave": "D",
+      "max_parallel": 2,
+      "tasks": [
+        {
+          "id": "D1",
+          "title": "ChainReasoningStage + PipelineArtifacts field",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/pipeline/stages/chain_reasoning.py",
+            "software/server/src/auralink/pipeline/artifacts.py",
+            "software/server/tests/unit/reasoning/test_chain_reasoning_stage.py"
+          ],
+          "depends_on": ["A1", "A2", "C1"],
+          "expected_tests": 3,
+          "commit_msg": "feat(pipeline): add ChainReasoningStage + chain_observations artifact field"
+        },
+        {
+          "id": "D2",
+          "title": "Report assembler",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/report/assembler.py",
+            "software/server/tests/unit/report/test_assembler.py"
+          ],
+          "depends_on": ["A1", "B3"],
+          "expected_tests": 4,
+          "commit_msg": "feat(report): add report assembler with wellness-positioned narrative"
+        }
+      ]
+    },
+    {
+      "wave": "E",
+      "max_parallel": 2,
+      "tasks": [
+        {
+          "id": "E1",
+          "title": "Orchestrator wiring — chain_reasoning stage appended",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/pipeline/orchestrator.py",
+            "software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py"
+          ],
+          "depends_on": ["A2", "B1", "B2", "D1"],
+          "expected_tests": 3,
+          "commit_msg": "feat(pipeline): wire ChainReasoningStage into default and push_up stage lists"
+        },
+        {
+          "id": "E2",
+          "title": "Update GET /sessions/{id}/report to return Report",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/api/routes/reports.py",
+            "software/server/tests/unit/api/test_reports_route.py"
+          ],
+          "depends_on": ["D2"],
+          "expected_tests": 2,
+          "commit_msg": "feat(api): GET /sessions/{id}/report returns structured Report"
+        }
+      ]
+    },
+    {
+      "wave": "F",
+      "max_parallel": 2,
+      "tasks": [
+        {
+          "id": "F1",
+          "title": "Integration test — fixture → full report",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/tests/integration/test_full_report.py"
+          ],
+          "depends_on": ["E1", "E2"],
+          "expected_tests": 3,
+          "commit_msg": "test(integration): end-to-end report generation from synthetic fixtures"
+        },
+        {
+          "id": "F2",
+          "title": "Wellness language lint test",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/tests/unit/reasoning/test_wellness_language.py"
+          ],
+          "depends_on": ["A5", "A6"],
+          "expected_tests": 1,
+          "commit_msg": "test(reasoning): enforce wellness-language lint on rule narratives"
+        }
+      ]
+    },
+    {
+      "wave": "G",
+      "max_parallel": 1,
+      "tasks": [
+        {
+          "id": "G1",
+          "title": "Final validation",
+          "label": "skip-tdd",
+          "files_owned": [],
+          "depends_on": ["F1", "F2"],
+          "expected_tests": 0,
+          "commit_msg": "chore(server): ruff/black cleanup after plan 2"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "tasks": 14,
+    "waves": 7,
+    "max_parallelism": 6,
+    "expected_new_tests": 30
+  }
+}
+```
 
 ## Exit Criteria
 
-- ~20 new tests.
-- Synthetic overhead_squat fixture with a 12° knee valgus angle produces a `ChainObservation` for SBL with severity ≥ `concern`.
-- A fixture with zero compensation produces zero observations but still returns a valid `Report`.
-- Report language matches the Capstone CLAUDE.md wellness-positioning rules (no forbidden terms).
-- Threshold + rule configs are loaded from YAML at startup; changing a threshold does not require code changes.
-- Body-type profile optionally passed with the session; if present, the threshold table adjusts accordingly.
+- ~42 new tests pass (per task expected counts sum: 3+2+4+0+0+0+4+4+3+6+3+4+3+2+3+1 = 42).
+- Synthetic `overhead_squat_valgus` fixture produces at least one SBL `ChainObservation` with severity `concern` or `flag`.
+- Synthetic `overhead_squat_clean` fixture produces zero observations and the "clean overall pattern" narrative.
+- Wellness language lint passes over all `config/rules/*.yaml` files.
+- `ruff check` and `black --check` are clean.
+- Dev-server smoke test passes end-to-end.
+- `GET /sessions/{id}/report` returns the `Report` pydantic model (not raw `PipelineArtifacts`).
 
-## Deferred to L3
+## Deferred & Cross-Cutting Concerns
 
-- Exact severity thresholds (info vs concern vs flag) — pick pragmatic defaults during implementation.
-- Rule format details (YAML schema shape) — iterate during implementation.
-- Whether `BodyTypeProfile` arrives in the session metadata or as a separate endpoint (leaning metadata to keep the API surface small).
+### Scope deferred to later plans
 
-## Notes for writing-plans
+- **`BodyTypeProfile` attachment to session ingest.** Plan 2 ships the pydantic schema, the `adjust_for_body_type()` mechanism, and unit tests for the adjustment logic. The `ChainReasoningStage` constructor accepts `body_type: BodyTypeProfile | None = None`; v1 orchestrator wiring passes `None`. Reason: the "where does the profile live" question is tangled up with user-model scope (see sEMG note below), and Plan 2 should not pin that decision prematurely. Plan 2 is the "mechanism exists, off by default" milestone.
+- **DTW / temporal analysis** — Plan 3 populates `TemporalSection`.
+- **Cross-movement aggregation** — Plan 3 populates `CrossMovementSection`.
+- **LLM-generated narratives** — out of scope; all text is template-driven.
 
-- This plan introduces YAML as a new file format. Verify pydantic-yaml (`pyyaml` is already transitive — confirm during library check).
-- Rule evaluation should be fully deterministic and independently testable per rule. Avoid rule-engine framework overhead — plain Python conditionals in a loop is the right level of simplicity for v1.
-- The `ChainReasoner` protocol must accept the artifact bundle from Plan 1 — define the exact input shape during `writing-plans` after Plan 1 execution settles the artifact schemas.
-- Narrative text generation is stage-scope, not LLM — template strings per rule. LLM narrative comes in a separate plan if ever.
+### Cross-cutting architectural choices worth documenting
+
+- **Single-metric rule engine.** `RuleConfig.metric_key` is pinned to a single `PerRepMetrics` field per rule (`Literal["mean_knee_valgus_deg", "mean_trunk_lean_deg", "rom_deg", "peak_velocity_deg_per_s"]`). This is deliberate for v1 — pose-only data fits naturally into per-rep scalar metrics, and the simplicity is testable. **Known limitation:** rules cannot express multi-signal conditions like "high knee valgus AND high hamstring co-activation." When sEMG lands, this will need to evolve — either by widening `RuleConfig` to `conditions: list[Condition]` with a combinator, or by introducing a second reasoner that consumes a joint pose+EMG artifact bundle. The choice belongs in the sEMG integration epoch, not here.
+
+- **BodyTypeProfile scope will shift from session-level to user-level when sEMG arrives.** Current mental model (v1): attach profile optionally to a session. Better mental model (post-sEMG): profile is a user-level attribute that calibrates both pose thresholds AND sEMG activation baselines, and is re-used across every session that user records. Plan 2 does not commit to either location — the profile is a standalone pydantic model with no session or user bindings, so future wiring can go either way.
+
+- **Report is a view on artifacts, not a stored artifact.** Assembly runs on-demand in the endpoint. The canonical data lives in `PipelineArtifacts`; the `Report` shape is free to evolve without a backfill. If we ever need stored reports (e.g., for a mobile client that wants guaranteed historical consistency), add a cache layer behind the endpoint — don't move assembly into the pipeline.
+
+- **Chain observations ARE stored** — they live on `PipelineArtifacts.chain_observations` because they are analytical output, not a presentation concern. Re-generating them would require re-running the reasoner and re-computing deterministic thresholds. Storing them is simpler and keeps the reasoner out of the read path.
+
+- **MovementSection is intentionally maximally inclusive.** Every artifact field is exposed to the client. The phone renders what it needs and ignores the rest. Payload-size control is an endpoint-stage concern (future `?compact=true` query param), not a schema concern.
