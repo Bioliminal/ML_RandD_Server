@@ -923,7 +923,7 @@ Note: `SessionQualityReport.model_construct()` bypasses validation so tests do n
 ```python
 from typing import Protocol
 
-from auralink.pipeline.artifacts import PerRepMetrics, PipelineArtifacts
+from auralink.pipeline.artifacts import PerRepMetrics
 from auralink.reasoning.body_type import BodyTypeProfile
 from auralink.reasoning.config_schemas import (
     BodyTypeAdjustmentsConfig,
@@ -937,7 +937,7 @@ from auralink.reasoning.threshold_loader import adjust_for_body_type
 class ChainReasoner(Protocol):
     def reason(
         self,
-        artifacts: PipelineArtifacts,
+        per_rep_metrics: PerRepMetrics | None,
         movement: str,
         body_type: BodyTypeProfile | None = None,
     ) -> list[ChainObservation]: ...
@@ -972,11 +972,11 @@ class RuleBasedChainReasoner:
 
     def reason(
         self,
-        artifacts: PipelineArtifacts,
+        per_rep_metrics: PerRepMetrics | None,
         movement: str,
         body_type: BodyTypeProfile | None = None,
     ) -> list[ChainObservation]:
-        if artifacts.per_rep_metrics is None:
+        if per_rep_metrics is None:
             return []
         thresholds = self._base
         if body_type is not None:
@@ -986,7 +986,7 @@ class RuleBasedChainReasoner:
         for rule in self._rules:
             if movement not in rule.applies_to_movements:
                 continue
-            values = _extract_metric(artifacts.per_rep_metrics, rule.metric_key)
+            values = _extract_metric(per_rep_metrics, rule.metric_key)
             if not values:
                 continue
             aggregated = _aggregate(values, rule.aggregation)
@@ -1022,7 +1022,7 @@ class RuleBasedChainReasoner:
 ```python
 import pytest
 
-from auralink.pipeline.artifacts import PerRepMetrics, PipelineArtifacts, RepMetric
+from auralink.pipeline.artifacts import PerRepMetrics, RepMetric
 from auralink.reasoning.body_type import BodyTypeProfile
 from auralink.reasoning.chains import ChainName
 from auralink.reasoning.config_schemas import (
@@ -1046,9 +1046,8 @@ def _rep(valgus: float = 0.0, trunk_lean: float = 0.0) -> RepMetric:
     )
 
 
-def _artifacts(reps: list[RepMetric]) -> PipelineArtifacts:
-    per_rep = PerRepMetrics(primary_angle="knee_flexion", reps=reps)
-    return PipelineArtifacts.model_construct(per_rep_metrics=per_rep)
+def _per_rep(reps: list[RepMetric]) -> PerRepMetrics:
+    return PerRepMetrics(primary_angle="knee_flexion", reps=reps)
 
 
 def _thresholds() -> ThresholdSetConfig:
@@ -1077,53 +1076,52 @@ def _valgus_rule() -> RuleConfig:
     )
 
 
-def test_returns_empty_when_no_per_rep_metrics():
-    artifacts = PipelineArtifacts.model_construct(per_rep_metrics=None)
+def test_returns_empty_when_per_rep_metrics_is_none():
     reasoner = RuleBasedChainReasoner(
         rules=[_valgus_rule()],
         base_thresholds=_thresholds(),
         adjustments=BodyTypeAdjustmentsConfig(),
     )
-    assert reasoner.reason(artifacts, "overhead_squat") == []
+    assert reasoner.reason(None, "overhead_squat") == []
 
 
 def test_rule_fires_at_concern_severity():
-    artifacts = _artifacts([_rep(valgus=9.5)])
+    per_rep = _per_rep([_rep(valgus=9.5)])
     reasoner = RuleBasedChainReasoner(
         rules=[_valgus_rule()],
         base_thresholds=_thresholds(),
         adjustments=BodyTypeAdjustmentsConfig(),
     )
-    obs = reasoner.reason(artifacts, "overhead_squat")
+    obs = reasoner.reason(per_rep, "overhead_squat")
     assert len(obs) == 1
     assert obs[0].severity == ObservationSeverity.CONCERN
     assert obs[0].chain == ChainName.SBL
 
 
 def test_rule_fires_at_flag_severity():
-    artifacts = _artifacts([_rep(valgus=13.0)])
+    per_rep = _per_rep([_rep(valgus=13.0)])
     reasoner = RuleBasedChainReasoner(
         rules=[_valgus_rule()],
         base_thresholds=_thresholds(),
         adjustments=BodyTypeAdjustmentsConfig(),
     )
-    obs = reasoner.reason(artifacts, "overhead_squat")
+    obs = reasoner.reason(per_rep, "overhead_squat")
     assert len(obs) == 1
     assert obs[0].severity == ObservationSeverity.FLAG
 
 
 def test_rule_skipped_when_movement_does_not_match():
-    artifacts = _artifacts([_rep(valgus=13.0)])
+    per_rep = _per_rep([_rep(valgus=13.0)])
     reasoner = RuleBasedChainReasoner(
         rules=[_valgus_rule()],
         base_thresholds=_thresholds(),
         adjustments=BodyTypeAdjustmentsConfig(),
     )
-    assert reasoner.reason(artifacts, "push_up") == []
+    assert reasoner.reason(per_rep, "push_up") == []
 
 
 def test_body_type_adjustment_raises_threshold_so_rule_does_not_fire():
-    artifacts = _artifacts([_rep(valgus=9.5)])
+    per_rep = _per_rep([_rep(valgus=9.5)])
     adjustments = BodyTypeAdjustmentsConfig(
         adjustments=[
             BodyTypeAdjustment(
@@ -1141,21 +1139,21 @@ def test_body_type_adjustment_raises_threshold_so_rule_does_not_fire():
         adjustments=adjustments,
     )
     profile = BodyTypeProfile(hypermobile=True)
-    assert reasoner.reason(artifacts, "overhead_squat", body_type=profile) == []
+    assert reasoner.reason(per_rep, "overhead_squat", body_type=profile) == []
 
 
 def test_narrative_template_formats_value():
-    artifacts = _artifacts([_rep(valgus=9.5)])
+    per_rep = _per_rep([_rep(valgus=9.5)])
     reasoner = RuleBasedChainReasoner(
         rules=[_valgus_rule()],
         base_thresholds=_thresholds(),
         adjustments=BodyTypeAdjustmentsConfig(),
     )
-    obs = reasoner.reason(artifacts, "overhead_squat")
+    obs = reasoner.reason(per_rep, "overhead_squat")
     assert obs[0].narrative == "knee valgus 9.5"
 ```
 
-Note: test uses `PipelineArtifacts.model_construct(...)` to bypass validation of required fields from Plan 1. If `PerRepMetrics` or `RepMetric` field names differ in the installed code, subagent reads `pipeline/artifacts.py` and adjusts the test helpers — the field names `rep_index`, `amplitude_deg`, `peak_velocity_deg_per_s`, `rom_deg`, `mean_trunk_lean_deg`, `mean_knee_valgus_deg` are the contract this plan was written against.
+Note: `PerRepMetrics` and `RepMetric` field names (`rep_index`, `amplitude_deg`, `peak_velocity_deg_per_s`, `rom_deg`, `mean_trunk_lean_deg`, `mean_knee_valgus_deg`) are the contract this plan was written against — verified against `pipeline/artifacts.py` at plan time.
 
 **Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_rule_engine.py -v`
 
