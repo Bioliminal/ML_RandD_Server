@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from auralink.reasoning.observations import ChainObservation
+
 
 class QualityIssue(BaseModel):
     code: str
@@ -91,3 +93,4 @@ class PipelineArtifacts(BaseModel):
     lift_result: LiftedAngleTimeSeries | None = None
     skeleton_result: SkeletonBundle | None = None
     phase_boundaries: PhaseBoundaries | None = None
+    chain_observations: list[ChainObservation] | None = None
