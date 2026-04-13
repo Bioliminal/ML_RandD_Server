@@ -5,7 +5,7 @@
 **Depends on:** Plan 1 (pipeline framework, PerRepMetrics, WithinMovementTrend), Plan 4 (synthetic fixtures, load_fixture helper)
 **Supersedes:** Stub version of this file from 2026-04-10
 **Created:** 2026-04-11
-**Execution:** parallel-plan-executor, 14 tasks, 7 waves, max parallelism 6
+**Execution:** parallel-plan-executor, 19 tasks, 8 waves, max parallelism 6
 
 ## Goal
 
@@ -19,7 +19,7 @@ Turn the raw `PipelineArtifacts` produced by Plan 1 into a structured, human-rea
 4. **Threshold adjustments via body-type profile.** `BodyTypeProfile` drives `adjust_for_body_type(base, profile, adjustments) -> ThresholdSetConfig`.
 5. **Temporal / cross-movement slots are empty stubs.** Plan 3 fills them.
 6. **Wellness language enforcement is a pytest scan** over `config/rules/*.yaml` narrative templates (regex against forbidden terms).
-7. **No new runtime deps** beyond confirming `pyyaml` is importable. If not present, add to `software/server/pyproject.toml`.
+7. **One new runtime dep:** `pyyaml>=6.0`. Added explicitly as Task PRE1 in Wave 0 (runs alone before Wave A) because B1, B2, and F2 all import yaml.
 8. **Wellness positioning:** All narrative text uses "your movement shows X pattern", "body connection from A to B", "opportunity to explore". NEVER "diagnosis", "dysfunction", "drivers of pain", "injury", "damage", "pathology".
 
 ## File Tree Delta
@@ -39,11 +39,12 @@ software/server/src/auralink/
 │   ├── schemas.py              # NEW — Report pydantic model + stubs
 │   └── assembler.py            # NEW — assemble_report()
 ├── pipeline/
-│   ├── artifacts.py            # MODIFIED — adds chain_observations field
-│   ├── orchestrator.py         # MODIFIED — wires chain_reasoning stage
+│   ├── artifacts.py            # MODIFIED (B4) — adds chain_observations field
+│   ├── orchestrator.py         # MODIFIED (E1) — wires run_chain_reasoning + _assemble_artifacts
 │   └── stages/
-│       └── chain_reasoning.py  # NEW — ChainReasoningStage
-└── api/routes/reports.py       # MODIFIED — returns Report not raw artifacts
+│       ├── base.py             # MODIFIED (D1) — adds STAGE_NAME_CHAIN_REASONING constant
+│       └── chain_reasoning.py  # NEW (D1) — run_chain_reasoning module-level function
+└── api/routes/reports.py       # MODIFIED (E2) — returns Report not raw artifacts
 
 software/server/config/
 ├── thresholds/
@@ -57,10 +58,36 @@ software/server/config/
 software/server/tests/
 ├── unit/reasoning/                      # NEW — per-module tests
 ├── unit/report/                         # NEW — schema + assembler tests
+├── unit/pipeline/                       # MODIFIED — chain reasoning stage + orchestrator wiring + artifacts field tests
+├── unit/api/                            # MODIFIED — reports route tests
 └── integration/test_full_report.py      # NEW — fixture → full report
 ```
 
 ## Task List
+
+---
+
+#### Task PRE1: Add pyyaml runtime dependency
+
+**Label:** skip-tdd
+
+**Files owned (exclusive to this task):**
+- `software/server/pyproject.toml`
+
+**Depends on:** nothing
+
+**Rationale:** Tasks B1, B2, and F2 all `import yaml`, but `pyyaml` is NOT currently in `software/server/pyproject.toml` `[project.dependencies]`. Adding the dep inside a parallel wave would race; PRE1 lives in its own Wave 0 that runs alone before Wave A.
+
+**Steps:**
+
+1. Read the current `software/server/pyproject.toml` `[project] dependencies` list.
+2. If `pyyaml` is not already present, add `"pyyaml>=6.0"` to the list. Any alphabetical position in the list is acceptable.
+3. Run `cd software/server && uv sync` to install it into the uv-managed venv.
+4. **Verify:** `cd software/server && uv run python -c "import yaml; print(yaml.__version__)"` — should print a version string (e.g., `6.0.2`).
+
+**Expected result:** `pyyaml>=6.0` appears in `[project.dependencies]`; `uv sync` completes without error; the verify command prints a version.
+
+**Commit message:** `chore(deps): add pyyaml for chain reasoning config loaders`
 
 ---
 
@@ -905,6 +932,65 @@ Note: `SessionQualityReport.model_construct()` bypasses validation so tests do n
 
 ---
 
+#### Task B4: Add chain_observations field to PipelineArtifacts
+
+**Label:** TDD
+
+**Files owned (exclusive to this task):**
+- `software/server/src/auralink/pipeline/artifacts.py`
+- `software/server/tests/unit/pipeline/test_artifacts_chain_observations.py`
+
+**Depends on:** A1 (ChainObservation)
+
+**Rationale:** Split out from the original D1 bundle to eliminate a Wave D race condition. D1 (stage function) and D2 (assembler) both read the `chain_observations` field; if either task also mutates `artifacts.py` in parallel, they collide. B4 lands the field addition alone in Wave B so D1 and D2 can run safely in parallel.
+
+**Edit to `software/server/src/auralink/pipeline/artifacts.py`:**
+
+1. Add import (group with existing imports at the top of the file):
+```python
+from auralink.reasoning.observations import ChainObservation
+```
+
+2. Add a new optional field to `PipelineArtifacts` (group with the other `| None = None` fields):
+```python
+    chain_observations: list[ChainObservation] | None = None
+```
+
+Subagent must guard against circular import between `pipeline/artifacts.py` and `reasoning/observations.py`. Since `observations.py` only imports from `reasoning/chains.py`, the import should be safe — verify by running tests.
+
+**Test file:**
+
+`software/server/tests/unit/pipeline/test_artifacts_chain_observations.py`:
+```python
+from auralink.pipeline.artifacts import PipelineArtifacts
+from auralink.reasoning.chains import ChainName
+from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+
+
+def test_pipeline_artifacts_accepts_chain_observations():
+    obs = ChainObservation(
+        chain=ChainName.SBL,
+        severity=ObservationSeverity.CONCERN,
+        confidence=0.75,
+        trigger_rule="sbl_rule",
+        narrative="n",
+    )
+    artifacts = PipelineArtifacts.model_construct(chain_observations=[obs])
+    data = artifacts.model_dump()
+    restored = PipelineArtifacts.model_validate(data)
+    assert restored.chain_observations is not None
+    assert len(restored.chain_observations) == 1
+    assert restored.chain_observations[0].trigger_rule == "sbl_rule"
+```
+
+**Focused test command:** `cd software/server && uv run pytest tests/unit/pipeline/test_artifacts_chain_observations.py -v`
+
+**Expected result:** `1 passed`
+
+**Commit message:** `feat(pipeline): add chain_observations field to PipelineArtifacts`
+
+---
+
 #### Task C1: ChainReasoner protocol + RuleBasedChainReasoner
 
 **Label:** TDD
@@ -1163,73 +1249,85 @@ Note: `PerRepMetrics` and `RepMetric` field names (`rep_index`, `amplitude_deg`,
 
 ---
 
-#### Task D1: ChainReasoningStage + PipelineArtifacts field
+#### Task D1: run_chain_reasoning stage function
 
 **Label:** TDD
 
 **Files owned (exclusive to this task):**
 - `software/server/src/auralink/pipeline/stages/chain_reasoning.py`
-- `software/server/src/auralink/pipeline/artifacts.py` (MODIFIED — add one field)
-- `software/server/tests/unit/reasoning/test_chain_reasoning_stage.py`
+- `software/server/src/auralink/pipeline/stages/base.py` (MODIFIED — add one constant)
+- `software/server/tests/unit/pipeline/test_chain_reasoning_stage.py`
 
-**Depends on:** A1 (observations), A2 (body_type), C1 (ChainReasoner protocol)
+**Depends on:** A1 (observations), C1 (ChainReasoner protocol), B4 (chain_observations field)
 
-**Pre-step:** Subagent MUST first read `software/server/src/auralink/pipeline/stages/base.py` to see the exact `Stage` pattern used by existing stages. If the existing pattern differs from the class-based shape below (e.g., Stage is a `@dataclass(frozen=True)` with `run: Callable`), adapt the implementation to match the existing pattern — construct a `Stage(name=STAGE_NAME_CHAIN_REASONING, run=<closure>)` factory function instead of a class. The tests below are written against a class with a `.run(artifacts)` method; if the Stage pattern is callable-based, the subagent adjusts the test to call the returned Stage's `.run(ctx)` with the right argument shape. If the existing orchestrator passes `StageContext` (not `PipelineArtifacts`) to stages, the chain reasoning stage must read `ctx.artifacts["..."]` — subagent inspects and matches.
+**Ground truth (verified against code, not subject to improvisation):** The existing `Stage` in `software/server/src/auralink/pipeline/stages/base.py` is `@dataclass(frozen=True)` wrapping `run: Callable[[StageContext], Any]`. All existing stages (see `lift.py`, `normalize.py`, `per_rep_metrics.py`) are module-level functions of shape `run_xxx(ctx: StageContext, impl: Protocol | None = None) -> Artifact`. The chain reasoning stage MUST follow this convention — NO classes. `STAGE_NAME_*` constants live in `base.py`, not in individual stage modules.
 
-If the adaptation requires a design decision (e.g., how to store `artifacts` in the existing `StageContext.artifacts` dict), report STATUS: CHECKPOINT.
+**Edit to `software/server/src/auralink/pipeline/stages/base.py`:**
 
-**Artifacts field addition (edit to `pipeline/artifacts.py`):**
-
-Add this import at the top if not present:
+Add a new constant directly after the existing `STAGE_NAME_PHASE_SEGMENT = "phase_segment"` line (currently line 33):
 ```python
-from auralink.reasoning.observations import ChainObservation
+STAGE_NAME_CHAIN_REASONING = "chain_reasoning"
 ```
-
-And add this field to the `PipelineArtifacts` class body (near the other optional fields):
-```python
-    chain_observations: list[ChainObservation] | None = None
-```
-
-Note: subagent must guard against circular import between `pipeline/artifacts.py` and `reasoning/observations.py`. Since `observations.py` only imports from `reasoning/chains.py`, the import should be safe — but verify by running tests.
 
 **Exact file contents (verbatim):**
 
 `software/server/src/auralink/pipeline/stages/chain_reasoning.py`:
 ```python
-from auralink.pipeline.artifacts import PipelineArtifacts
-from auralink.reasoning.body_type import BodyTypeProfile
-from auralink.reasoning.rule_engine import ChainReasoner
+from auralink.pipeline.stages.base import (
+    STAGE_NAME_CHAIN_REASONING,
+    STAGE_NAME_PER_REP_METRICS,
+    StageContext,
+)
+from auralink.reasoning.observations import ChainObservation
+from auralink.reasoning.rule_engine import ChainReasoner, RuleBasedChainReasoner
+from auralink.reasoning.rule_loader import load_rules
+from auralink.reasoning.threshold_loader import (
+    load_body_type_adjustments,
+    load_default_thresholds,
+)
 
-STAGE_NAME_CHAIN_REASONING = "chain_reasoning"
+
+def _build_default_reasoner() -> RuleBasedChainReasoner:
+    return RuleBasedChainReasoner(
+        rules=load_rules(),
+        base_thresholds=load_default_thresholds(),
+        adjustments=load_body_type_adjustments(),
+    )
 
 
-class ChainReasoningStage:
-    name = STAGE_NAME_CHAIN_REASONING
+_default_reasoner: ChainReasoner = _build_default_reasoner()
 
-    def __init__(
-        self,
-        reasoner: ChainReasoner,
-        movement: str,
-        body_type: BodyTypeProfile | None = None,
-    ) -> None:
-        self._reasoner = reasoner
-        self._movement = movement
-        self._body_type = body_type
 
-    def run(self, artifacts: PipelineArtifacts) -> PipelineArtifacts:
-        observations = self._reasoner.reason(artifacts, self._movement, self._body_type)
-        return artifacts.model_copy(update={"chain_observations": observations})
+def run_chain_reasoning(
+    ctx: StageContext,
+    reasoner: ChainReasoner | None = None,
+) -> list[ChainObservation]:
+    """Apply rule-based chain reasoning over per-rep metrics.
+
+    Reads PerRepMetrics from the prior stage and returns a list of
+    ChainObservations. Returns an empty list if per_rep_metrics is missing
+    (push_up stops at skeleton; rollup uses phase_segment instead of reps).
+    """
+    impl = reasoner if reasoner is not None else _default_reasoner
+    per_rep = ctx.artifacts.get(STAGE_NAME_PER_REP_METRICS)
+    return impl.reason(
+        per_rep,
+        ctx.session.metadata.movement,
+        body_type=None,
+    )
 ```
+
+Note: `STAGE_NAME_CHAIN_REASONING` is imported from `base.py` (where D1 also adds it); it is NOT defined in this file. This matches the existing convention (see `lift.py` importing `STAGE_NAME_NORMALIZE` from `base.py`).
 
 **Test file:**
 
-`software/server/tests/unit/reasoning/test_chain_reasoning_stage.py`:
+`software/server/tests/unit/pipeline/test_chain_reasoning_stage.py`:
 ```python
-from auralink.pipeline.artifacts import PipelineArtifacts
-from auralink.pipeline.stages.chain_reasoning import (
-    STAGE_NAME_CHAIN_REASONING,
-    ChainReasoningStage,
-)
+from datetime import UTC, datetime
+
+from auralink.api.schemas import Session, SessionMetadata
+from auralink.pipeline.stages.base import STAGE_NAME_PER_REP_METRICS, StageContext
+from auralink.pipeline.stages.chain_reasoning import run_chain_reasoning
 from auralink.reasoning.chains import ChainName
 from auralink.reasoning.observations import ChainObservation, ObservationSeverity
 
@@ -1237,25 +1335,44 @@ from auralink.reasoning.observations import ChainObservation, ObservationSeverit
 class _FakeReasoner:
     def __init__(self, observations: list[ChainObservation]):
         self._observations = observations
+        self.calls: list[tuple] = []
 
-    def reason(self, artifacts, movement, body_type=None):
+    def reason(self, per_rep_metrics, movement, body_type=None):
+        self.calls.append((per_rep_metrics, movement, body_type))
         return list(self._observations)
 
 
-def test_stage_name_is_chain_reasoning():
-    assert STAGE_NAME_CHAIN_REASONING == "chain_reasoning"
-    stage = ChainReasoningStage(reasoner=_FakeReasoner([]), movement="overhead_squat")
-    assert stage.name == "chain_reasoning"
+def _ctx(movement: str = "overhead_squat") -> StageContext:
+    session = Session(
+        metadata=SessionMetadata(
+            movement=movement,
+            device="test",
+            model="test",
+            frame_rate=30.0,
+            captured_at=datetime.now(UTC),
+        ),
+        frames=[],
+    )
+    return StageContext(session=session)
 
 
-def test_stage_run_with_empty_observations():
-    artifacts = PipelineArtifacts.model_construct()
-    stage = ChainReasoningStage(reasoner=_FakeReasoner([]), movement="overhead_squat")
-    result = stage.run(artifacts)
-    assert result.chain_observations == []
+def test_run_chain_reasoning_returns_empty_when_per_rep_missing():
+    ctx = _ctx()
+    fake = _FakeReasoner([])
+    result = run_chain_reasoning(ctx, reasoner=fake)
+    assert result == []
+    assert fake.calls == [(None, "overhead_squat", None)]
 
 
-def test_stage_run_with_two_observations():
+def test_run_chain_reasoning_passes_movement_and_per_rep_to_reasoner():
+    ctx = _ctx(movement="single_leg_squat")
+    ctx.artifacts[STAGE_NAME_PER_REP_METRICS] = "sentinel-per-rep"
+    fake = _FakeReasoner([])
+    run_chain_reasoning(ctx, reasoner=fake)
+    assert fake.calls == [("sentinel-per-rep", "single_leg_squat", None)]
+
+
+def test_run_chain_reasoning_returns_reasoner_observations_unchanged():
     obs_a = ChainObservation(
         chain=ChainName.SBL,
         severity=ObservationSeverity.CONCERN,
@@ -1270,22 +1387,18 @@ def test_stage_run_with_two_observations():
         trigger_rule="bfl_b",
         narrative="b",
     )
-    artifacts = PipelineArtifacts.model_construct()
-    stage = ChainReasoningStage(
-        reasoner=_FakeReasoner([obs_a, obs_b]),
-        movement="overhead_squat",
-    )
-    result = stage.run(artifacts)
-    assert len(result.chain_observations) == 2
-    assert result.chain_observations[0].trigger_rule == "sbl_a"
-    assert result.chain_observations[1].trigger_rule == "bfl_b"
+    ctx = _ctx()
+    ctx.artifacts[STAGE_NAME_PER_REP_METRICS] = "x"
+    fake = _FakeReasoner([obs_a, obs_b])
+    result = run_chain_reasoning(ctx, reasoner=fake)
+    assert result == [obs_a, obs_b]
 ```
 
-**Focused test command:** `cd software/server && uv run pytest tests/unit/reasoning/test_chain_reasoning_stage.py -v`
+**Focused test command:** `cd software/server && uv run pytest tests/unit/pipeline/test_chain_reasoning_stage.py -v`
 
 **Expected result:** `3 passed`
 
-**Commit message:** `feat(pipeline): add ChainReasoningStage + chain_observations artifact field`
+**Commit message:** `feat(pipeline): add run_chain_reasoning stage function`
 
 ---
 
@@ -1457,53 +1570,65 @@ def test_assemble_with_concern_and_flag_produces_compound_narrative():
 - `software/server/src/auralink/pipeline/orchestrator.py` (MODIFIED)
 - `software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py`
 
-**Depends on:** D1 (ChainReasoningStage), B1 (threshold_loader), B2 (rule_loader), A2 (BodyTypeProfile)
+**Depends on:** D1 (run_chain_reasoning), B1 (threshold_loader), B2 (rule_loader), B4 (chain_observations field)
 
-**Pre-step:** Subagent MUST first read `software/server/src/auralink/pipeline/orchestrator.py` to see the exact shape of `_default_stage_list()`, `_push_up_stage_list()`, `_rollup_stage_list()`, and how other stages are constructed and appended. Match that construction style exactly.
+**Ground truth (verified, not subject to improvisation):** `_default_stage_list`, `_push_up_stage_list`, `_rollup_stage_list`, and `_assemble_artifacts` are private module-level functions in `orchestrator.py`. Each list builds `Stage(name=..., run=run_xxx)` from imported module-level stage functions. `_assemble_artifacts(ctx)` is hard-coded: it reads `ctx.artifacts.get(STAGE_NAME_X)` for every output field of `PipelineArtifacts`. Adding a new artifact field REQUIRES extending `_assemble_artifacts` — it does not auto-populate. The default reasoner lives in `stages/chain_reasoning.py` as a module-level singleton (D1); no factories, closures, or global caches live in `orchestrator.py`.
 
-**Implementation guidance:**
-1. Add a module-level helper `_build_chain_reasoner()` that loads rules, default thresholds, and adjustments once (module-level cache acceptable for v1). Example shape:
-   ```python
-   _CHAIN_REASONER: RuleBasedChainReasoner | None = None
+**Implementation steps:**
 
-   def _build_chain_reasoner() -> RuleBasedChainReasoner:
-       global _CHAIN_REASONER
-       if _CHAIN_REASONER is None:
-           from auralink.reasoning.rule_engine import RuleBasedChainReasoner
-           from auralink.reasoning.rule_loader import load_rules
-           from auralink.reasoning.threshold_loader import (
-               load_body_type_adjustments,
-               load_default_thresholds,
-           )
-           _CHAIN_REASONER = RuleBasedChainReasoner(
-               rules=load_rules(),
-               base_thresholds=load_default_thresholds(),
-               adjustments=load_body_type_adjustments(),
-           )
-       return _CHAIN_REASONER
-   ```
-2. In `_default_stage_list()` and `_push_up_stage_list()`, after the existing stages, append a `ChainReasoningStage(reasoner=_build_chain_reasoner(), movement=<movement-name>, body_type=None)`. The movement name to pass depends on how each list is scoped — `_default_stage_list` is `"overhead_squat"` (default), `_push_up_stage_list` is `"push_up"`. If these names differ in the existing code, use the existing names.
-3. `_rollup_stage_list()` is NOT modified — chain reasoning is skipped for rollup because rollup has no rep metrics.
-4. If the existing `Stage` is a `@dataclass(frozen=True)` with `run: Callable[[StageContext], Any]`, the subagent wraps `ChainReasoningStage` into a `Stage` using a closure:
-   ```python
-   def _chain_reasoning_stage_factory(movement: str) -> Stage:
-       impl = ChainReasoningStage(reasoner=_build_chain_reasoner(), movement=movement)
-       def _run(ctx: StageContext):
-           artifacts = ctx.artifacts["pipeline_artifacts"]  # or whatever key Plan 1 uses
-           ctx.artifacts["pipeline_artifacts"] = impl.run(artifacts)
-           return ctx.artifacts["pipeline_artifacts"]
-       return Stage(name="chain_reasoning", run=_run)
-   ```
-   If Plan 1 stores artifacts under a different key (or reshapes them differently), subagent reports STATUS: CHECKPOINT with the actual key so the plan can be revised.
+1. Extend the base.py import block to include `STAGE_NAME_CHAIN_REASONING`:
+```python
+from auralink.pipeline.stages.base import (
+    STAGE_NAME_ANGLE_SERIES,
+    STAGE_NAME_CHAIN_REASONING,
+    STAGE_NAME_LIFT,
+    STAGE_NAME_NORMALIZE,
+    STAGE_NAME_PER_REP_METRICS,
+    STAGE_NAME_PHASE_SEGMENT,
+    STAGE_NAME_QUALITY_GATE,
+    STAGE_NAME_REP_SEGMENT,
+    STAGE_NAME_SKELETON,
+    STAGE_NAME_WITHIN_MOVEMENT_TREND,
+    Stage,
+    StageContext,
+)
+```
+
+2. Add a new stage import alongside the other `run_xxx` imports:
+```python
+from auralink.pipeline.stages.chain_reasoning import run_chain_reasoning
+```
+
+3. Append a chain-reasoning stage at the END of `_default_stage_list()` (after the `STAGE_NAME_WITHIN_MOVEMENT_TREND` line):
+```python
+        Stage(name=STAGE_NAME_CHAIN_REASONING, run=run_chain_reasoning),
+```
+
+4. Append the same line at the END of `_push_up_stage_list()` (after the `STAGE_NAME_SKELETON` line).
+
+5. Do NOT modify `_rollup_stage_list()` — rollup skips chain reasoning because it has no per-rep metrics.
+
+6. **Update `_assemble_artifacts()`** — add one new kwarg AFTER the existing `phase_boundaries=...` line:
+```python
+        chain_observations=ctx.artifacts.get(STAGE_NAME_CHAIN_REASONING),
+```
 
 **Test file:**
 
 `software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py`:
 ```python
+from unittest.mock import patch
+
 from auralink.pipeline.orchestrator import (
+    _assemble_artifacts,
     _default_stage_list,
     _push_up_stage_list,
     _rollup_stage_list,
+)
+from auralink.pipeline.stages.base import (
+    STAGE_NAME_CHAIN_REASONING,
+    STAGE_NAME_QUALITY_GATE,
+    StageContext,
 )
 
 
@@ -1511,13 +1636,13 @@ def _stage_names(stages) -> list[str]:
     return [s.name for s in stages]
 
 
-def test_default_stage_list_contains_chain_reasoning():
+def test_default_stage_list_ends_with_chain_reasoning():
     names = _stage_names(_default_stage_list())
     assert "chain_reasoning" in names
     assert names[-1] == "chain_reasoning"
 
 
-def test_push_up_stage_list_contains_chain_reasoning():
+def test_push_up_stage_list_ends_with_chain_reasoning():
     names = _stage_names(_push_up_stage_list())
     assert "chain_reasoning" in names
     assert names[-1] == "chain_reasoning"
@@ -1526,15 +1651,33 @@ def test_push_up_stage_list_contains_chain_reasoning():
 def test_rollup_stage_list_does_not_contain_chain_reasoning():
     names = _stage_names(_rollup_stage_list())
     assert "chain_reasoning" not in names
-```
 
-Note: if `_default_stage_list`, `_push_up_stage_list`, and `_rollup_stage_list` are private module-level names that don't exist (e.g., they're methods on a class or named differently in the installed code), subagent reports STATUS: CHECKPOINT with the actual names.
+
+def test_assemble_artifacts_populates_chain_observations():
+    """_assemble_artifacts must copy chain_reasoning stage output onto PipelineArtifacts."""
+    class _FakeSession:
+        class metadata:
+            movement = "overhead_squat"
+
+    ctx = StageContext.__new__(StageContext)
+    ctx.session = _FakeSession()
+    ctx.artifacts = {
+        STAGE_NAME_QUALITY_GATE: object(),
+        STAGE_NAME_CHAIN_REASONING: ["sentinel-observation"],
+    }
+    ctx.config = {}
+
+    with patch("auralink.pipeline.orchestrator.PipelineArtifacts") as fake_pa:
+        _assemble_artifacts(ctx)
+        kwargs = fake_pa.call_args.kwargs
+        assert kwargs["chain_observations"] == ["sentinel-observation"]
+```
 
 **Focused test command:** `cd software/server && uv run pytest tests/unit/pipeline/test_orchestrator_chain_wiring.py -v`
 
-**Expected result:** `3 passed`
+**Expected result:** `4 passed`
 
-**Commit message:** `feat(pipeline): wire ChainReasoningStage into default and push_up stage lists`
+**Commit message:** `feat(pipeline): wire run_chain_reasoning into default + push_up stage lists`
 
 ---
 
@@ -1548,9 +1691,7 @@ Note: if `_default_stage_list`, `_push_up_stage_list`, and `_rollup_stage_list` 
 
 **Depends on:** D2 (assemble_report)
 
-**Pre-step:** Subagent MUST first read `software/server/src/auralink/pipeline/storage.py` to check whether `SessionStorage` has a method for loading the original `Session` (carrying session metadata like `movement`). The template below assumes `storage.load_session(session_id)`. If no such method exists (e.g., the actual method is `storage.load(session_id)` or similar), subagent reports STATUS: CHECKPOINT so the plan can be revised with the correct method name. Do NOT improvise.
-
-Also read the current `api/routes/reports.py` to see the exact dependency injection pattern (`Settings`, `SessionStorage` provider) and match it.
+**Ground truth (verified, not subject to improvisation):** `SessionStorage` exposes `save`, `load(session_id) -> Session`, `save_artifacts`, and `load_artifacts(session_id) -> PipelineArtifacts`. There is NO `load_session` method — use `storage.load()`. `SessionMetadata.captured_at` is a `datetime` (see `api/schemas.py:48`) — there is NO `captured_at_ms` field. Convert via `int(session.metadata.captured_at.timestamp() * 1000)`.
 
 **Exact file contents (verbatim):**
 
@@ -1577,18 +1718,19 @@ def get_report(
 ) -> Report:
     try:
         artifacts = storage.load_artifacts(session_id)
+        session = storage.load(session_id)
     except FileNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"no report for session {session_id}",
         ) from exc
 
-    session_record = storage.load_session(session_id)
+    captured_at_ms = int(session.metadata.captured_at.timestamp() * 1000)
     return assemble_report(
         artifacts=artifacts,
         session_id=session_id,
-        movement=session_record.metadata.movement,
-        captured_at_ms=getattr(session_record.metadata, "captured_at_ms", None),
+        movement=session.metadata.movement,
+        captured_at_ms=captured_at_ms,
     )
 ```
 
@@ -1607,35 +1749,13 @@ def test_get_report_returns_404_for_missing_session(tmp_path, monkeypatch):
     client = TestClient(app)
     response = client.get("/sessions/does-not-exist/report")
     assert response.status_code == 404
-
-
-def test_get_report_returns_report_with_metadata_and_movement_section(
-    tmp_path, monkeypatch
-):
-    """Given a stored session + artifacts, GET /report returns a Report JSON
-    with metadata.session_id and movement_section.movement populated."""
-    monkeypatch.setenv("AURALINK_SESSIONS_DIR", str(tmp_path))
-    app = create_app()
-    client = TestClient(app)
-    # POST a minimal synthetic session using fixture loader, then GET the report.
-    from tests.fixtures.loader import load_fixture
-
-    session = load_fixture("overhead_squat", variant="clean")
-    post = client.post("/sessions", json=session.model_dump(mode="json"))
-    assert post.status_code in (200, 201)
-    session_id = post.json()["session_id"]
-    report = client.get(f"/sessions/{session_id}/report")
-    assert report.status_code == 200
-    body = report.json()
-    assert body["metadata"]["session_id"] == session_id
-    assert body["movement_section"]["movement"] == "overhead_squat"
 ```
 
-Note: the integration test here depends on the `POST /sessions` flow running the full pipeline synchronously and persisting artifacts. If the existing flow is async or returns a different shape, subagent reports STATUS: CHECKPOINT. The fixture loader path assumes Plan 4's `tests/fixtures/loader.py::load_fixture` is importable.
+Note: a full end-to-end fixture → POST → GET test lives in F1 (`tests/integration/test_full_report.py`). E2 intentionally keeps only the route-level 404 test to avoid duplicating F1's coverage.
 
 **Focused test command:** `cd software/server && uv run pytest tests/unit/api/test_reports_route.py -v`
 
-**Expected result:** `2 passed`
+**Expected result:** `1 passed`
 
 **Commit message:** `feat(api): GET /sessions/{id}/report returns structured Report`
 
@@ -1807,7 +1927,7 @@ def test_no_forbidden_wellness_terms_in_rule_narratives():
    ```
    cd software/server && uv run pytest -q
    ```
-   Expected: ~42 new tests on top of the 136 baseline (~178 total). All pass.
+   Expected: ~43 new tests on top of the 136 baseline (~179 total). All pass.
 
 2. **Ruff auto-fix:**
    ```
@@ -1827,32 +1947,34 @@ def test_no_forbidden_wellness_terms_in_rule_narratives():
    ```
    cd software/server && uv run pytest -q
    ```
-   Expected: same ~178 tests pass.
+   Expected: same ~179 tests pass.
 
-5. **Dev-server smoke test:**
-   ```
-   cd software/server && uv run uvicorn auralink.api.app:create_app --factory --port 8765 &
-   SERVER_PID=$!
-   sleep 2
-   python - <<'PY'
-   import json, urllib.request, sys
-   from tests.fixtures.loader import load_fixture
-   session = load_fixture("overhead_squat", variant="valgus")
-   req = urllib.request.Request(
-       "http://127.0.0.1:8765/sessions",
-       data=session.model_dump_json().encode(),
-       headers={"Content-Type": "application/json"},
-       method="POST",
-   )
-   session_id = json.loads(urllib.request.urlopen(req).read())["session_id"]
-   report = json.loads(urllib.request.urlopen(f"http://127.0.0.1:8765/sessions/{session_id}/report").read())
-   obs = report["movement_section"]["chain_observations"]
-   sbl = [o for o in obs if o["chain"] == "superficial_back_line" and o["severity"] in {"concern", "flag"}]
-   assert sbl, f"expected SBL observation, got {obs}"
-   print("SMOKE OK:", len(sbl), "SBL observation(s)")
-   PY
-   kill $SERVER_PID
-   ```
+5. **Dev-server smoke test.** First write the smoke script to a temp file with NO list indentation (the heredoc terminator `PY` must be at column 0 or bash will not recognize it):
+
+```
+cat > /tmp/auralink_smoke.py <<'PY'
+import json, urllib.request
+from tests.fixtures.loader import load_fixture
+session = load_fixture("overhead_squat", variant="valgus")
+req = urllib.request.Request(
+    "http://127.0.0.1:8765/sessions",
+    data=session.model_dump_json().encode(),
+    headers={"Content-Type": "application/json"},
+    method="POST",
+)
+session_id = json.loads(urllib.request.urlopen(req).read())["session_id"]
+report = json.loads(urllib.request.urlopen(f"http://127.0.0.1:8765/sessions/{session_id}/report").read())
+obs = report["movement_section"]["chain_observations"]
+sbl = [o for o in obs if o["chain"] == "superficial_back_line" and o["severity"] in {"concern", "flag"}]
+assert sbl, f"expected SBL observation, got {obs}"
+print("SMOKE OK:", len(sbl), "SBL observation(s)")
+PY
+cd software/server && uv run uvicorn auralink.api.app:create_app --factory --port 8765 &
+SERVER_PID=$!
+sleep 2
+cd software/server && uv run python /tmp/auralink_smoke.py
+kill $SERVER_PID
+```
    Expected: prints `SMOKE OK: N SBL observation(s)` where N >= 1. Server cleanly killed.
 
 6. **If ruff/black changed anything, commit the cleanup:**
@@ -1873,8 +1995,9 @@ def test_no_forbidden_wellness_terms_in_rule_narratives():
 Wave groupings enforce parallelism and dependency barriers. Subagents within a wave run concurrently (max 6). Barriers between waves.
 
 ```
+Wave 0 (1):           PRE1
 Wave A (parallel, 6): A1, A2, A3, A4, A5, A6
-Wave B (parallel, 3): B1, B2, B3
+Wave B (parallel, 4): B1, B2, B3, B4
 Wave C (1):           C1
 Wave D (parallel, 2): D1, D2
 Wave E (parallel, 2): E1, E2
@@ -1888,6 +2011,23 @@ Wave G (1):           G1
 {
   "plan_id": "2026-04-10-L2-2-chain-reasoning",
   "waves": [
+    {
+      "wave": "0",
+      "max_parallel": 1,
+      "tasks": [
+        {
+          "id": "PRE1",
+          "title": "Add pyyaml runtime dependency",
+          "label": "skip-tdd",
+          "files_owned": [
+            "software/server/pyproject.toml"
+          ],
+          "depends_on": [],
+          "expected_tests": 0,
+          "commit_msg": "chore(deps): add pyyaml for chain reasoning config loaders"
+        }
+      ]
+    },
     {
       "wave": "A",
       "max_parallel": 6,
@@ -1967,7 +2107,7 @@ Wave G (1):           G1
     },
     {
       "wave": "B",
-      "max_parallel": 3,
+      "max_parallel": 4,
       "tasks": [
         {
           "id": "B1",
@@ -2006,6 +2146,18 @@ Wave G (1):           G1
           "depends_on": ["A1"],
           "expected_tests": 3,
           "commit_msg": "feat(report): add Report pydantic schema with Plan-3 slot stubs"
+        },
+        {
+          "id": "B4",
+          "title": "Add chain_observations field to PipelineArtifacts",
+          "label": "TDD",
+          "files_owned": [
+            "software/server/src/auralink/pipeline/artifacts.py",
+            "software/server/tests/unit/pipeline/test_artifacts_chain_observations.py"
+          ],
+          "depends_on": ["A1"],
+          "expected_tests": 1,
+          "commit_msg": "feat(pipeline): add chain_observations field to PipelineArtifacts"
         }
       ]
     },
@@ -2033,16 +2185,16 @@ Wave G (1):           G1
       "tasks": [
         {
           "id": "D1",
-          "title": "ChainReasoningStage + PipelineArtifacts field",
+          "title": "run_chain_reasoning stage function",
           "label": "TDD",
           "files_owned": [
             "software/server/src/auralink/pipeline/stages/chain_reasoning.py",
-            "software/server/src/auralink/pipeline/artifacts.py",
-            "software/server/tests/unit/reasoning/test_chain_reasoning_stage.py"
+            "software/server/src/auralink/pipeline/stages/base.py",
+            "software/server/tests/unit/pipeline/test_chain_reasoning_stage.py"
           ],
-          "depends_on": ["A1", "A2", "C1"],
+          "depends_on": ["A1", "C1", "B4"],
           "expected_tests": 3,
-          "commit_msg": "feat(pipeline): add ChainReasoningStage + chain_observations artifact field"
+          "commit_msg": "feat(pipeline): add run_chain_reasoning stage function"
         },
         {
           "id": "D2",
@@ -2052,7 +2204,7 @@ Wave G (1):           G1
             "software/server/src/auralink/report/assembler.py",
             "software/server/tests/unit/report/test_assembler.py"
           ],
-          "depends_on": ["A1", "B3"],
+          "depends_on": ["A1", "B3", "B4"],
           "expected_tests": 4,
           "commit_msg": "feat(report): add report assembler with wellness-positioned narrative"
         }
@@ -2064,15 +2216,15 @@ Wave G (1):           G1
       "tasks": [
         {
           "id": "E1",
-          "title": "Orchestrator wiring — chain_reasoning stage appended",
+          "title": "Orchestrator wiring — run_chain_reasoning + _assemble_artifacts update",
           "label": "TDD",
           "files_owned": [
             "software/server/src/auralink/pipeline/orchestrator.py",
             "software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py"
           ],
-          "depends_on": ["A2", "B1", "B2", "D1"],
-          "expected_tests": 3,
-          "commit_msg": "feat(pipeline): wire ChainReasoningStage into default and push_up stage lists"
+          "depends_on": ["B1", "B2", "B4", "D1"],
+          "expected_tests": 4,
+          "commit_msg": "feat(pipeline): wire run_chain_reasoning into default + push_up stage lists"
         },
         {
           "id": "E2",
@@ -2083,7 +2235,7 @@ Wave G (1):           G1
             "software/server/tests/unit/api/test_reports_route.py"
           ],
           "depends_on": ["D2"],
-          "expected_tests": 2,
+          "expected_tests": 1,
           "commit_msg": "feat(api): GET /sessions/{id}/report returns structured Report"
         }
       ]
@@ -2133,17 +2285,19 @@ Wave G (1):           G1
     }
   ],
   "totals": {
-    "tasks": 14,
-    "waves": 7,
+    "tasks": 19,
+    "waves": 8,
     "max_parallelism": 6,
-    "expected_new_tests": 30
+    "expected_new_tests": 43
   }
 }
 ```
 
+Expected new test count breakdown: PRE1=0 + A1=3 + A2=2 + A3=4 + A4=0 + A5=0 + A6=0 + B1=4 + B2=4 + B3=3 + B4=1 + C1=6 + D1=3 + D2=4 + E1=4 + E2=1 + F1=3 + F2=1 + G1=0 = 43.
+
 ## Exit Criteria
 
-- ~42 new tests pass (per task expected counts sum: 3+2+4+0+0+0+4+4+3+6+3+4+3+2+3+1 = 42).
+- ~43 new tests pass (per task expected counts sum: 0+3+2+4+0+0+0+4+4+3+1+6+3+4+4+1+3+1 = 43).
 - Synthetic `overhead_squat_valgus` fixture produces at least one SBL `ChainObservation` with severity `concern` or `flag`.
 - Synthetic `overhead_squat_clean` fixture produces zero observations and the "clean overall pattern" narrative.
 - Wellness language lint passes over all `config/rules/*.yaml` files.
