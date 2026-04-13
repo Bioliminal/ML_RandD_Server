@@ -12,8 +12,8 @@ from typing import Any, Literal
 MovementType = Literal["overhead_squat", "single_leg_squat", "push_up", "rollup"]
 
 
-def _landmark(x: float, y: float) -> dict:
-    return {"x": x, "y": y, "z": 0.0, "visibility": 1.0, "presence": 1.0}
+def _landmark(x: float, y: float, z: float = 0.0) -> dict:
+    return {"x": x, "y": y, "z": z, "visibility": 1.0, "presence": 1.0}
 
 
 def _frame_for_knee_angle(
@@ -23,16 +23,19 @@ def _frame_for_knee_angle(
     trunk_lean_deg: float = 4.0,
 ) -> dict:
     """Stylized pose: hip at (0.5, 0.5), knee at (0.5, 0.7), ankle placed so
-    `knee_flexion_angle()` returns the requested value. Applies a horizontal
-    valgus offset on the ankle and a trunk-lean offset on the shoulder mid.
+    the knee-flexion arc lives on the z axis (ignored by 2D angle math) and
+    does not contaminate the 2D knee-valgus reading. Valgus is a horizontal
+    x-offset on the ankle; the knee folds vertically via the cos term and
+    forward-into-depth via the sin term on z.
     """
     hip = (0.5, 0.5)
     knee = (0.5, 0.7)
     r = 0.2
     angle_from_down_rad = math.radians(180.0 - knee_flexion_deg)
     valgus_offset = math.radians(knee_valgus_deg) * 0.1
-    ankle_x = knee[0] + r * math.sin(angle_from_down_rad) + valgus_offset
+    ankle_x = knee[0] + valgus_offset
     ankle_y = knee[1] + r * math.cos(angle_from_down_rad)
+    ankle_z = r * math.sin(angle_from_down_rad)
 
     trunk_rad = math.radians(trunk_lean_deg)
     shoulder_x = hip[0] + 0.2 * math.sin(trunk_rad)
@@ -45,8 +48,8 @@ def _frame_for_knee_angle(
     landmarks[24] = _landmark(hip[0] + 0.05, hip[1])  # RIGHT_HIP
     landmarks[25] = _landmark(knee[0] - 0.05, knee[1])  # LEFT_KNEE
     landmarks[26] = _landmark(knee[0] + 0.05, knee[1])  # RIGHT_KNEE
-    landmarks[27] = _landmark(ankle_x - 0.05, ankle_y)  # LEFT_ANKLE
-    landmarks[28] = _landmark(ankle_x + 0.05, ankle_y)  # RIGHT_ANKLE
+    landmarks[27] = _landmark(ankle_x - 0.05, ankle_y, ankle_z)  # LEFT_ANKLE
+    landmarks[28] = _landmark(ankle_x + 0.05, ankle_y, ankle_z)  # RIGHT_ANKLE
 
     for i in range(33):
         if landmarks[i]["x"] == 0.0 and landmarks[i]["y"] == 0.0:
