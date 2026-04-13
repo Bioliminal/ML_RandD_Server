@@ -14,7 +14,7 @@ Turn the raw `PipelineArtifacts` produced by Plan 1 into a structured, human-rea
 ## Design Decisions (Locked)
 
 1. **Report is assembled on-demand in the endpoint**, NOT as a pipeline stage. The `GET /sessions/{id}/report` handler loads `PipelineArtifacts` from storage, calls `assemble_report(artifacts, session_metadata)`, and returns the result.
-2. **Chain reasoning IS a pipeline stage.** It reads artifacts, produces `list[ChainObservation]`, and stores them back on `PipelineArtifacts.chain_observations`.
+2. **Chain reasoning IS a pipeline stage.** It reads `per_rep_metrics` from `ctx.artifacts` and returns `list[ChainObservation]`. The orchestrator's executor loop stores that return value under `ctx.artifacts[STAGE_NAME_CHAIN_REASONING]` (the existing auto-store convention — see `orchestrator.py::run_pipeline`). `_assemble_artifacts()` later copies the value onto `PipelineArtifacts.chain_observations`. The stage function never touches `PipelineArtifacts` directly.
 3. **Rules and thresholds are YAML-driven.** Pydantic models (`RuleConfig`, `ThresholdSetConfig`) validate loaded YAML. Pure `pyyaml` + pydantic — no `pydantic-yaml` dependency.
 4. **Threshold adjustments via body-type profile.** `BodyTypeProfile` drives `adjust_for_body_type(base, profile, adjustments) -> ThresholdSetConfig`.
 5. **Temporal / cross-movement slots are empty stubs.** Plan 3 fills them.
@@ -1572,7 +1572,12 @@ def test_assemble_with_concern_and_flag_produces_compound_narrative():
 
 **Depends on:** D1 (run_chain_reasoning), B1 (threshold_loader), B2 (rule_loader), B4 (chain_observations field)
 
-**Ground truth (verified, not subject to improvisation):** `_default_stage_list`, `_push_up_stage_list`, `_rollup_stage_list`, and `_assemble_artifacts` are private module-level functions in `orchestrator.py`. Each list builds `Stage(name=..., run=run_xxx)` from imported module-level stage functions. `_assemble_artifacts(ctx)` is hard-coded: it reads `ctx.artifacts.get(STAGE_NAME_X)` for every output field of `PipelineArtifacts`. Adding a new artifact field REQUIRES extending `_assemble_artifacts` — it does not auto-populate. The default reasoner lives in `stages/chain_reasoning.py` as a module-level singleton (D1); no factories, closures, or global caches live in `orchestrator.py`.
+**Ground truth (verified against `orchestrator.py`, not subject to improvisation):**
+- `_default_stage_list`, `_push_up_stage_list`, `_rollup_stage_list`, and `_assemble_artifacts` are private module-level functions. Each list builds `Stage(name=..., run=run_xxx)` from imported module-level stage functions.
+- **Executor stores stage return values automatically.** The `run_pipeline(session, registry)` loop does `result = stage.run(ctx)` followed by `ctx.artifacts[stage.name] = result` (verified at `orchestrator.py:95`). This means `run_chain_reasoning` returning `list[ChainObservation]` will end up in `ctx.artifacts["chain_reasoning"]` without any explicit wiring in E1. The D1 stage MUST NOT mutate `ctx.artifacts` itself — just return the list.
+- `_assemble_artifacts(ctx)` is hard-coded: it reads `ctx.artifacts.get(STAGE_NAME_X)` for every output field of `PipelineArtifacts` (orchestrator.py:103–114). Adding a new artifact field REQUIRES extending `_assemble_artifacts` — it does not auto-populate from the ctx.artifacts dict.
+- `PipelineArtifacts` is imported directly into the `orchestrator` namespace via `from auralink.pipeline.artifacts import PipelineArtifacts` (orchestrator.py:2), so E1's test can patch `auralink.pipeline.orchestrator.PipelineArtifacts`.
+- The default reasoner lives in `stages/chain_reasoning.py` as a module-level singleton (D1); no factories, closures, or global caches live in `orchestrator.py`.
 
 **Implementation steps:**
 
@@ -1628,6 +1633,7 @@ from auralink.pipeline.orchestrator import (
 from auralink.pipeline.stages.base import (
     STAGE_NAME_CHAIN_REASONING,
     STAGE_NAME_QUALITY_GATE,
+    Stage,
     StageContext,
 )
 
@@ -1671,11 +1677,56 @@ def test_assemble_artifacts_populates_chain_observations():
         _assemble_artifacts(ctx)
         kwargs = fake_pa.call_args.kwargs
         assert kwargs["chain_observations"] == ["sentinel-observation"]
+
+
+def test_chain_reasoning_return_value_reaches_assemble_artifacts():
+    """End-to-end contract: the executor loop must store run_chain_reasoning's
+    return value under ctx.artifacts[STAGE_NAME_CHAIN_REASONING], and
+    _assemble_artifacts must read it back. This test exercises the real
+    orchestrator loop against a stub stage list so it breaks loudly if the
+    auto-store convention ever regresses.
+    """
+    from datetime import UTC, datetime
+
+    from auralink.api.schemas import Session, SessionMetadata
+    from auralink.pipeline.orchestrator import run_pipeline
+    from auralink.pipeline.registry import StageRegistry
+
+    sentinel = ["sentinel-obs"]
+
+    def _quality(ctx):
+        class _QR:
+            passed = True
+        return _QR()
+
+    def _chain(ctx):
+        return sentinel
+
+    registry = StageRegistry()
+    registry.register_movement(
+        "overhead_squat",
+        [
+            Stage(name=STAGE_NAME_QUALITY_GATE, run=_quality),
+            Stage(name=STAGE_NAME_CHAIN_REASONING, run=_chain),
+        ],
+    )
+    session = Session(
+        metadata=SessionMetadata(
+            movement="overhead_squat",
+            device="t",
+            model="t",
+            frame_rate=30.0,
+            captured_at=datetime.now(UTC),
+        ),
+        frames=[],
+    )
+    artifacts = run_pipeline(session, registry=registry)
+    assert artifacts.chain_observations == sentinel
 ```
 
 **Focused test command:** `cd software/server && uv run pytest tests/unit/pipeline/test_orchestrator_chain_wiring.py -v`
 
-**Expected result:** `4 passed`
+**Expected result:** `5 passed`
 
 **Commit message:** `feat(pipeline): wire run_chain_reasoning into default + push_up stage lists`
 
@@ -1927,7 +1978,7 @@ def test_no_forbidden_wellness_terms_in_rule_narratives():
    ```
    cd software/server && uv run pytest -q
    ```
-   Expected: ~43 new tests on top of the 136 baseline (~179 total). All pass.
+   Expected: ~44 new tests on top of the 136 baseline (~180 total). All pass.
 
 2. **Ruff auto-fix:**
    ```
@@ -1947,7 +1998,7 @@ def test_no_forbidden_wellness_terms_in_rule_narratives():
    ```
    cd software/server && uv run pytest -q
    ```
-   Expected: same ~179 tests pass.
+   Expected: same ~180 tests pass.
 
 5. **Dev-server smoke test.** First write the smoke script to a temp file with NO list indentation (the heredoc terminator `PY` must be at column 0 or bash will not recognize it):
 
@@ -2223,7 +2274,7 @@ Wave G (1):           G1
             "software/server/tests/unit/pipeline/test_orchestrator_chain_wiring.py"
           ],
           "depends_on": ["B1", "B2", "B4", "D1"],
-          "expected_tests": 4,
+          "expected_tests": 5,
           "commit_msg": "feat(pipeline): wire run_chain_reasoning into default + push_up stage lists"
         },
         {
@@ -2288,16 +2339,16 @@ Wave G (1):           G1
     "tasks": 19,
     "waves": 8,
     "max_parallelism": 6,
-    "expected_new_tests": 43
+    "expected_new_tests": 44
   }
 }
 ```
 
-Expected new test count breakdown: PRE1=0 + A1=3 + A2=2 + A3=4 + A4=0 + A5=0 + A6=0 + B1=4 + B2=4 + B3=3 + B4=1 + C1=6 + D1=3 + D2=4 + E1=4 + E2=1 + F1=3 + F2=1 + G1=0 = 43.
+Expected new test count breakdown: PRE1=0 + A1=3 + A2=2 + A3=4 + A4=0 + A5=0 + A6=0 + B1=4 + B2=4 + B3=3 + B4=1 + C1=6 + D1=3 + D2=4 + E1=5 + E2=1 + F1=3 + F2=1 + G1=0 = 44.
 
 ## Exit Criteria
 
-- ~43 new tests pass (per task expected counts sum: 0+3+2+4+0+0+0+4+4+3+1+6+3+4+4+1+3+1 = 43).
+- ~44 new tests pass (per task expected counts sum: 0+3+2+4+0+0+0+4+4+3+1+6+3+4+5+1+3+1 = 44).
 - Synthetic `overhead_squat_valgus` fixture produces at least one SBL `ChainObservation` with severity `concern` or `flag`.
 - Synthetic `overhead_squat_clean` fixture produces zero observations and the "clean overall pattern" narrative.
 - Wellness language lint passes over all `config/rules/*.yaml` files.
