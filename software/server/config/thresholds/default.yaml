@@ -1,0 +1,6 @@
+knee_valgus_concern: 8.0
+knee_valgus_flag: 12.0
+hip_drop_concern: 5.0
+hip_drop_flag: 10.0
+trunk_lean_concern: 6.0
+trunk_lean_flag: 10.0

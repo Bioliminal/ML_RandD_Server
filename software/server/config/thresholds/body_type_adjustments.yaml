@@ -1,0 +1,11 @@
+adjustments:
+  - applies_to_hypermobile: true
+    threshold_overrides:
+      knee_valgus_concern: 10.0
+      knee_valgus_flag: 15.0
+      hip_drop_concern: 7.0
+      hip_drop_flag: 12.0
+  - applies_to_age_range: [youth]
+    threshold_overrides:
+      trunk_lean_concern: 8.0
+      trunk_lean_flag: 12.0
