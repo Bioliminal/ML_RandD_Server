@@ -1,0 +1,11 @@
+rules:
+  - rule_id: ffl_trunk_shift_concern
+    chain: front_functional_line
+    applies_to_movements: [overhead_squat]
+    metric_key: mean_trunk_lean_deg
+    aggregation: max
+    threshold_concern_ref: trunk_lean_concern
+    threshold_flag_ref: trunk_lean_flag
+    involved_joints: [contralateral_shoulder, hip, opposite_knee]
+    narrative_template: "Your front-line movement pattern shows {value:.1f} degrees of trunk movement — exploring the pec-to-adductor connection may be helpful."
+    confidence: 0.65

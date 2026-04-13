@@ -1,0 +1,11 @@
+rules:
+  - rule_id: bfl_hip_drop_concern
+    chain: back_functional_line
+    applies_to_movements: [single_leg_squat]
+    metric_key: mean_trunk_lean_deg
+    aggregation: max
+    threshold_concern_ref: hip_drop_concern
+    threshold_flag_ref: hip_drop_flag
+    involved_joints: [hip, contralateral_shoulder]
+    narrative_template: "Your lateral trunk shift of {value:.1f} degrees suggests an opportunity to explore the lat-to-glute body connection."
+    confidence: 0.7
