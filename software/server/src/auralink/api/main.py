@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from auralink.api.errors import register_exception_handlers
-from auralink.api.routes import health, reports, sessions
+from auralink.api.routes import health, protocols, reports, sessions
 from auralink.config import get_settings
 
 
@@ -12,6 +12,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(sessions.router)
     app.include_router(reports.router)
+    app.include_router(protocols.router)
     return app
 
 
