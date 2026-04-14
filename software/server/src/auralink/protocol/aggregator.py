@@ -78,7 +78,7 @@ def aggregate_protocol(reports: list[Report], session_ids: list[str]) -> Protoco
         metrics.append(
             CrossMovementMetric(
                 metric_name="mean_ncc",
-                values_by_movement=dict(mean_ncc_by_session),
+                values_by_session=dict(mean_ncc_by_session),
                 trend=_trend(list(mean_ncc_by_session.values()), higher_is_better=True),
             )
         )
@@ -86,7 +86,7 @@ def aggregate_protocol(reports: list[Report], session_ids: list[str]) -> Protoco
         metrics.append(
             CrossMovementMetric(
                 metric_name="mean_rom_deviation_pct",
-                values_by_movement=dict(mean_rom_dev_by_session),
+                values_by_session=dict(mean_rom_dev_by_session),
                 trend=_trend(
                     [abs(v) for v in mean_rom_dev_by_session.values()],
                     higher_is_better=False,
@@ -95,7 +95,10 @@ def aggregate_protocol(reports: list[Report], session_ids: list[str]) -> Protoco
         )
 
     carryover = False
-    if len(mean_ncc_by_session) >= _MIN_SESSIONS_FOR_CARRYOVER:
+    if (
+        len(mean_ncc_by_session) >= _MIN_SESSIONS_FOR_CARRYOVER
+        and len(mean_rom_dev_by_session) >= _MIN_SESSIONS_FOR_CARRYOVER
+    ):
         ncc_values = list(mean_ncc_by_session.values())
         rom_abs_values = [abs(v) for v in mean_rom_dev_by_session.values()]
         ncc_slope = _slope(ncc_values)

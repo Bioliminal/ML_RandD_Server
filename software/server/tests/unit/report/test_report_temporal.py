@@ -40,7 +40,7 @@ def test_temporal_section_holds_movement_temporal_summary():
 def test_cross_movement_section_holds_metrics():
     metric = CrossMovementMetric(
         metric_name="mean_ncc",
-        values_by_movement={"overhead_squat": 0.95},
+        values_by_session={"s1": 0.95},
         trend="stable",
     )
     section = CrossMovementSection(cross_movement_metrics=[metric])

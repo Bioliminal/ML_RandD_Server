@@ -79,4 +79,22 @@ def test_session_without_movement_temporal_summary_is_skipped():
         None,
     )
     assert ncc_metric is not None
-    assert "push_up" not in ncc_metric.values_by_movement
+    assert "s1" in ncc_metric.values_by_session
+    assert "s2" not in ncc_metric.values_by_session
+
+
+def test_repeated_same_movement_sessions_do_not_overwrite_each_other():
+    """Regression guard: before the session_id keying fix, four overhead_squat
+    sessions collapsed into a single entry, breaking cross-session metrics.
+    """
+    reports = [
+        _mk_report("s1", "overhead_squat", 0.97, -2.0),
+        _mk_report("s2", "overhead_squat", 0.93, -6.0),
+        _mk_report("s3", "overhead_squat", 0.89, -12.0),
+        _mk_report("s4", "overhead_squat", 0.85, -18.0),
+    ]
+    protocol = aggregate_protocol(reports, ["s1", "s2", "s3", "s4"])
+    ncc_metric = next(m for m in protocol.cross_movement_metrics if m.metric_name == "mean_ncc")
+    assert set(ncc_metric.values_by_session.keys()) == {"s1", "s2", "s3", "s4"}
+    assert ncc_metric.values_by_session["s1"] == 0.97
+    assert ncc_metric.values_by_session["s4"] == 0.85

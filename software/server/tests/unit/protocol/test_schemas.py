@@ -15,7 +15,7 @@ def test_protocol_request_min_and_max_length():
 def test_protocol_report_and_cross_movement_metric_round_trip():
     metric = CrossMovementMetric(
         metric_name="mean_ncc",
-        values_by_movement={"overhead_squat": 0.93, "single_leg_squat": 0.90},
+        values_by_session={"s1": 0.93, "s2": 0.90},
         trend="declining",
     )
     report = ProtocolReport(

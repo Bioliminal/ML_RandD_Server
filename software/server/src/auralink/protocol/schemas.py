@@ -19,16 +19,19 @@ class ProtocolRequest(BaseModel):
 
 
 class CrossMovementMetric(BaseModel):
-    """One metric aggregated across the movements in a protocol.
+    """One metric aggregated across the sessions in a protocol.
 
-    values_by_movement is keyed by movement string (e.g. "overhead_squat").
+    values_by_session is keyed by session_id (preserving insertion order, which
+    mirrors the session_ids order from the request). Session-keyed (not
+    movement-keyed) so repeated same-movement sessions in a protocol don't
+    overwrite each other.
     trend classifies the sequence: "improving" when lower-is-better metrics
     decrease across sessions or higher-is-better metrics increase; "declining"
     is the opposite; "stable" when neither.
     """
 
     metric_name: str
-    values_by_movement: dict[str, float]
+    values_by_session: dict[str, float]
     trend: Literal["improving", "stable", "declining"]
 
 
