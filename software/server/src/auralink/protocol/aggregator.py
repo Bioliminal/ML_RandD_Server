@@ -107,10 +107,7 @@ def aggregate_protocol(reports: list[Report], session_ids: list[str]) -> Protoco
         ncc_endpoint_drop = ncc_values[-1] < ncc_values[0] - 1e-6
         rom_endpoint_growth = rom_abs_values[-1] > rom_abs_values[0] + 1e-6
         carryover = (
-            ncc_slope < 0.0
-            and rom_slope > 0.0
-            and ncc_endpoint_drop
-            and rom_endpoint_growth
+            ncc_slope < 0.0 and rom_slope > 0.0 and ncc_endpoint_drop and rom_endpoint_growth
         )
 
     if carryover:

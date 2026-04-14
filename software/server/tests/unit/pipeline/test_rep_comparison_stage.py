@@ -34,7 +34,9 @@ def _cosine_trace(n: int = 30, amplitude: float = 45.0, offset: float = 135.0) -
     return [offset + amplitude * math.cos(2.0 * math.pi * i / n) for i in range(n)]
 
 
-def _write_reference_rep(tmp_path: Path, movement: str, angle_name: str, series: list[float]) -> None:
+def _write_reference_rep(
+    tmp_path: Path, movement: str, angle_name: str, series: list[float]
+) -> None:
     import json
 
     (tmp_path / f"{movement}.json").write_text(
@@ -49,11 +51,13 @@ def _write_reference_rep(tmp_path: Path, movement: str, angle_name: str, series:
     )
 
 
-def _build_ctx(movement: str, primary_angle: str, user_series: list[float], n_reps: int) -> StageContext:
+def _build_ctx(
+    movement: str, primary_angle: str, user_series: list[float], n_reps: int
+) -> StageContext:
     ctx = StageContext(session=_make_session(movement))
     full_trace: list[float] = []
     boundaries: list[RepBoundaryModel] = []
-    for r in range(n_reps):
+    for _r in range(n_reps):
         start = len(full_trace)
         full_trace.extend(user_series)
         end = len(full_trace) - 1
@@ -95,16 +99,14 @@ def _patch_config_dirs(tmp_path, monkeypatch):
     ref_dir = tmp_path / "reference_reps"
     ref_dir.mkdir()
     thr_path = tmp_path / "thresholds.yaml"
-    thr_path.write_text(
-        """
+    thr_path.write_text("""
 ncc_clean_min: 0.95
 ncc_concern_min: 0.75
 rom_deviation_concern_pct: 15.0
 rom_deviation_flag_pct: 25.0
 form_drift_ncc_slope_threshold: -0.02
 form_drift_rom_mean_deviation_pct: 15.0
-"""
-    )
+""")
     import auralink.temporal.reference_reps as ref_mod
     import auralink.temporal.threshold_loader as thr_mod
 

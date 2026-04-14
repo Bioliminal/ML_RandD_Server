@@ -12,8 +12,8 @@ from auralink.pipeline.artifacts import (
     SkeletonBundle,
     WithinMovementTrend,
 )
-from auralink.reasoning.observations import ChainObservation
 from auralink.protocol.schemas import CrossMovementMetric
+from auralink.reasoning.observations import ChainObservation
 
 
 class TemporalSection(BaseModel):

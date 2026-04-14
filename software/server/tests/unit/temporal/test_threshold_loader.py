@@ -10,16 +10,14 @@ from auralink.temporal.threshold_loader import (
 
 def _write_yaml(tmp_path: Path) -> Path:
     p = tmp_path / "thresholds.yaml"
-    p.write_text(
-        """
+    p.write_text("""
 ncc_clean_min: 0.95
 ncc_concern_min: 0.75
 rom_deviation_concern_pct: 15.0
 rom_deviation_flag_pct: 25.0
 form_drift_ncc_slope_threshold: -0.02
 form_drift_rom_mean_deviation_pct: 15.0
-"""
-    )
+""")
     return p
 
 

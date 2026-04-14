@@ -86,10 +86,7 @@ def compare_rep(
 
     rom_user = _rom(user_angles)
     rom_ref = _rom(reference_angles)
-    if rom_ref > 0.0:
-        rom_deviation_pct = (rom_user - rom_ref) / rom_ref * 100.0
-    else:
-        rom_deviation_pct = 0.0
+    rom_deviation_pct = (rom_user - rom_ref) / rom_ref * 100.0 if rom_ref > 0.0 else 0.0
 
     ncc_status = _classify_ncc(ncc_score, thresholds)
     rom_status = _classify_rom(rom_deviation_pct, thresholds)

@@ -5,7 +5,9 @@ from auralink.api.schemas import Session
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
-def _post_squat(client: TestClient, rep_count: int, valgus_deg: float, trunk_lean_deg: float) -> str:
+def _post_squat(
+    client: TestClient, rep_count: int, valgus_deg: float, trunk_lean_deg: float
+) -> str:
     payload = build_overhead_squat_payload(
         rep_count=rep_count,
         frames_per_rep=30,
@@ -24,9 +26,7 @@ def test_four_clean_sessions_do_not_trigger_fatigue_carryover(tmp_path, monkeypa
     app = create_app()
     client = TestClient(app)
 
-    ids = [
-        _post_squat(client, rep_count=3, valgus_deg=2.0, trunk_lean_deg=4.0) for _ in range(4)
-    ]
+    ids = [_post_squat(client, rep_count=3, valgus_deg=2.0, trunk_lean_deg=4.0) for _ in range(4)]
     resp = client.post("/protocols", json={"session_ids": ids})
     assert resp.status_code == 200
     body = resp.json()
@@ -38,7 +38,9 @@ def test_four_clean_sessions_do_not_trigger_fatigue_carryover(tmp_path, monkeypa
     assert isinstance(body["summary_narrative"], str)
 
 
-def test_four_sessions_with_escalating_compensation_trigger_fatigue_carryover(tmp_path, monkeypatch):
+def test_four_sessions_with_escalating_compensation_trigger_fatigue_carryover(
+    tmp_path, monkeypatch
+):
     monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
