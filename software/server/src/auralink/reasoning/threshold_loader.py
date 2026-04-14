@@ -8,8 +8,9 @@ from auralink.reasoning.config_schemas import (
     ThresholdSetConfig,
 )
 
-_DEFAULT_PATH = Path(__file__).resolve().parents[3] / "config" / "thresholds" / "default.yaml"
-_ADJUSTMENTS_PATH = Path(__file__).resolve().parents[3] / "config" / "thresholds" / "body_type_adjustments.yaml"
+_CONFIG_DIR = Path(__file__).resolve().parents[3] / "config" / "thresholds"
+_DEFAULT_PATH = _CONFIG_DIR / "default.yaml"
+_ADJUSTMENTS_PATH = _CONFIG_DIR / "body_type_adjustments.yaml"
 
 
 def load_default_thresholds(path: Path | None = None) -> ThresholdSetConfig:
@@ -33,7 +34,10 @@ def adjust_for_body_type(
     for adj in adjustments.adjustments:
         if adj.applies_to_sex and profile.sex.value not in adj.applies_to_sex:
             continue
-        if adj.applies_to_hypermobile is not None and adj.applies_to_hypermobile != profile.hypermobile:
+        if (
+            adj.applies_to_hypermobile is not None
+            and adj.applies_to_hypermobile != profile.hypermobile
+        ):
             continue
         if adj.applies_to_age_range and profile.age_range not in adj.applies_to_age_range:
             continue

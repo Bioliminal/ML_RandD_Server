@@ -1,5 +1,3 @@
-import pytest
-
 from auralink.pipeline.artifacts import PerRepMetrics, RepMetric
 from auralink.reasoning.body_type import BodyTypeProfile
 from auralink.reasoning.chains import ChainName

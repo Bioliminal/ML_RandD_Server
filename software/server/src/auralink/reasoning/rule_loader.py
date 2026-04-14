@@ -19,9 +19,7 @@ def load_rules(rules_dir: Path | None = None) -> list[RuleConfig]:
         rules = _RuleListAdapter.validate_python(raw["rules"])
         for rule in rules:
             if rule.rule_id in seen_ids:
-                raise ValueError(
-                    f"duplicate rule_id {rule.rule_id!r} found in {yaml_path.name}"
-                )
+                raise ValueError(f"duplicate rule_id {rule.rule_id!r} found in {yaml_path.name}")
             seen_ids.add(rule.rule_id)
         all_rules.extend(rules)
     return all_rules

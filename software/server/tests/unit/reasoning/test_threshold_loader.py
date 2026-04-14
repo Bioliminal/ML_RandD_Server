@@ -54,9 +54,7 @@ def test_load_body_type_adjustments(adjustments_yaml: Path):
     assert cfg.adjustments[0].applies_to_hypermobile is True
 
 
-def test_adjust_for_body_type_hypermobile_overrides(
-    default_yaml: Path, adjustments_yaml: Path
-):
+def test_adjust_for_body_type_hypermobile_overrides(default_yaml: Path, adjustments_yaml: Path):
     base = load_default_thresholds(default_yaml)
     adjustments = load_body_type_adjustments(adjustments_yaml)
     profile = BodyTypeProfile(hypermobile=True)
@@ -66,9 +64,7 @@ def test_adjust_for_body_type_hypermobile_overrides(
     assert adjusted.trunk_lean_concern == 6.0
 
 
-def test_adjust_for_body_type_no_match_returns_base(
-    default_yaml: Path, adjustments_yaml: Path
-):
+def test_adjust_for_body_type_no_match_returns_base(default_yaml: Path, adjustments_yaml: Path):
     base = load_default_thresholds(default_yaml)
     adjustments = load_body_type_adjustments(adjustments_yaml)
     profile = BodyTypeProfile(hypermobile=False)

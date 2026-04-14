@@ -37,8 +37,9 @@ def test_rollup_stage_list_does_not_contain_chain_reasoning():
 
 def test_assemble_artifacts_populates_chain_observations():
     """_assemble_artifacts must copy chain_reasoning stage output onto PipelineArtifacts."""
+
     class _FakeSession:
-        class metadata:
+        class metadata:  # noqa: N801  — mock namespace mirroring session.metadata attribute
             movement = "overhead_squat"
 
     ctx = StageContext.__new__(StageContext)

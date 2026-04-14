@@ -19,9 +19,13 @@ def _build_overall_narrative(section: MovementSection) -> str:
     concern = [o for o in obs if o.severity.value == "concern"]
     parts: list[str] = []
     if flagged:
-        parts.append(f"Your movement shows {len(flagged)} notable pattern(s) worth exploring further.")
+        parts.append(
+            f"Your movement shows {len(flagged)} notable pattern(s) worth exploring further."
+        )
     if concern:
-        parts.append(f"There are {len(concern)} area(s) of early-stage variation in your body connections.")
+        parts.append(
+            f"There are {len(concern)} area(s) of early-stage variation in your body connections."
+        )
     return " ".join(parts)
 
 

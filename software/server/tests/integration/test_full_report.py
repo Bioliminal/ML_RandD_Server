@@ -21,12 +21,11 @@ def test_overhead_squat_valgus_produces_sbl_observation(tmp_path, monkeypatch):
     sbl_obs = [
         o
         for o in observations
-        if o["chain"] == "superficial_back_line"
-        and o["severity"] in {"concern", "flag"}
+        if o["chain"] == "superficial_back_line" and o["severity"] in {"concern", "flag"}
     ]
-    assert len(sbl_obs) >= 1, (
-        f"expected at least one SBL concern/flag observation, got {observations}"
-    )
+    assert (
+        len(sbl_obs) >= 1
+    ), f"expected at least one SBL concern/flag observation, got {observations}"
 
 
 def test_overhead_squat_clean_produces_no_observations(tmp_path, monkeypatch):
