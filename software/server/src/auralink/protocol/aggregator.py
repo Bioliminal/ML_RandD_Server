@@ -60,43 +60,44 @@ def aggregate_protocol(reports: list[Report], session_ids: list[str]) -> Protoco
         )
 
     per_session_movements: dict[str, str] = {}
-    mean_ncc_by_movement: dict[str, float] = {}
-    mean_rom_dev_by_movement: dict[str, float] = {}
+    # Keyed by session_id (preserving order) so same-movement repeated sessions
+    # don't overwrite each other. The time-series order is session_ids order.
+    mean_ncc_by_session: dict[str, float] = {}
+    mean_rom_dev_by_session: dict[str, float] = {}
 
     for session_id, report in zip(session_ids, reports, strict=True):
         per_session_movements[session_id] = report.movement_section.movement
         summary = report.movement_section.movement_temporal_summary
         if summary is None:
             continue
-        key = report.movement_section.movement
-        mean_ncc_by_movement[key] = summary.mean_ncc
-        mean_rom_dev_by_movement[key] = summary.mean_rom_deviation_pct
+        mean_ncc_by_session[session_id] = summary.mean_ncc
+        mean_rom_dev_by_session[session_id] = summary.mean_rom_deviation_pct
 
     metrics: list[CrossMovementMetric] = []
-    if mean_ncc_by_movement:
+    if mean_ncc_by_session:
         metrics.append(
             CrossMovementMetric(
                 metric_name="mean_ncc",
-                values_by_movement=dict(mean_ncc_by_movement),
-                trend=_trend(list(mean_ncc_by_movement.values()), higher_is_better=True),
+                values_by_movement=dict(mean_ncc_by_session),
+                trend=_trend(list(mean_ncc_by_session.values()), higher_is_better=True),
             )
         )
-    if mean_rom_dev_by_movement:
+    if mean_rom_dev_by_session:
         metrics.append(
             CrossMovementMetric(
                 metric_name="mean_rom_deviation_pct",
-                values_by_movement=dict(mean_rom_dev_by_movement),
+                values_by_movement=dict(mean_rom_dev_by_session),
                 trend=_trend(
-                    [abs(v) for v in mean_rom_dev_by_movement.values()],
+                    [abs(v) for v in mean_rom_dev_by_session.values()],
                     higher_is_better=False,
                 ),
             )
         )
 
     carryover = False
-    if len(mean_ncc_by_movement) >= _MIN_SESSIONS_FOR_CARRYOVER:
-        ncc_values = list(mean_ncc_by_movement.values())
-        rom_abs_values = [abs(v) for v in mean_rom_dev_by_movement.values()]
+    if len(mean_ncc_by_session) >= _MIN_SESSIONS_FOR_CARRYOVER:
+        ncc_values = list(mean_ncc_by_session.values())
+        rom_abs_values = [abs(v) for v in mean_rom_dev_by_session.values()]
         ncc_slope = _slope(ncc_values)
         rom_slope = _slope(rom_abs_values)
         # Belt-and-braces: with only 3-4 sessions a polyfit slope is very
