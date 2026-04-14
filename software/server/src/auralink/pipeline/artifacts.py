@@ -136,3 +136,4 @@ class PipelineArtifacts(BaseModel):
     skeleton_result: SkeletonBundle | None = None
     phase_boundaries: PhaseBoundaries | None = None
     chain_observations: list[ChainObservation] | None = None
+    movement_temporal_summary: MovementTemporalSummary | None = None

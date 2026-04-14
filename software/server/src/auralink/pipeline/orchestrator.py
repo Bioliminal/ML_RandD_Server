@@ -11,6 +11,7 @@ from auralink.pipeline.stages.base import (
     STAGE_NAME_PER_REP_METRICS,
     STAGE_NAME_PHASE_SEGMENT,
     STAGE_NAME_QUALITY_GATE,
+    STAGE_NAME_REP_COMPARISON,
     STAGE_NAME_REP_SEGMENT,
     STAGE_NAME_SKELETON,
     STAGE_NAME_WITHIN_MOVEMENT_TREND,
@@ -23,6 +24,7 @@ from auralink.pipeline.stages.normalize import run_normalize
 from auralink.pipeline.stages.per_rep_metrics import run_per_rep_metrics
 from auralink.pipeline.stages.phase_segment import run_phase_segment
 from auralink.pipeline.stages.quality_gate import run_quality_gate
+from auralink.pipeline.stages.rep_comparison import run_rep_comparison
 from auralink.pipeline.stages.rep_segment import run_rep_segment
 from auralink.pipeline.stages.skeleton import run_skeleton
 from auralink.pipeline.stages.within_movement_trend import run_within_movement_trend
@@ -39,6 +41,7 @@ def _default_stage_list() -> list[Stage]:
         Stage(name=STAGE_NAME_REP_SEGMENT, run=run_rep_segment),
         Stage(name=STAGE_NAME_PER_REP_METRICS, run=run_per_rep_metrics),
         Stage(name=STAGE_NAME_WITHIN_MOVEMENT_TREND, run=run_within_movement_trend),
+        Stage(name=STAGE_NAME_REP_COMPARISON, run=run_rep_comparison),
         Stage(name=STAGE_NAME_CHAIN_REASONING, run=run_chain_reasoning),
     ]
 
@@ -116,4 +119,5 @@ def _assemble_artifacts(ctx: StageContext) -> PipelineArtifacts:
         skeleton_result=ctx.artifacts.get(STAGE_NAME_SKELETON),
         phase_boundaries=ctx.artifacts.get(STAGE_NAME_PHASE_SEGMENT),
         chain_observations=ctx.artifacts.get(STAGE_NAME_CHAIN_REASONING),
+        movement_temporal_summary=ctx.artifacts.get(STAGE_NAME_REP_COMPARISON),
     )
