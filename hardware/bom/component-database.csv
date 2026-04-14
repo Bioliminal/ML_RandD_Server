@@ -1,0 +1,108 @@
+component_name,quantity,unit_price,total_price,vendor,category,status,source_document
+AD8232 ECG/EMG module (generic),10,$7,$70,Amazon,sensor,current,final-buy-list-with-local.md
+ADS1115 16-bit ADC breakout,5,$3,$15,Amazon,microcontroller,current,final-buy-list-with-local.md
+ESP32-S3 DevKitC-1 (N16R8),2,$10,$20,Amazon,microcontroller,current,final-buy-list-with-local.md
+Ag/AgCl snap electrodes 100-pack,3,$8,$24,Amazon,electrode,current,final-buy-list-with-local.md
+Ten20 conductive paste 4oz,1,$12,$12,Amazon,electrode,current,final-buy-list-with-local.md
+NuPrep skin prep gel 4oz,1,$8,$8,Amazon,electrode,current,final-buy-list-with-local.md
+3M Transpore medical tape 1" x2,1,$5,$5,Amazon,electrode,current,final-buy-list-with-local.md
+Coban self-adhering wrap 2",2,$3,$6,Amazon,cable,current,final-buy-list-with-local.md
+Disposable razors 10-pack,1,$5,$5,Amazon,accessory,current,final-buy-list-with-local.md
+Isopropyl alcohol 70% 16oz,1,$3,$3,Amazon,accessory,current,final-buy-list-with-local.md
+Skin-safe marker (surgical),2,$3,$6,Amazon,accessory,current,final-buy-list-with-local.md
+ERM coin vibe motors 10mm 10-pack,2,$7,$14,Amazon,actuator,current,final-buy-list-with-local.md
+1200mAh LiPo 3.7V (JST-PH 2.0),3,$5,$15,Amazon,power,current,final-buy-list-with-local.md
+TP4056 USB-C LiPo charger module,3,$1.50,$4.50,Amazon,power,current,final-buy-list-with-local.md
+30AWG silicone wire kit (6 colors),1,$8,$8,Amazon,cable,current,final-buy-list-with-local.md
+Shielded cable 4-conductor 30AWG 5m,2,$8,$16,Amazon,cable,current,final-buy-list-with-local.md
+Mini breadboard 400-point,4,$2.50,$10,Amazon,accessory,current,final-buy-list-with-local.md
+Jumper wire kit (M-M M-F F-F),1,$7,$7,Amazon,cable,current,final-buy-list-with-local.md
+Elastic webbing 1" + buckles 10-pack,1,$12,$12,Amazon,garment,current,final-buy-list-with-local.md
+Velcro adhesive hook+loop 1" x 5yd,1,$6,$6,Amazon,garment,current,final-buy-list-with-local.md
+Neoprene fabric 2mm 12"x24",1,$8,$8,Amazon,garment,current,final-buy-list-with-local.md
+Snap button kit (press studs 100pc),1,$6,$6,Amazon,accessory,current,final-buy-list-with-local.md
+Compression shirts (athletic M+L),2,$10,$20,Amazon,garment,current,final-buy-list-with-local.md
+Adafruit conductive fabric 20x20cm,2,$5,$10,Amazon,garment,current,final-buy-list-with-local.md
+12mm snap connector kit,1,$10,$10,Amazon,accessory,current,final-buy-list-with-local.md
+Conductive thread (silver-coated 50ft),1,$12,$12,Amazon,cable,current,final-buy-list-with-local.md
+ADS1292R breakout (2ch 24-bit),2,$25,$50,SparkFun/Mouser,sensor,current,final-buy-list-with-local.md
+BioAmp EXG Pill 2-pack,1,$65,$65,Mouser,sensor,current,final-buy-list-with-local.md
+DRV8833 dual H-bridge driver,4,$2,$8,Mouser,actuator,current,final-buy-list-with-local.md
+N20 gearmotor 6V 100RPM,4,$3,$12,Mouser,actuator,current,final-buy-list-with-local.md
+INA219 current sensor breakout,2,$2,$4,Mouser,sensor,current,final-buy-list-with-local.md
+SS49E linear hall sensor,4,$1,$4,Mouser,sensor,current,final-buy-list-with-local.md
+Dyneema braided line 50lb 25m,1,$8,$8,Amazon 2-day,cable,current,final-buy-list-with-local.md
+PTFE tubing 1.5mm ID 5m,1,$5,$5,Amazon 2-day,cable,current,final-buy-list-with-local.md
+INA128PA (DIP-8) instrumentation amplifier,5,$8.22,$41.10,DigiKey,sensor,current,wave1-lean-final.md
+ESP32-S3 DevKitC-1 (N16R8),2,$10,$20,Amazon,microcontroller,current,wave1-lean-final.md
+1% Metal Film Resistor Kit,1,$8,$8,Amazon,accessory,current,wave1-lean-final.md
+Ceramic Capacitor Kit,1,$10,$10,Amazon,accessory,current,wave1-lean-final.md
+Ag/AgCl Snap Electrodes 100-pack,3,$8,$24,Amazon,electrode,current,wave1-lean-final.md
+Ten20 Conductive Paste 4oz,1,$12,$12,Amazon,electrode,current,wave1-lean-final.md
+NuPrep Skin Prep Gel 4oz,1,$8,$8,Amazon,electrode,current,wave1-lean-final.md
+3M Transpore medical tape,1,$5,$5,CVS/HEB,electrode,current,wave1-lean-final.md
+Coban self-adhering wrap 2",2,$3,$6,CVS/HEB,cable,current,wave1-lean-final.md
+Disposable razors 10-pack,1,$5,$5,CVS/HEB,accessory,current,wave1-lean-final.md
+Isopropyl alcohol 70% 16oz,1,$3,$3,CVS/HEB,accessory,current,wave1-lean-final.md
+Skin markers (surgical),2,$3,$6,CVS/HEB,accessory,current,wave1-lean-final.md
+ERM coin vibe motors 10mm 10-pack,2,$7,$14,Amazon,actuator,current,wave1-lean-final.md
+1200mAh LiPo 3.7V (JST-PH 2.0),3,$5,$15,Amazon,power,current,wave1-lean-final.md
+TP4056 USB-C LiPo charger module,3,$1.50,$4.50,Amazon,power,current,wave1-lean-final.md
+30AWG silicone wire kit,1,$8,$8,Amazon,cable,current,wave1-lean-final.md
+Shielded cable 4-conductor 30AWG 5m,1,$8,$8,Amazon,cable,current,wave1-lean-final.md
+Mini breadboards 400-point,4,$2.50,$10,Amazon,accessory,current,wave1-lean-final.md
+Jumper wire kit,1,$7,$7,Amazon,cable,current,wave1-lean-final.md
+Elastic webbing 1" + buckles,1,$12,$12,Amazon,garment,current,wave1-lean-final.md
+Velcro adhesive hook+loop 1" x 5yd,1,$6,$6,Amazon,garment,current,wave1-lean-final.md
+Neoprene fabric 2mm 12"x24",1,$8,$8,Amazon,garment,current,wave1-lean-final.md
+Snap button kit 100pc,1,$6,$6,Amazon,accessory,current,wave1-lean-final.md
+Compression shirts M+L,2,$10,$20,Amazon,garment,current,wave1-lean-final.md
+INA128 instrumentation amp IC,2,$8,$16,Mouser,sensor,alternative,mvp-build-decisions.md
+SG90 micro servo,1,$5,$5,AliExpress,actuator,alternative,mvp-build-decisions.md
+8mm flat coin ERM,2,$1,$2,AliExpress,actuator,alternative,mvp-build-decisions.md
+Arduino Nano clone,1,$3,$3,AliExpress,microcontroller,alternative,mvp-build-decisions.md
+9V battery + clip,1,$2,$2,Any,power,alternative,mvp-build-decisions.md
+Disposable Ag/AgCl snap pads 10-pack,1,$3,$3,Amazon,electrode,alternative,mvp-build-decisions.md
+BioAmp EXG Pill (Tier 2),2,$20,$40,Crowd Supply/Mouser,sensor,alternative,mvp-build-decisions.md
+GA12-N20 gearmotor,1,$25,$25,AliExpress+Amazon,actuator,alternative,mvp-build-decisions.md
+Dyneema 0.5mm,1,$0,$0,AliExpress+Amazon,cable,alternative,mvp-build-decisions.md
+A3144 hall sensor,1,$0,$0,AliExpress+Amazon,sensor,alternative,mvp-build-decisions.md
+Magnet,1,$0,$0,AliExpress+Amazon,accessory,alternative,mvp-build-decisions.md
+DRV8833 dual H-bridge breakout,1,$2,$2,AliExpress,actuator,alternative,mvp-build-decisions.md
+Precision Microdrives 310-103 10mm coin ERM,3,$8,$24,Precision Microdrives,actuator,alternative,mvp-build-decisions.md
+800mAh LiPo,1,$8,$8,AliExpress,power,alternative,mvp-build-decisions.md
+Protocentral ADS1292R breakout,2,$45,$90,Mouser/Protocentral,sensor,superseded,mvp-build-decisions.md
+Pololu 25D 47:1 gearmotor,1,$50,$50,Pololu,actuator,superseded,mvp-build-decisions.md
+Pololu encoder,1,$0,$0,Pololu,sensor,superseded,mvp-build-decisions.md
+TB9051FTG with current sensing,1,$8,$8,Pololu,actuator,superseded,mvp-build-decisions.md
+Jinlong Z-LRA-0825 8mm LRA,3,$35,$105,Mouser/DigiKey,actuator,superseded,mvp-build-decisions.md
+DRV2605L driver,1,$35,$35,Mouser/DigiKey,actuator,superseded,mvp-build-decisions.md
+Adafruit Feather nRF52840,1,$25,$25,Adafruit,microcontroller,superseded,mvp-build-decisions.md
+1000mAh LiPo,1,$10,$10,Adafruit,power,superseded,mvp-build-decisions.md
+MyoWare 2.0 Muscle Sensor (DEV-21265),3,$38-43,$114,Amazon/SparkFun,sensor,alternative,buy-list-final.md
+CD4051BE 8:1 analog mux,4,$3,$12,Mouser,sensor,current,buy-list-final.md
+Adafruit woven conductive fabric 20x20cm,2,$5,$10,Amazon,garment,current,buy-list-final.md
+Olimex SHIELD-EKG-EMG,1,$23.35,$23.35,DigiKey,sensor,alternative,sensor-sourcing-reality.md
+DFRobot SEN0240 (Gravity EMG),1,$18.57-$49.50,$18.57-$49.50,Arrow/DFRobot,sensor,alternative,sensor-sourcing-reality.md
+SparkFun SEN-13723 Medical EMG eval,1,$25,$25,DigiKey,sensor,alternative,sensor-sourcing-reality.md
+Cerelog ESP-EEG (ADS1299 8ch),1,$349.99,$349.99,cerelog.com,sensor,alternative,sensor-sourcing-reality.md
+OpenBCI Cyton,1,$1249,$1249,OpenBCI,sensor,superseded,sensor-sourcing-reality.md
+HackEEG,1,$200-400,$200-400,Crowd Supply,sensor,alternative,sensor-sourcing-reality.md
+BioAmp EXG Pill,10,$31,$310,Tindie/Mouser/Crowd Supply,sensor,current,buy-list-final.md
+N20 gearmotor 6V 100RPM,4,$3,$12,Mouser,actuator,current,buy-list-final.md
+LessEMF A321 silver Lycra,1,$35,$35,LessEMF,garment,alternative,buy-list-final.md
+Extra Ag/AgCl electrodes 100-pack,2,$8,$16,Amazon,electrode,current,buy-list-final.md
+DRV2605L + LRA haptic driver,4,$32,$128,SparkFun,actuator,alternative,buy-list-final.md
+Precision Microdrives 310-103 LRA,6,$30,$180,Precision Microdrives,actuator,alternative,buy-list-final.md
+Pololu 25D metal gearmotor + encoder,2,$50,$100,Pololu,actuator,alternative,buy-list-final.md
+nRF52840 DK,1,$40,$40,Mouser,microcontroller,alternative,buy-list-final.md
+3D printer filament PETG 1kg,1,$20,$20,Micro Center,accessory,alternative,buy-list-final.md
+Soldering iron + solder,1,$25,$25,UT TIW/Micro Center,accessory,current,final-buy-list-with-local.md
+3D printing (PETG PLA resin),1,$20,$20,UT TIW DFAB Lab,accessory,current,final-buy-list-with-local.md
+Sewing machines,1,$15,$15,UT TIW DFAB Lab,accessory,current,final-buy-list-with-local.md
+Laser cutter,1,$0,$0,UT TIW Laser Lab,accessory,current,final-buy-list-with-local.md
+Oscilloscope + bench power supply,1,$200+,$200+,UT TIW Electronics Lab,accessory,current,final-buy-list-with-local.md
+Heat shrink tubing,1,$5,$5,UT The Garage,cable,current,final-buy-list-with-local.md
+Wire strippers,1,$20,$20,UT The Garage,accessory,current,final-buy-list-with-local.md
+Multimeter,1,$0,$0,UT The Garage,accessory,current,final-buy-list-with-local.md
+Hand tools,1,$0,$0,UT The Garage,accessory,current,final-buy-list-with-local.md

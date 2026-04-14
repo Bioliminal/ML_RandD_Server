@@ -1,0 +1,988 @@
+[
+	{
+		"id": "http://zotero.org/users/6160776/items/4X8NL3Q7",
+		"type": "article-journal",
+		"abstract": "The objective of this work is to develop a method for tracking human skeletal movements by integrating data from two synchronized video streams. To achieve this, two datasets were created, each consisting of four different rehabilitation exercise videos featuring various individuals in diverse environments and wearing different clothing. The prediction model is employed to create a dual-image stream system that enables the tracking of joint positions even when a joint is obscured in one of the streams. This system also mitigates depth coordinate errors by using data from both video streams. The final implementation successfully corrects the positions of the right elbow and wrist joints, though some depth error persists in the left hand. The results demonstrate that adding a second video camera, rotated 90° and aimed at the subject, can compensate for depth prediction inaccuracies, reducing errors by up to 0.4 m. By using a dual-camera setup and fusing the predicted human skeletal models, it is possible to construct a complete human model even when one camera does not capture all body parts and to refine depth coordinates through error correction using a linear regression model.",
+		"container-title": "Applied Sciences",
+		"DOI": "10.3390/app15020906",
+		"ISSN": "2076-3417",
+		"issue": "2",
+		"language": "en",
+		"license": "http://creativecommons.org/licenses/by/3.0/",
+		"page": "906",
+		"publisher": "Multidisciplinary Digital Publishing Institute",
+		"source": "www.mdpi.com",
+		"title": "Enhanced Human Skeleton Tracking for Improved Joint Position and Depth Accuracy in Rehabilitation Exercises",
+		"URL": "https://www.mdpi.com/2076-3417/15/2/906",
+		"volume": "15",
+		"author": [
+			{
+				"family": "Abromavičius",
+				"given": "Vytautas"
+			},
+			{
+				"family": "Gisleris",
+				"given": "Ervinas"
+			},
+			{
+				"family": "Daunoravičienė",
+				"given": "Kristina"
+			},
+			{
+				"family": "Žižienė",
+				"given": "Jurgita"
+			},
+			{
+				"family": "Serackis",
+				"given": "Artūras"
+			},
+			{
+				"family": "Maskeliūnas",
+				"given": "Rytis"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/U36VUHK5",
+		"type": "webpage",
+		"abstract": "Pose estimation is transforming how we understand human movement, powering everything from fitness tracking and sports analytics to healthcare rehabilitation. This guide explores the best pose estimation models, and shows how to deploy them efficiently across mobile, edge, and cloud environments.",
+		"container-title": "Roboflow Blog",
+		"language": "en",
+		"title": "Best Pose Estimation Models & How to Deploy Them",
+		"URL": "https://blog.roboflow.com/best-pose-estimation-models/",
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					11,
+					6
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/ZELVBKF3",
+		"type": "article-journal",
+		"abstract": "Human pose estimation is a crucial task in computer vision with widespread applications in healthcare, rehabilitation, sports, and remote monitoring. In this paper, we propose a deep learning-based method for automatic human pose estimation and joint angle computation, tailored specifically for physiotherapy and telemedicine scenarios. Beyond pose estimation, the proposed method is able to compute angles between joints, enabling analysis of body alignment and posture. The proposed approach is built upon a customized skeleton with 25 anatomical keypoints and a dataset composed of over 150,000 annotated and augmented images derived from multiple open-source datasets. Experimental results demonstrate the effectiveness of the proposed method, achieving a mAP@50 of 0.58 for keypoint localization and 0.98 for object detection. Moreover, we demonstrate several real-world practical use cases in evaluating exercise correctness and identifying postural deviations by exploiting the proposed method, confirming that the proposed method can represent a promising approach for automated motion analysis, with potential impact on digital health, rehabilitation support, and remote patient care.",
+		"container-title": "Journal of Imaging",
+		"DOI": "10.3390/jimaging12040157",
+		"ISSN": "2313-433X",
+		"issue": "4",
+		"language": "en",
+		"license": "http://creativecommons.org/licenses/by/3.0/",
+		"page": "157",
+		"publisher": "Multidisciplinary Digital Publishing Institute",
+		"source": "www.mdpi.com",
+		"title": "A Method for Human Pose Estimation and Joint Angle Computation Through Deep Learning",
+		"URL": "https://www.mdpi.com/2313-433X/12/4/157",
+		"volume": "12",
+		"author": [
+			{
+				"family": "Ciardiello",
+				"given": "Ludovica"
+			},
+			{
+				"family": "Agnello",
+				"given": "Patrizia"
+			},
+			{
+				"family": "Petyx",
+				"given": "Marta"
+			},
+			{
+				"family": "Martinelli",
+				"given": "Fabio"
+			},
+			{
+				"family": "Cesarelli",
+				"given": "Mario"
+			},
+			{
+				"family": "Santone",
+				"given": "Antonella"
+			},
+			{
+				"family": "Mercaldo",
+				"given": "Francesco"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2026",
+					4
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/RZTRJSJD",
+		"type": "article-journal",
+		"abstract": "Kinematic and biomechanical analysis in monitoring human movement to assess athletes’ or patients’ motor control behaviors. Traditional motion capture systems provide high accuracy but are expensive and complex for the public. Recent advancements in markerless systems using videos captured with commercial RGB, depth, and infrared cameras, such as Microsoft Kinect, StereoLabs ZED Camera, and Intel RealSense, enable the acquisition of high-quality videos for 2D and 3D kinematic analyses. On the other hand, open-source frameworks like OpenPose, MediaPipe, AlphaPose, and DensePose are the new generation of 2D or 3D mesh-based markerless motion tools that utilize standard cameras in motion analysis through real-time and offline pose estimation models in sports, clinical, and gaming applications. The review examined studies that focused on the validity and reliability of these technologies compared to gold-standard systems, specifically in sports and exercise applications. Additionally, it discusses the optimal setup and perspectives for achieving accurate results in these studies. The findings suggest that 2D systems offer economic and straightforward solutions, but they still face limitations in capturing out-of-plane movements and environmental factors. Merging vision sensors with built-in artificial intelligence and machine learning software to create 2D-to-3D pose estimation is highlighted as a promising method to address these challenges, supporting the broader adoption of markerless motion analysis in future kinematic and biomechanical research.",
+		"container-title": "Frontiers in Physiology",
+		"DOI": "10.3389/fphys.2025.1649330",
+		"ISSN": "1664-042X",
+		"journalAbbreviation": "Front Physiol",
+		"page": "1649330",
+		"PMID": "40873758",
+		"PMCID": "PMC12378739",
+		"source": "PubMed Central",
+		"title": "Commercial vision sensors and AI-based pose estimation frameworks for markerless motion analysis in sports and exercises: a mini review",
+		"title-short": "Commercial vision sensors and AI-based pose estimation frameworks for markerless motion analysis in sports and exercises",
+		"URL": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12378739/",
+		"volume": "16",
+		"author": [
+			{
+				"family": "Edriss",
+				"given": "Saeid"
+			},
+			{
+				"family": "Romagnoli",
+				"given": "Cristian"
+			},
+			{
+				"family": "Caprioli",
+				"given": "Lucio"
+			},
+			{
+				"family": "Bonaiuto",
+				"given": "Vincenzo"
+			},
+			{
+				"family": "Padua",
+				"given": "Elvira"
+			},
+			{
+				"family": "Annino",
+				"given": "Giuseppe"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					8,
+					12
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/9VUQLJSQ",
+		"type": "article-journal",
+		"abstract": "With the development of sports rehabilitation, accurate assessment of the patient's rehabilitation process has become the key to enhance the rehabilitation effect. To solve the problems of inaccurate recognition and poor real-time performance of the rehabilitation human pose recognition model for traditional sports in complex environments, this study proposes an integrated framework for efficient and accurate human pose recognition and automated scoring in sports rehabilitation. The study constructs a human pose recognition model using a human pose tracking algorithm and achieves pose classification by extracting key points of the human skeleton and combining them with a random forest algorithm. Meanwhile, a siamese neural network and similarity metric algorithm are introduced to optimize the automated score detection model, accurately assessing the quality of rehabilitation movements. The outcomes indicated that the automatic scoring detection system achieved 98% accuracy in human body pose recognition. In terms of joint angle error, the error rate of the detection model designed in the study was below 6%, which was significantly better than the comparison method. In rehabilitation score correlation test, the correlation of the model was maintained at 92%-98%, demonstrating higher scoring accuracy. The outcomes reveal that the model designed in the study has high recognition accuracy and evaluation stability. This makes it an efficient and accurate assessment tool for rehabilitation therapy. It can also effectively improve the effectiveness of rehabilitation training and the quality of life of patients.",
+		"container-title": "Scientific Reports",
+		"DOI": "10.1038/s41598-026-43294-1",
+		"ISSN": "2045-2322",
+		"journalAbbreviation": "Sci Rep",
+		"language": "en",
+		"source": "DOI.org (Crossref)",
+		"title": "Human pose recognition and automated scoring detection for sports rehabilitation",
+		"URL": "https://www.nature.com/articles/s41598-026-43294-1",
+		"author": [
+			{
+				"family": "Peng",
+				"given": "Xiaoqian"
+			},
+			{
+				"family": "Mao",
+				"given": "Xujiang"
+			},
+			{
+				"family": "Fang",
+				"given": "Xiaomin"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2026",
+					3,
+					14
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/NEVAT6BG",
+		"type": "article-journal",
+		"abstract": "Human pose estimation is a fundamental task in computer vision and robotics that involves detecting the human body joints from images or videos. It became a rapidly evolving field with applications ranging from action recognition to healthcare. This survey provides a detailed review of various methods in 2D and 3D human pose estimation for single-person and multi-person contexts in both image-based and video-based scenarios. We present a comprehensive categorization and comparison of available 2D and 3D pose datasets with an emphasis on their strengths and limitations. In addition, we also provide an overview of various evaluation metrics and loss functions commonly used to evaluate the accuracy and robustness of pose estimation models. We further discuss emerging trends, offering readers an insight into current trends in the field. We then explore key application domains where pose estimation plays an important role. The survey explains in detail about challenges in human pose estimation, including occlusion, data scarcity, privacy concerns, generalization issues, and model complexity, and suggests potential future research directions. Overall, this review aims to guide researchers in understanding current methods, datasets, and applications, while pointing out open issues and highlighting the future scope of human pose estimation.",
+		"container-title": "Artificial Intelligence Review",
+		"DOI": "10.1007/s10462-025-11430-4",
+		"ISSN": "1573-7462",
+		"issue": "1",
+		"journalAbbreviation": "Artif Intell Rev",
+		"language": "en",
+		"page": "32",
+		"source": "Springer Link",
+		"title": "A survey on deep learning for 2D and 3D human pose estimation",
+		"URL": "https://doi.org/10.1007/s10462-025-11430-4",
+		"volume": "59",
+		"author": [
+			{
+				"family": "Kappan",
+				"given": "Marsha Mariya"
+			},
+			{
+				"family": "Sandoval",
+				"given": "Eduardo Benitez"
+			},
+			{
+				"family": "Meijering",
+				"given": "Erik"
+			},
+			{
+				"family": "Cruz",
+				"given": "Francisco"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					12,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/M56FRMPY",
+		"type": "webpage",
+		"abstract": "Describes Interaction SDK's body pose detection, which detects body poses by comparing joint orientations.",
+		"language": "en",
+		"title": "Body Pose Detection",
+		"URL": "https://developers.meta.com/horizon/documentation/unity/unity-isdk-body-pose-detection/",
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/LMRY9NHZ",
+		"type": "webpage",
+		"title": "Skarimva: Skeleton-based Action Recognition is a Multi-view Application",
+		"URL": "https://arxiv.org/html/2602.23231v1",
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/WGSUPZ2A",
+		"type": "article-journal",
+		"language": "en",
+		"source": "Zotero",
+		"title": "Reconstructing Humans with a Biomechanically Accurate Skeleton",
+		"author": [
+			{
+				"family": "Xia",
+				"given": "Yan"
+			},
+			{
+				"family": "Zhou",
+				"given": "Xiaowei"
+			},
+			{
+				"family": "Vouga",
+				"given": "Etienne"
+			},
+			{
+				"family": "Huang",
+				"given": "Qixing"
+			},
+			{
+				"family": "Pavlakos",
+				"given": "Georgios"
+			}
+		]
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/KKPZLZXM",
+		"type": "post-weblog",
+		"abstract": "QuickPose Android SDK allows developers to quickly add Pose Estimation into Android apps. QuickPose comes with pre-built exercises and measurements.",
+		"container-title": "QuickPose.ai",
+		"language": "en-US",
+		"title": "Pose Estimation/Detection SDK for Android",
+		"URL": "https://quickpose.ai/products/android-sdk/",
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/ZJACJMC2",
+		"type": "article-journal",
+		"abstract": "The prediction of blood donation behavior is essential for improving donor recruitment and retention strategies within healthcare systems. This study performed a comparative analysis of three machine learning models such as Logistic Regression, Random Forest and Support Vector Machine (SVM) to predict blood donation behavior based on blood donation history data. The primary goal was to conduct a comparative analysis of three machine learning models. The study employed a comprehensive dataset that included various features related to donation history of potential donors. The models were evaluated using several key performance metrics, including accuracy, precision, recall, F1 score, and ROC-AUC, which provide assessing their predictive capabilities. The findings of the analysis indicated that the Random Forest model significantly outperformed the other two algorithms, achieving an accuracy of 92% and a ROC-AUC score of 0.93. This superior performance was attributed to Random Forest’s ability to capture complex interactions within the dataset, making it particularly effective for this type of predictive modeling. In contrast, SVM and Logistic Regression demonstrated lower accuracy and predictive power, highlighting their limitations in this context. The results of this study highlight the potential of machine learning techniques to improve blood donation strategies. By utilizing advanced predictive modeling, healthcare organizations can refine their outreach efforts, ultimately increasing donation rates and addressing critical public health needs. This research contributes to the expanding field of predictive analytics in healthcare, providing valuable insights that can inform future initiatives aimed at improving blood donation behaviors.",
+		"container-title": "International Journal of Research and Scientific Innovation",
+		"DOI": "10.51244/IJRSI.2025.12040113",
+		"ISSN": "23212705",
+		"issue": "V",
+		"journalAbbreviation": "IJRSI",
+		"page": "1647-1655",
+		"source": "DOI.org (Crossref)",
+		"title": "A Comparative Analysis of Machine Learning Models in Predicting Blood Donation Behavior",
+		"URL": "https://rsisinternational.org/journals/ijrsi/articles/a-comparative-analysis-of-machine-learning-models-in-predicting-blood-donation-behavior/",
+		"volume": "XII",
+		"author": [
+			{
+				"family": "Aung",
+				"given": "Thu Thu"
+			},
+			{
+				"family": "Thinzar",
+				"given": "Khine"
+			},
+			{
+				"family": "Phyo",
+				"given": "Su Wai"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/7VHCXDQU",
+		"type": "article-journal",
+		"abstract": "The prediction of blood donation behavior is essential for improving donor recruitment and retention strategies within healthcare systems. This study performed a comparative analysis of three machine learning models such as Logistic Regression, Random Forest and Support Vector Machine (SVM) to predict blood donation behavior based on blood donation history data. The primary goal was to conduct a comparative analysis of three machine learning models. The study employed a comprehensive dataset that included various features related to donation history of potential donors. The models were evaluated using several key performance metrics, including accuracy, precision, recall, F1 score, and ROC-AUC, which provide assessing their predictive capabilities. The findings of the analysis indicated that the Random Forest model significantly outperformed the other two algorithms, achieving an accuracy of 92% and a ROC-AUC score of 0.93. This superior performance was attributed to Random Forest’s ability to capture complex interactions within the dataset, making it particularly effective for this type of predictive modeling. In contrast, SVM and Logistic Regression demonstrated lower accuracy and predictive power, highlighting their limitations in this context. The results of this study highlight the potential of machine learning techniques to improve blood donation strategies. By utilizing advanced predictive modeling, healthcare organizations can refine their outreach efforts, ultimately increasing donation rates and addressing critical public health needs. This research contributes to the expanding field of predictive analytics in healthcare, providing valuable insights that can inform future initiatives aimed at improving blood donation behaviors.",
+		"container-title": "International Journal of Research and Scientific Innovation",
+		"DOI": "10.51244/IJRSI.2025.120500157",
+		"ISSN": "23212705",
+		"issue": "V",
+		"journalAbbreviation": "IJRSI",
+		"page": "1647-1655",
+		"source": "DOI.org (Crossref)",
+		"title": "A Comparative Analysis of Machine Learning Models in Predicting Blood Donation Behavior",
+		"URL": "https://rsisinternational.org/journals/ijrsi/articles/a-comparative-analysis-of-machine-learning-models-in-predicting-blood-donation-behavior/",
+		"volume": "XII",
+		"author": [
+			{
+				"family": "Thu Thu Aung",
+				"given": "Thu Thu Aung"
+			},
+			{
+				"family": "Thinzar",
+				"given": "Khine"
+			},
+			{
+				"family": "Phyo",
+				"given": "Su Wai"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025"
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/UNZENYVQ",
+		"type": "paper-conference",
+		"abstract": "This research utilizes Human Pose Estimation (HPE) to detect improper working postures that may lead to Work-Related Musculoskeletal Disorders. These postures are evaluated according to ergonomic principles using the OWAS method, which assesses the back, arms, legs, and the weight of the load during the task with codes indicating risk categories. In the experiment, both Two-dimensional (2D) and three-dimensional (3D) keypoints of body joints obtained from MediaPipe Pose and the angles of the joints relative to 72 different postures, encompassing all combinations of the code for the three body parts, were used as features for setting the criteria in posture prediction. The best classifier obtained from the experiment provided accuracy rates of 90.74% for the back, 92.71% for the arms, and 85.53% for the legs, respectively. When the program was applied to evaluate working postures in a simulated packing station, the accuracy rates for the back, arms, and legs were 70.42%, 82.78%, and 71.25%, respectively. The accuracy in identifying the risk category, which considers all body parts simultaneously, is 77.64%.",
+		"collection-title": "AICCC '24",
+		"container-title": "Proceedings of the 2024 7th Artificial Intelligence and Cloud Computing Conference",
+		"DOI": "10.1145/3719384.3719453",
+		"ISBN": "979-8-4007-1792-5",
+		"page": "465–471",
+		"publisher": "Association for Computing Machinery",
+		"publisher-place": "New York, NY, USA",
+		"source": "ACM Digital Library",
+		"title": "Ergonomic Risk Assessment Using Human Pose Estimation with MediaPipe Pose",
+		"URL": "https://dl.acm.org/doi/10.1145/3719384.3719453",
+		"author": [
+			{
+				"family": "Singhtaun",
+				"given": "Chansiri"
+			},
+			{
+				"family": "Natsupakpong",
+				"given": "Suriya"
+			},
+			{
+				"family": "Lorprasertkul",
+				"given": "Pollakrit"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					7,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/LWFBPDCX",
+		"type": "article-journal",
+		"abstract": "Deep neural networks are used to accurately detect, estimate, and predict human body poses in images or videos through deep learning-based human pose estimation. However, traditional multi-person pose estimation methods face challenges due to partial occlusions and overlaps between multiple human bodies and body parts. To address these issues, we propose EE-YOLOv8, a human pose estimation network based on the YOLOv8 framework, which integrates Efficient Multi-scale Receptive Field (EMRF) and Expanded Feature Pyramid Network (EFPN). First, the EMRF module is employed to further enhance the model’s feature representation capability. Second, the EFPN optimizes cross-level information exchange and improves multi-scale data integration. Finally, Wise-IoU replaces the traditional Intersection over Union (IoU) to improve detection accuracy through precise overlap measurement between predicted and ground-truth bounding boxes. We evaluate EE-YOLOv8 on the MS COCO 2017 dataset. Compared to YOLOv8-Pose, EE-YOLOv8 achieves an AP of 89.0% at an IoU threshold of 0.5 (an improvement of 3.3%) and an AP of 65.6% over the IoU range of 0.5–0.95 (an improvement of 5.8%). Therefore, EE-YOLOv8 achieves the highest accuracy while maintaining the lowest parameter count and computational complexity among all analyzed algorithms. These results demonstrate that EE-YOLOv8 exhibits superior competitiveness compared to other mainstream methods.",
+		"container-title": "Scientific Reports",
+		"DOI": "10.1038/s41598-025-00259-0",
+		"ISSN": "2045-2322",
+		"issue": "1",
+		"journalAbbreviation": "Sci Rep",
+		"language": "en",
+		"license": "2025 The Author(s)",
+		"page": "15284",
+		"publisher": "Nature Publishing Group",
+		"source": "www.nature.com",
+		"title": "A human pose estimation network based on YOLOv8 framework with efficient multi-scale receptive field and expanded feature pyramid network",
+		"URL": "https://www.nature.com/articles/s41598-025-00259-0",
+		"volume": "15",
+		"author": [
+			{
+				"family": "Cai",
+				"given": "Shaobin"
+			},
+			{
+				"family": "Xu",
+				"given": "Han"
+			},
+			{
+				"family": "Cai",
+				"given": "Wanchen"
+			},
+			{
+				"family": "Mo",
+				"given": "Yuchang"
+			},
+			{
+				"family": "Wei",
+				"given": "Liansuo"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					5,
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/2KA2E7CI",
+		"type": "article-journal",
+		"abstract": "Pose estimation is a popular computer vision method for the automated analysis of animals in observational studies. Since pose estimation is a challenging task, the use of pre-trained models is widespread. However, if the shift between the domains of pre-training and application is too large, fine-tuning of the models is necessary. Pose estimation is based on keypoints, the annotation of which is costly in terms of time and effort. In most realistic settings, the available resources for the annotation of video frames are limited. Therefore, it is crucial to maximise the utility of a small number of labelled frames. This study proposes skeleton integrity, a method for selecting the frames with the highest utility for fine-tuning a pose estimation model. It works by analysing the keypoint structure of the pre-trained model's predictions and only requires the initial preparation of a single labelled frame. The method was evaluated in the context of a study on social behaviour in pigs. Skeleton integrity was used to extract a selection of 100 high-utility frames (895 pig instances) from a large dataset recorded in the study. A detailed analysis was performed, showing that frame utility is determined by variations in keypoint visibility, crowding and the resolution of the pigs. An empirical study showed that a ViTPose model fine-tuned on a skeleton integrity-based selection outperformed the same model fine-tuned on a random selection by at least 2.51% in average precision and 3.48% in average recall, underlining the importance of targeted data selection for low-data fine-tuning.",
+		"container-title": "Biosystems Engineering",
+		"DOI": "10.1016/j.biosystemseng.2025.104380",
+		"ISSN": "1537-5110",
+		"journalAbbreviation": "Biosystems Engineering",
+		"page": "104380",
+		"source": "ScienceDirect",
+		"title": "Skeleton integrity: A method for the efficient fine-tuning of pose estimation models for pigs",
+		"title-short": "Skeleton integrity",
+		"URL": "https://www.sciencedirect.com/science/article/pii/S1537511025003162",
+		"volume": "264",
+		"author": [
+			{
+				"family": "Brunner",
+				"given": "David"
+			},
+			{
+				"family": "Bordes",
+				"given": "Marie"
+			},
+			{
+				"family": "Mayrhuber",
+				"given": "Elisabeth"
+			},
+			{
+				"family": "Winkler",
+				"given": "Stephan M."
+			},
+			{
+				"family": "Dorfer",
+				"given": "Viktoria"
+			},
+			{
+				"family": "Oczak",
+				"given": "Maciej"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/IKN5CI72",
+		"type": "webpage",
+		"abstract": "Download scientific diagram | Mediapipe Pose's position detection of 33 posture joints. Mediapipe has many functions, including face recognition, iris detection, posture, hands, hair and other target detection. Users can develop applications for different functions according to their business needs. Taking pose detection as an example, Mediapipe Pose is a machine learning solution for high-fidelity body pose tracking. BlazePose research is used to infer the 3D coordinates of 33 joint points on the whole body in real time from each frame of RGB video, where Z represents the coordinate depth. The depth of the hip midpoint is the origin. The smaller the value, the closer the coordinate is to the camera. from publication: Detection of 3D Human Posture Based on Improved Mediapipe | Posture | ResearchGate, the professional network for scientists.",
+		"container-title": "ResearchGate",
+		"language": "en",
+		"title": "Figure 1. Mediapipe Pose's position detection of 33 posture joints....",
+		"URL": "https://www.researchgate.net/figure/Mediapipe-Poses-position-detection-of-33-posture-joints-Mediapipe-has-many-functions_fig1_368864097",
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/WQS7SE62",
+		"type": "article-journal",
+		"abstract": "Over the past few decades, Human Skeleton Modeling (HSM) has gained considerable attention in computer vision, exploring various practical applications such as the video surveillance, the human-computer interaction, the medical assistance analysis, and the autonomous driving through images and videos. The performance of HSM and its applications on challenging datasets has been significantly improved due to recent advancements of deep learning methods. These advancements have been extended to non-Euclidean or graph data with multiple nodes and edges. Because human joints and skeleton combinations are represented as graph structures, graph networks are appropriate for the non-Euclidean HSM. In recent years, graph networks have become essential tools for the HSM and behavioral analyses. However, prior surveys are often siloed, focusing either on a narrow class of models such as GCNs or on a single application like action recognition. A unified framework that systematically analyzes diverse graph network learning paradigms across the entire HSM pipeline has been notably absent. We conduct a survey of graph network methods for HSM and their application domains. This comprehensive overview includes a taxonomy of graph network techniques, a detailed study of benchmark datasets for HSM, extensive descriptions of the performance of graph networks in three major application domains, and a collection of related resources and open-source codes. Finally, we provided insightful recommendations for future research directions and trends of graph networks for HSM. This survey serves as the introductory material for beginners in graph network-based HSM and as the reference materials for advanced researchers.",
+		"container-title": "Artificial Intelligence Review",
+		"DOI": "10.1007/s10462-025-11442-0",
+		"ISSN": "1573-7462",
+		"issue": "1",
+		"journalAbbreviation": "Artif Intell Rev",
+		"language": "en",
+		"page": "31",
+		"source": "Springer Link",
+		"title": "Graph network learning for human skeleton modeling: a survey",
+		"title-short": "Graph network learning for human skeleton modeling",
+		"URL": "https://doi.org/10.1007/s10462-025-11442-0",
+		"volume": "59",
+		"author": [
+			{
+				"family": "Yang",
+				"given": "Xi"
+			},
+			{
+				"family": "Li",
+				"given": "Shaoyi"
+			},
+			{
+				"family": "Niu",
+				"given": "Saisai"
+			},
+			{
+				"family": "Yue",
+				"given": "Xiaokui"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					12,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/7QVZVIVP",
+		"type": "article-journal",
+		"abstract": "Existing model-based gait databases provide the 2D poses (i.e., joint locations) extracted by general pose estimators as the human model. However, these 2D poses suffer from information loss and are of relatively low quality. In this paper, we consider a more informative 3D human mesh model with parametric pose and shape features, and propose a multi-view training framework for accurate mesh estimation. Unlike existing methods, which estimate a mesh from a single view and suffer from the ill-posed estimation problem in 3D space, the proposed framework takes asynchronous multi-view gait sequences as input and uses both multi-view and single-view streams to learn consistent and accurate mesh models for both multi-view and single-view sequences. After applying the proposed framework to the existing OU-MVLP database, we establish a large-scale gait database with human meshes (i.e., OUMVLP-Mesh), containing over 10,000 subjects and up to 14 view angles. Experimental results show that the proposed framework estimates human mesh models more accurately than similar methods, providing models of sufficient quality to improve the recognition performance of a baseline model-based gait recognition approach.",
+		"container-title": "IEEE Transactions on Biometrics, Behavior, and Identity Science",
+		"DOI": "10.1109/TBIOM.2022.3174559",
+		"journalAbbreviation": "IEEE Transactions on Biometrics, Behavior, and Identity Science",
+		"page": "1-1",
+		"source": "ResearchGate",
+		"title": "Multi-View Large Population Gait Database With Human Meshes and Its Performance Evaluation",
+		"volume": "4",
+		"author": [
+			{
+				"family": "Li",
+				"given": "Xiang"
+			},
+			{
+				"family": "Makihara",
+				"given": "Yasushi"
+			},
+			{
+				"family": "Xu",
+				"given": "Chi"
+			},
+			{
+				"family": "Yagi",
+				"given": "Yasushi"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2022",
+					4,
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/IP8JJ3P2",
+		"type": "article-journal",
+		"abstract": "Intelligent unmanned vending machines (UVMs) based on machine vision have attracted great attention in the unmanned retail industry. However, due to the complexity of practical application scenarios and environments, the existing vision-based intelligent UVMs face challenges related to missed-detection and mis-detection of product, and require costly physical components such as the infrared radio frequency sensors to capture shopping behaviors. In this study, we propose a BP-YOLO, the real-time model that integrates optimized YOLOv7 and BlazePose for product detection and shopping behaviors recognition. BP-YOLO can accurately detect the products purchased by consumers and their shopping behaviors in complex scenarios. To address the problems of missed-detection and mis-detection, we introduce the 3D attention mechanism SimAM and the deformable ConvNets v2 (DCNv2) to recombine and optimize the one-stage object detection model YOLOv7. This method reduces the interference of the invalid information in complex scenarios by adaptively weighting each channel and 3D spatial features, focuses on feature information in a sparse space, and minimizes the loss of feature information during the transmission process based on multi-scale feature extraction and fusion. To recognize and judge the shopping behaviors of consumers, we track the hand and arm key points of consumers using the pose estimation model BlazePose. Using the mAP@[0.5:0.95] as the evaluation metric for product detection, the experimental results on a customized product dataset show that BP-YOLO achieves an average accuracy of 96.17% for all product categories detection; the average success rate of consumer shopping recognition reaches 92%, 98%, and 94.7% under three light and noise intensity, respectively. Therefore, our BP-YOLO model for intelligent UVMs has effectiveness in commercial deployment.",
+		"container-title": "IEEE Access",
+		"DOI": "10.1109/ACCESS.2024.3361675",
+		"journalAbbreviation": "IEEE Access",
+		"page": "1-1",
+		"source": "ResearchGate",
+		"title": "BP-YOLO: A Real-Time Product Detection and Shopping Behaviors Recognition Model for Intelligent Unmanned Vending Machine",
+		"title-short": "BP-YOLO",
+		"volume": "PP",
+		"author": [
+			{
+				"family": "Li",
+				"given": "Jingxiang"
+			},
+			{
+				"family": "Tang",
+				"given": "Fuquan"
+			},
+			{
+				"family": "Zhu",
+				"given": "Chao"
+			},
+			{
+				"family": "He",
+				"given": "Shiwei"
+			},
+			{
+				"family": "Zhang",
+				"given": "Shujin"
+			},
+			{
+				"family": "Su",
+				"given": "Yu"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2024",
+					1,
+					1
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/H8MN4NA4",
+		"type": "article-journal",
+		"abstract": "A new approach for skeleton extraction has been designed to work directly with 3D point cloud data. It blends hierarchical segmentation with a multi-scale ensemble built on top of modified PointNet models. Outputs from three network variants trained at different spatial resolutions are aggregated using majority voting, unweighted averaging, and adaptive weighting, with the latter yielding the best performance. Each joint is set at the center of its part. A radius-based filter is used to remove any outliers, specifically, points that fall too far from where the joints are expected to be. When evaluated on benchmark datasets such as DFaust, CMU, Kids, and EHF, the model demonstrated strong segmentation accuracy (mIoU = 0.8938) and low joint localization error (MPJPE = 22.82 mm). The method generalizes well to an unseen dataset (DanceDB), maintaining strong performance across diverse body types and poses. Compared to benchmark methods such as L1-Medial, Pinocchio, and MediaPipe, our approach offers greater anatomical symmetry, joint completeness, and robustness in occluded or overlapping regions. Structural integrity is maintained by working directly with 3D data, without the need for 2D projections or medial-axis approximations. The visual assessment of DanceDB results indicates improved anatomical accuracy, even in the absence of quantitative comparison. The outcome supports practical applications in animation, motion tracking, and biomechanics.",
+		"container-title": "Symmetry",
+		"DOI": "10.3390/sym17060879",
+		"ISSN": "2073-8994",
+		"issue": "6",
+		"language": "en",
+		"license": "http://creativecommons.org/licenses/by/3.0/",
+		"page": "879",
+		"publisher": "Multidisciplinary Digital Publishing Institute",
+		"source": "www.mdpi.com",
+		"title": "Kinematic Skeleton Extraction from 3D Model Based on Hierarchical Segmentation",
+		"URL": "https://www.mdpi.com/2073-8994/17/6/879",
+		"volume": "17",
+		"author": [
+			{
+				"family": "Mata",
+				"given": "Nitinan"
+			},
+			{
+				"family": "Tangwannawit",
+				"given": "Sakchai"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					6
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/YAA46X3H",
+		"type": "article-journal",
+		"abstract": "This study explores the use of MediaPipe for markerless joint angle estimation and its application in calculating joint moments during sit-to-stand movements. The problem is the absence of an accurate, affordable, and easy alternative to costly, complex marker-based systems that restrict natural movement. Our approach leverages a rapid setup using a single camera to capture motion, making it a cost-effective and accessible solution for motion analysis. We conducted experiments with 15 healthy volunteers, recording their STS movements using a smartphone camera. The videos were processed using MediaPipe to estimate joint angles at the ankle, knee, and hip. These angles were then used to compute angular velocities, accelerations, and joint moments through an inverse dynamics model. We compared the performance of our markerless approach with conventional marker-based systems and MATLAB simulations. The results showed strong consistency in hip and knee joint moment estimations, with correlation coefficients of 0.94 and 0.95, respectively. While the ankle joint demonstrated moderate agreement (R = 0.11), the findings confirm the method’s reliability for lower limb analysis. Our results also highlight the potential of our method for real-time applications in clinical and sports settings. The study underscores the advantages of using a markerless system, including ease of setup, reduced costs, and the elimination of movement restrictions associated with traditional marker-based systems. This research contributes to the field by providing a detailed analysis of STS movements using an innovative, deep learning-based approach. The findings support MediaPipe’s effectiveness for biomechanical analysis and its potential in clinical and rehabilitation settings.",
+		"container-title": "Multimedia Tools and Applications",
+		"DOI": "10.1007/s11042-026-21256-z",
+		"ISSN": "1573-7721",
+		"issue": "1",
+		"journalAbbreviation": "Multimed Tools Appl",
+		"language": "en",
+		"page": "38",
+		"source": "Springer Link",
+		"title": "Markerless joint angle estimation using MediaPipe with a rapid setup for joint moment calculation",
+		"URL": "https://doi.org/10.1007/s11042-026-21256-z",
+		"volume": "85",
+		"author": [
+			{
+				"family": "Akturk",
+				"given": "Suleyman"
+			},
+			{
+				"family": "Derdiyok",
+				"given": "Fatma Betul"
+			},
+			{
+				"family": "Serbest",
+				"given": "Kasim"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2026",
+					1,
+					27
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/49EQBV4D",
+		"type": "webpage",
+		"title": "Sequential keypoint density estimator: an overlooked baseline of skeleton-based video anomaly detection",
+		"URL": "https://arxiv.org/html/2506.18368v1",
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/R9XSF3PH",
+		"type": "article-journal",
+		"abstract": "Real-time human pose estimation and tracking on monocular videos is a fundamental task in computer vision with a wide range of applications. Recently, benefiting from deep learning-based methods, it has received impressive progress in performance. Although some works have reviewed and summarised the advancements in this field, few have specifically focused on real-time performance and monocular video-based solutions. The goal of this review is to bridge this gap by providing a comprehensive understanding of real-time monocular video-based human pose estimation and tracking, encompassing both 2D and 3D domains, as well as single-person and multi-person scenarios. To achieve this objective, this paper systematically reviews 68 papers published between 2014 and 2024 to answer six research questions. This review brings new insights into computational efficiency measures and hardware configurations of existing methods. Additionally, this review provides a deep discussion on trade-off strategies for accuracy and efficiency in real-time systems. Finally, this review highlights promising directions for future research and provides practical solutions for real-world applications.",
+		"container-title": "Neurocomputing",
+		"DOI": "10.1016/j.neucom.2025.131309",
+		"ISSN": "0925-2312",
+		"journalAbbreviation": "Neurocomputing",
+		"page": "131309",
+		"source": "ScienceDirect",
+		"title": "Real-time human pose estimation and tracking on monocular videos: A systematic literature review",
+		"title-short": "Real-time human pose estimation and tracking on monocular videos",
+		"URL": "https://www.sciencedirect.com/science/article/pii/S0925231225019812",
+		"volume": "655",
+		"author": [
+			{
+				"family": "Chen",
+				"given": "Yingying"
+			},
+			{
+				"family": "Feng",
+				"given": "Zhenan"
+			},
+			{
+				"family": "Paes",
+				"given": "Daniel"
+			},
+			{
+				"family": "Nilsson",
+				"given": "Daniel"
+			},
+			{
+				"family": "Lovreglio",
+				"given": "Ruggiero"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		},
+		"issued": {
+			"date-parts": [
+				[
+					"2025",
+					11,
+					28
+				]
+			]
+		}
+	},
+	{
+		"id": "http://zotero.org/users/6160776/items/PDPZZC3Y",
+		"type": "post-weblog",
+		"abstract": "Learn how to build apps with the features like humane pose estimation, posture detection, corrective feedback and comparative training.",
+		"container-title": "MobiDev",
+		"language": "en",
+		"title": "Human Pose Estimation for Fitness & Sports Apps",
+		"URL": "https://mobidev.biz/blog/human-pose-estimation-technology-guide",
+		"author": [
+			{
+				"family": "Molodoria",
+				"given": "Anastasiia"
+			}
+		],
+		"accessed": {
+			"date-parts": [
+				[
+					"2026",
+					4,
+					9
+				]
+			]
+		}
+	}
+]
