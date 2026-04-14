@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for AuraLink server tests."""
+"""Shared pytest fixtures for BioLiminal server tests."""
 
 import pytest
 

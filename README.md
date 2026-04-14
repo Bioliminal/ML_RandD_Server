@@ -1,4 +1,4 @@
-# AuraLink Capstone
+# BioLiminal Capstone
 
 AI-powered movement screening + sEMG compression garment for injury prevention. UT Austin capstone project.
 

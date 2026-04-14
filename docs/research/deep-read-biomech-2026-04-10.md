@@ -1,6 +1,6 @@
 # Deep Read — Biomechanics Papers Added 2026-04-10
 
-**Purpose:** Per-paper extraction + verdict on the Sahrmann Movement System Impairment (MSI) framework for AuraLink.
+**Purpose:** Per-paper extraction + verdict on the Sahrmann Movement System Impairment (MSI) framework for BioLiminal.
 **Scope:** 9 items moved from `unsorted/` → `biomechanics/` on 2026-04-10.
 **Upstream:** `docs/operations/comms/research-integration-report.md` (fascial chain rule strategy).
 
@@ -28,7 +28,7 @@
   - **Predictive validity** — movement-based labels like "verticality" haven't been shown to predict future pathology (e.g., falls).
   - **Known-group validity** — asymptomatic individuals often show the same "abnormal" movement patterns as symptomatic ones.
   - Clear linkage to health outcomes (pain, disability, future pathology).
-- **Implication for AuraLink:** Any movement pattern we flag as "concerning" must be validated against an outcome we actually care about, not just as a label. "Hip adduction during single-leg squat" is defensible as a rule because there's mechanistic evidence tying it to function (Harris-Hayes 2018); "lumbar flexion bias" is not defensible as a diagnosis without that link.
+- **Implication for BioLiminal:** Any movement pattern we flag as "concerning" must be validated against an outcome we actually care about, not just as a label. "Hip adduction during single-leg squat" is defensible as a rule because there's mechanistic evidence tying it to function (Harris-Hayes 2018); "lumbar flexion bias" is not defensible as a diagnosis without that link.
 
 ### 4. Physiopedia — Sahrmann MSI for LBP (web)
 

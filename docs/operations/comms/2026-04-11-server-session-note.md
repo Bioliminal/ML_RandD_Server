@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-11
 **From:** the research/planning session.
-**To:** whoever is currently coding the AuraLink server (probably executing
+**To:** whoever is currently coding the BioLiminal server (probably executing
 L2 Plan 1 / Plan 4 / Plan 2 via `parallel-plan-executor`).
 
 You don't need to change what you're building. This note tells you what *I*

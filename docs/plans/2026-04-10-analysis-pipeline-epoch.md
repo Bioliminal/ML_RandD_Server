@@ -1,4 +1,4 @@
-# AuraLink Server — Analysis Pipeline Epoch (L1)
+# BioLiminal Server — Analysis Pipeline Epoch (L1)
 
 **Status:** Planning
 **Created:** 2026-04-10

@@ -1,6 +1,6 @@
 # Deep Read — Sensing/ML Papers Added 2026-04-10
 
-**Purpose:** Per-paper technical extraction + pipeline synthesis for the AuraLink server/mobile stack.
+**Purpose:** Per-paper technical extraction + pipeline synthesis for the BioLiminal server/mobile stack.
 **Scope:** 8 ML/vision items moved from `unsorted/` → `sensing/` on 2026-04-10.
 **Upstream:** `docs/operations/comms/research-integration-report.md` (2026-04-09). This document refines / partially contradicts the pipeline recommendation in that report.
 
@@ -19,7 +19,7 @@
 - **Runtime:** Cloud processing, ~10–30 min per recording. **Not real-time, not single-frame.**
 - **Accuracy:** Walking kinematics agree with marker-based mocap within ~2–3° for major joints; validated on walking, squat, STS, drop-jump.
 - **Fine-tuning:** Not a learned end-to-end model — pose detector is pretrained; kinematics is physics-based inverse kinematics. No fine-tuning required for base use. Can swap MSK model (e.g., use a custom Rajagopal variant) without retraining.
-- **Integration path (AuraLink):** Premium server tier. But the **dual-camera requirement is a non-starter for consumer single-phone capture.** Use only if we support a dual-phone or phone-plus-tripod capture flow.
+- **Integration path (BioLiminal):** Premium server tier. But the **dual-camera requirement is a non-starter for consumer single-phone capture.** Use only if we support a dual-phone or phone-plus-tripod capture flow.
 - **Limitations:** Multi-camera requirement; cloud-only inference; ~tens-of-minutes latency unsuitable for real-time feedback.
 
 ### 2. Gilon, Miller, Uhlrich 2026 — OpenCap Monocular (Utah preprint)
@@ -32,14 +32,14 @@
 - **Checkpoint/license:** Open-source (`github.com/utahmobl/opencap-monocular` per author email affiliations; verify URL before use). Research license; same ecosystem as OpenCap.
 - **Runtime:** Cloud/server GPU. Optimization step is the bottleneck — seconds-to-minutes per capture. Not real-time.
 - **Fine-tuning:** Data needed to improve: subject-level anthropometry can be scaled (β shape vector or direct measurements). Can retrain the ML kinetics head on additional force-plate + video pairs.
-- **Integration path (AuraLink):** **This is the strongest single-phone premium candidate.** It already solves the MediaPipe → 3D → biomechanical → kinetics pipeline we were planning to assemble from MotionBERT + HSMR + a custom kinetics layer.
+- **Integration path (BioLiminal):** **This is the strongest single-phone premium candidate.** It already solves the MediaPipe → 3D → biomechanical → kinetics pipeline we were planning to assemble from MotionBERT + HSMR + a custom kinetics layer.
 - **Limitations:** Still validated only on walking / squat / STS. Rollup, push-up, single-leg squat coverage unproven. Requires subject height input (minor UX ask). Optimization is server-side only — no on-device variant.
 
 ### 3. Miller, Tan, Falisse, Uhlrich 2025 — Hybrid ML + MSK Simulation (bioRxiv)
 
 - **Contribution:** Shows that **neither pure physics nor pure ML** gives best dynamics estimates. A hybrid that uses ML to predict GRF + center-of-pressure and physics to enforce dynamic consistency is best.
 - **Reported improvements over baselines:** ~29–45% lower error on joint moments, GRF error down ~40%, knee loading metrics improved 13–30% vs prior OpenCap pipeline.
-- **Use in AuraLink:** Direct evidence that we should *not* implement a pure ML "joint moment regressor" and call it done. This justifies adopting the full OpenCap Monocular stack rather than replacing pieces with hand-rolled ML.
+- **Use in BioLiminal:** Direct evidence that we should *not* implement a pure ML "joint moment regressor" and call it done. This justifies adopting the full OpenCap Monocular stack rather than replacing pieces with hand-rolled ML.
 - **Limitations:** n=10 walking only in validation cohort. Still bioRxiv, not peer-reviewed.
 
 ### 4. Shin, Kim, Halilaj, Black 2024 — WHAM (CVPR 2024)
@@ -51,7 +51,7 @@
 - **Checkpoint/license:** Research license at wham.is.tue.mpg.de. **Non-commercial research-only terms from Max Planck / Tübingen — flag for capstone, may constrain any future productization.**
 - **Runtime:** Paper emphasizes efficiency vs optimization-based alternatives (SLAHMR). Likely GPU-only, not on-device. Exact FPS/parameter count not quoted — treat as "server GPU, near-real-time at best."
 - **Fine-tuning:** Inherits SMPL skeleton. Adapting to a different skeleton requires rebuilding the decoder head — non-trivial.
-- **Integration path (AuraLink):** Used as the 3D pose backbone by OpenCap Monocular (§2). If we adopt OpenCap Monocular, WHAM comes with it. We would not deploy WHAM standalone.
+- **Integration path (BioLiminal):** Used as the 3D pose backbone by OpenCap Monocular (§2). If we adopt OpenCap Monocular, WHAM comes with it. We would not deploy WHAM standalone.
 - **Limitations:** SMPL's joint-limit violations are still present (HSMR handles that better — see §2.3 of the integration report). WHAM does not enforce biomechanical joint limits; that's why OpenCap Monocular adds the optimization layer on top.
 
 ### 5. Liu et al. 2025 — TCPFormer (arXiv 2501.01770)

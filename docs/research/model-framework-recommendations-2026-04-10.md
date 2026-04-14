@@ -1,6 +1,6 @@
-# Model + Framework Recommendations — AuraLink 2026-04-10
+# Model + Framework Recommendations — BioLiminal 2026-04-10
 
-**Audience:** AuraLink team.
+**Audience:** BioLiminal team.
 **Purpose:** Given the 16 papers added on 2026-04-10, decide (a) which models/frameworks to prep for when the hardware lands, (b) where training data comes from if we need to fine-tune, (c) multi-model strategy, (d) what ships to the mobile teammate, and (e) how to land the Section 10 decisions from the research integration report.
 **Upstream:**
 - `docs/operations/comms/research-integration-report.md` (2026-04-09 snapshot; superseded in the pipeline-choice section by this doc)

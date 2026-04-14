@@ -1,4 +1,4 @@
-# AuraLink Hardware Buy List — Final Revision
+# BioLiminal Hardware Buy List — Final Revision
 
 **Date:** April 8, 2026 | **Budget:** ~$745 | **Location:** Austin, TX
 

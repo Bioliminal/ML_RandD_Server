@@ -1,4 +1,4 @@
-# Progress — AuraLink L2 Plan 4 Execution (ML Interfaces + Fixture Harness)
+# Progress — BioLiminal L2 Plan 4 Execution (ML Interfaces + Fixture Harness)
 
 ## Session Directive
 > **MANDATORY:** This progress file defines your assignment. Do NOT interpret, summarize, or re-scope.
@@ -7,14 +7,14 @@
 
 ## Application Context
 
-AuraLink — UT Austin capstone. AI movement screening tool using phone camera pose estimation + fascial chain reasoning (SBL/BFL/FFL). Free tier = on-device MediaPipe basics, premium tier = server-side analysis with MotionBERT + HSMR/SKEL biomechanical skeleton. 5-person team, Flutter mobile app + Python FastAPI server + future sEMG compression garment.
+BioLiminal — UT Austin capstone. AI movement screening tool using phone camera pose estimation + fascial chain reasoning (SBL/BFL/FFL). Free tier = on-device MediaPipe basics, premium tier = server-side analysis with MotionBERT + HSMR/SKEL biomechanical skeleton. 5-person team, Flutter mobile app + Python FastAPI server + future sEMG compression garment.
 
 **Current milestone:** Analysis Pipeline Epoch, **L2 Plan 4** (ML Interfaces + Fixture Harness) — mid-execution. Wave A (T1, T2, T4) and Wave B (T3, T5) complete — 5 of 17 dispatch units done. Plan 1 is FULLY COMPLETE (89/89 tests). Plan 4 execution resumes at **Wave C = T6 (Lifter stage)**.
 
 ## Position
 
-- **Project:** Capstone (AuraLink)
-- **Repo path:** `/home/context/olorin/projects/Capstone/` (symlink to `/home/context/projects/Capstone/`)
+- **Project:** Capstone (BioLiminal)
+- **Repo path:** `/home/context/olorin/projects/bioliminal/RnD_Server/` (symlink to `/home/context/projects/bioliminal/RnD_Server/`)
 - **Remote:** `https://github.com/AaronCarney/capstone-fascia.git`
 - **Branch:** `main`
 - **HEAD:** `40152a4 feat(models): real ModelRegistry with ModelLoader-based registration`
@@ -107,12 +107,12 @@ After T17 passes, invoke `finishing-a-development-branch` to decide on merge/PR/
 ## Key Files
 
 **Plan docs:**
-- `/home/context/olorin/projects/Capstone/docs/plans/2026-04-10-analysis-pipeline-epoch.md` — L1 epoch
-- `/home/context/olorin/projects/Capstone/docs/plans/2026-04-10-L2-1-pipeline-framework.md` — Plan 1 (complete)
-- `/home/context/olorin/projects/Capstone/docs/plans/2026-04-10-L2-4-ml-interfaces.md` — Plan 4 (executing, 2424 lines)
-- `/home/context/olorin/projects/Capstone/docs/plans/2026-04-10-L2-2-chain-reasoning.md` — stub (next after Plan 4)
-- `/home/context/olorin/projects/Capstone/docs/plans/2026-04-10-L2-3-dtw-temporal.md` — stub
-- `/home/context/olorin/projects/Capstone/docs/plans/2026-04-10-L2-5-operations.md` — stub
+- `/home/context/olorin/projects/bioliminal/RnD_Server/docs/plans/2026-04-10-analysis-pipeline-epoch.md` — L1 epoch
+- `/home/context/olorin/projects/bioliminal/RnD_Server/docs/plans/2026-04-10-L2-1-pipeline-framework.md` — Plan 1 (complete)
+- `/home/context/olorin/projects/bioliminal/RnD_Server/docs/plans/2026-04-10-L2-4-ml-interfaces.md` — Plan 4 (executing, 2424 lines)
+- `/home/context/olorin/projects/bioliminal/RnD_Server/docs/plans/2026-04-10-L2-2-chain-reasoning.md` — stub (next after Plan 4)
+- `/home/context/olorin/projects/bioliminal/RnD_Server/docs/plans/2026-04-10-L2-3-dtw-temporal.md` — stub
+- `/home/context/olorin/projects/bioliminal/RnD_Server/docs/plans/2026-04-10-L2-5-operations.md` — stub
 
 **Scaffold code Plan 4 references:**
 - `software/server/src/auralink/pipeline/artifacts.py` — existing artifact schemas; T9 will extend with lift_result/skeleton_result/phase_boundaries
@@ -136,7 +136,7 @@ After T17 passes, invoke `finishing-a-development-branch` to decide on merge/PR/
 ## Git State
 
 ```bash
-$ cd /home/context/olorin/projects/Capstone && git log --oneline -7
+$ cd /home/context/olorin/projects/bioliminal/RnD_Server && git log --oneline -7
 40152a4 feat(models): real ModelRegistry with ModelLoader-based registration
 10c5c6d feat(ml): add SkeletonFitter protocol and NoOpSkeletonFitter
 75c1b6d feat(ml): add PhaseSegmenter protocol and SinglePhaseSegmenter

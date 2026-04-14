@@ -59,7 +59,7 @@ The phrase "freely available for academic research use" is an explicit scope lim
 
 **Caveat.** I was not able to fetch opencap.ai/terms directly from this sandbox (non-GitHub hosts blocked). There may be a more formal ToS document with additional clauses (or, less likely, a commercial tier). Before any product decision, manually open https://www.opencap.ai/terms and https://www.opencap.ai/privacy in a browser and confirm.
 
-## Critical question 4: What can the AuraLink team safely build right now without licensing risk?
+## Critical question 4: What can the BioLiminal team safely build right now without licensing risk?
 
 ### Clean for commercial use (ship-ready)
 
@@ -81,7 +81,7 @@ The phrase "freely available for academic research use" is an explicit scope lim
 - **opencap.ai hosted service** — academic research use only per README.
 - **Human3.6M-trained checkpoints** (including stock MotionBERT weights) — research only.
 
-### Action items for AuraLink
+### Action items for BioLiminal
 
 1. **Capstone demo: use WHAM + OpenCap Monocular.** Good accuracy, fully covered by academic use. Document the license chain in the project writeup so reviewers see you understand it.
 2. **Any commercial pivot: switch to MediaPipe Pose Landmarker** as the baseline, accept the accuracy drop, and evaluate whether a commercial pose SDK is worth budgeting for.

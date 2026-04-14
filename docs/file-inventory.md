@@ -1,4 +1,4 @@
-# File Inventory — AuraLink Capstone
+# File Inventory — BioLiminal Capstone
 
 > Snapshot 2026-04-11. Maps every file in the repo to its folder and the placement rule that put it there. Source of placement rules: `/CLAUDE.md` → "File Organization" section.
 >

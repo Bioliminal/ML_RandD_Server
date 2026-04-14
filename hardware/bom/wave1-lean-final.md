@@ -1,4 +1,4 @@
-# AuraLink Wave 1 — Lean Build
+# BioLiminal Wave 1 — Lean Build
 
 **Goal:** "Do things function at all?" — 4 channels, ESP32 ADC, overnight where possible.
 

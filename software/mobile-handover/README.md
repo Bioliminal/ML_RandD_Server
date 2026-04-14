@@ -1,4 +1,4 @@
-# AuraLink Mobile Hand-off Package
+# BioLiminal Mobile Hand-off Package
 
 Everything the Flutter teammate needs to ship the launch-candidate phone client.
 Matches the server contract at `software/server/src/auralink/api/schemas.py`.

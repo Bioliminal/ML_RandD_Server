@@ -1,8 +1,8 @@
-# AuraLink Server Scaffold — Implementation Plan
+# BioLiminal Server Scaffold — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Scaffold the Python server project for AuraLink's ML pipeline — ingest pose keypoint sessions from the Flutter app, compute joint angles, segment reps, and prepare the scaffolding hooks for MotionBERT, HSMR, DTW, and chain reasoning to drop in later.
+**Goal:** Scaffold the Python server project for BioLiminal's ML pipeline — ingest pose keypoint sessions from the Flutter app, compute joint angles, segment reps, and prepare the scaffolding hooks for MotionBERT, HSMR, DTW, and chain reasoning to drop in later.
 
 **Architecture:** FastAPI server with a stage-based pipeline. Every stage is a pure function over JSON session artifacts (keypoints → angles → reps → 3D lift → SKEL → chain reasoning → report). Stages are independently testable and composable. Model loading happens once at startup via a registry. No ML models are integrated in this scaffold — they land in follow-on plans. This scaffold ships a working session ingest → joint angles → rep segmentation → basic chain placeholder pipeline that can be validated end-to-end with Flutter golden-capture fixtures.
 
@@ -98,7 +98,7 @@ Plus a new doc at `software/server/docs/blazepose_landmark_reference.md` — an 
 [project]
 name = "auralink-server"
 version = "0.1.0"
-description = "AuraLink movement screening server — ingests pose keypoints, runs analysis pipeline, returns reports"
+description = "BioLiminal movement screening server — ingests pose keypoints, runs analysis pipeline, returns reports"
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "fastapi>=0.115.0",
@@ -176,9 +176,9 @@ data/
 - [ ] **Step 4: Create `README.md`**
 
 ```markdown
-# AuraLink Server
+# BioLiminal Server
 
-Python server for AuraLink's movement screening ML pipeline. Accepts pose keypoint sessions from the Flutter app, runs analysis, returns reports.
+Python server for BioLiminal's movement screening ML pipeline. Accepts pose keypoint sessions from the Flutter app, runs analysis, returns reports.
 
 ## Quick Start
 
@@ -205,7 +205,7 @@ See `docs/operations/comms/research-integration-report.md` section 6 for archite
 
 ```bash
 git add software/server/pyproject.toml software/server/.gitignore software/server/.python-version software/server/README.md
-git commit -m "chore: scaffold AuraLink server project"
+git commit -m "chore: scaffold BioLiminal server project"
 ```
 
 ---
@@ -1668,7 +1668,7 @@ chmod +x software/server/scripts/dev.sh
 Create `software/server/tests/conftest.py`:
 
 ```python
-"""Shared pytest fixtures for AuraLink server tests."""
+"""Shared pytest fixtures for BioLiminal server tests."""
 
 import pytest
 
@@ -1767,7 +1767,7 @@ Create `software/server/docs/blazepose_landmark_reference.md`:
 ```markdown
 # BlazePose Landmark Reference (Server)
 
-Internal reference for the BlazePose 33-landmark ordering assumed by the AuraLink server's analysis pipeline. The canonical model interface contract is `custom_model_contract.md` (owned by the Flutter team). This doc is the server's view of the landmark schema.
+Internal reference for the BlazePose 33-landmark ordering assumed by the BioLiminal server's analysis pipeline. The canonical model interface contract is `custom_model_contract.md` (owned by the Flutter team). This doc is the server's view of the landmark schema.
 
 ## Canonical Spec — BlazePose 33 Landmarks
 
@@ -1832,7 +1832,7 @@ Landmarks 0-32 follow the canonical BlazePose body ordering:
 | 31 | left_foot_index |
 | 32 | right_foot_index |
 
-Landmarks 33-38 are auxiliary (used internally by BlazePose for next-frame ROI prediction). They are ignored by AuraLink.
+Landmarks 33-38 are auxiliary (used internally by BlazePose for next-frame ROI prediction). They are ignored by BioLiminal.
 
 Reference: https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/pose.md
 
@@ -1875,7 +1875,7 @@ transform: null  # or "swap_xy" / "flip_y" if needed
 
 ## Why This Matters
 
-Every downstream reference in AuraLink — joint angle math, chain reasoning, threshold tables, test fixtures, research paper citations — assumes BlazePose 33-landmark ordering. Deviating creates permanent tax on every future integration.
+Every downstream reference in BioLiminal — joint angle math, chain reasoning, threshold tables, test fixtures, research paper citations — assumes BlazePose 33-landmark ordering. Deviating creates permanent tax on every future integration.
 ```
 
 - [ ] **Step 2: Commit**

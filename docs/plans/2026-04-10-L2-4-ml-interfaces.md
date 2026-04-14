@@ -1,4 +1,4 @@
-# AuraLink L2 Plan 4 — ML Integration Interfaces + Fixture Harness
+# BioLiminal L2 Plan 4 — ML Integration Interfaces + Fixture Harness
 
 > **For agentic workers:** Execute via `parallel-plan-executor` skill (this repo's single L2 executor). Every task runs as a task-executor subagent in the main tree with narrow file ownership. Each TDD cycle = one commit. Do NOT use worktrees. Do NOT batch tasks.
 
@@ -1796,7 +1796,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Run the helper to produce the overhead_squat pair**
 
 ```bash
-cd /home/context/olorin/projects/Capstone && uv run python -c "
+cd /home/context/olorin/projects/bioliminal/RnD_Server && uv run python -c "
 import sys, json
 sys.path.insert(0, 'software/server')
 from tests.fixtures.synthetic.generator import generate_session
@@ -1870,7 +1870,7 @@ Generates the three remaining static JSON fixtures and extends the validation te
 - [ ] **Step 1: Generate the three new JSON files**
 
 ```bash
-cd /home/context/olorin/projects/Capstone && uv run python -c "
+cd /home/context/olorin/projects/bioliminal/RnD_Server && uv run python -c "
 import sys, json
 sys.path.insert(0, 'software/server')
 from tests.fixtures.synthetic.generator import generate_session
@@ -2263,7 +2263,7 @@ Expected: `push_up path ok`.
 If Step 2 (lint) auto-applied fixes via `ruff check --fix` or `black .`, the modified files are under `software/server/`. Stage only those files and commit:
 
 ```bash
-cd /home/context/olorin/projects/Capstone
+cd /home/context/olorin/projects/bioliminal/RnD_Server
 git add -u software/server/
 git diff --cached --quiet || git commit -m "chore(server): ruff/black cleanup after plan 4"
 ```
@@ -2516,7 +2516,7 @@ if __name__ == "__main__":
 
 **Fixture generation command:**
 ```bash
-cd /home/context/olorin/projects/Capstone && uv run python -c "
+cd /home/context/olorin/projects/bioliminal/RnD_Server && uv run python -c "
 import sys, json
 sys.path.insert(0, 'software/server')
 from tests.fixtures.synthetic.generator import generate_session
@@ -2569,7 +2569,7 @@ def test_overhead_squat_valgus_fixture_loads_as_session():
 
 **Fixture generation command:**
 ```bash
-cd /home/context/olorin/projects/Capstone && uv run python -c "
+cd /home/context/olorin/projects/bioliminal/RnD_Server && uv run python -c "
 import sys, json
 sys.path.insert(0, 'software/server')
 from tests.fixtures.synthetic.generator import generate_session
@@ -2611,7 +2611,7 @@ def test_single_leg_squat_clean_fixture_loads_as_session():
 
 **Fixture generation command:**
 ```bash
-cd /home/context/olorin/projects/Capstone && uv run python -c "
+cd /home/context/olorin/projects/bioliminal/RnD_Server && uv run python -c "
 import sys, json
 sys.path.insert(0, 'software/server')
 from tests.fixtures.synthetic.generator import generate_session
@@ -2653,7 +2653,7 @@ def test_push_up_clean_fixture_loads_as_session():
 
 **Fixture generation command:**
 ```bash
-cd /home/context/olorin/projects/Capstone && uv run python -c "
+cd /home/context/olorin/projects/bioliminal/RnD_Server && uv run python -c "
 import sys, json
 sys.path.insert(0, 'software/server')
 from tests.fixtures.synthetic.generator import generate_session

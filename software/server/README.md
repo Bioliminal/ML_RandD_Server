@@ -1,6 +1,6 @@
-# AuraLink Server
+# BioLiminal Server
 
-Python server for AuraLink's movement screening ML pipeline. Accepts pose keypoint sessions from the Flutter app, runs analysis, returns reports.
+Python server for BioLiminal's movement screening ML pipeline. Accepts pose keypoint sessions from the Flutter app, runs analysis, returns reports.
 
 ## Quick Start
 

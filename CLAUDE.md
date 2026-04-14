@@ -1,4 +1,4 @@
-# AuraLink Capstone
+# BioLiminal Capstone
 
 AI movement screening + sEMG compression garment for injury prevention. 5-person UT Austin team (Rajiv, Rajat, Kelsi, Aaron, Leo). ~$745 budget.
 

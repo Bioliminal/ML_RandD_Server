@@ -1,6 +1,6 @@
 # Research Integration Report — Technical Context Document
 
-**Project:** AuraLink (UT Austin capstone, 5-person team)
+**Project:** BioLiminal (UT Austin capstone, 5-person team)
 **Date:** 2026-04-09
 **Status:** Research synthesis — pre-implementation
 **Purpose:** Technical context document for team members and their AI agents. Captures the state of sensing/ML research, product architecture changes based on new findings, and open research directions. Companion to the plain-English PDF at `docs/operations/comms/research-integration-report.pdf`.
@@ -11,7 +11,7 @@
 
 ## 0. Document Scope & Conventions
 
-This document is intentionally dense. It is the authoritative technical context for the AuraLink sensing and ML layer as of 2026-04-09. It supersedes prior assumptions in `BRAINLIFT.pdf` where they conflict (notably the "free tier = on-device only" assumption).
+This document is intentionally dense. It is the authoritative technical context for the BioLiminal sensing and ML layer as of 2026-04-09. It supersedes prior assumptions in `BRAINLIFT.pdf` where they conflict (notably the "free tier = on-device only" assumption).
 
 **Source materials synthesized:**
 - 14 peer-reviewed papers in `docs/research/sensing/` (PDFs)
@@ -74,7 +74,7 @@ Source: Peng et al. 2026 (DOI: 10.1038/s41598-026-43294-1). BlazePose + Random F
 | Joint angle computation | Per-rep angle error | <6% |
 | Siamese NN + similarity metric | Quality scoring vs reference | 92-98% correlation with expert scores |
 
-**Integration path:** This is a direct blueprint for AuraLink's baseline scoring pipeline. We can adopt this architecture wholesale for the first-pass movement quality scorer. The siamese scoring component maps to our "compare user movement against chain-specific reference patterns" requirement.
+**Integration path:** This is a direct blueprint for BioLiminal's baseline scoring pipeline. We can adopt this architecture wholesale for the first-pass movement quality scorer. The siamese scoring component maps to our "compare user movement against chain-specific reference patterns" requirement.
 
 ### 1.4 Capable-phone upgrade path
 
@@ -270,9 +270,9 @@ Source: "Real time action scoring system for movement analysis and feedback in p
 
 **Validation:** Outperforms RepNet on both accuracy and computational cost. Runs on pose keypoints alone — no additional hardware, no additional models, no training data beyond reference movements.
 
-### 4.2 Application to AuraLink protocol
+### 4.2 Application to BioLiminal protocol
 
-AuraLink runs a 4-movement screening protocol. Within each movement, the user performs multiple reps. Across movements, we need to detect whether compensation patterns develop or worsen.
+BioLiminal runs a 4-movement screening protocol. Within each movement, the user performs multiple reps. Across movements, we need to detect whether compensation patterns develop or worsen.
 
 **Per-rep metrics:**
 - Joint angle amplitude (peak flexion/extension)
@@ -309,7 +309,7 @@ Fixed biomechanical thresholds systematically misclassify populations that devia
 - **Women**: ~5-8° more baseline valgus than men (Hewett 2005 data, reanalyzed).
 - **Youth (<16)**: different normative ROM tables published in PT literature.
 
-Without body-type adjustment, AuraLink's chain reasoning produces systematically wrong interpretations for these populations. This is a scientific validity issue, not a polish issue.
+Without body-type adjustment, BioLiminal's chain reasoning produces systematically wrong interpretations for these populations. This is a scientific validity issue, not a polish issue.
 
 ### 5.2 Detection methods (tiered)
 
@@ -355,7 +355,7 @@ Source: web research + HSMR paper. SKEL shares shape space with SMPL.
 
 ### 5.5 Research contribution framing
 
-Per SPOV 4 ("this is a research instrument first — the product direction follows the data"): the fact that no threshold adjustment tables exist is itself publishable. AuraLink can be the first to:
+Per SPOV 4 ("this is a research instrument first — the product direction follows the data"): the fact that no threshold adjustment tables exist is itself publishable. BioLiminal can be the first to:
 1. Quantify the magnitude of misclassification from fixed thresholds in diverse populations
 2. Publish empirically validated body-type-adjusted threshold tables
 3. Open-source the calibration dataset (with consent)
@@ -497,7 +497,7 @@ These are gaps in our current literature that require further investigation befo
 
 ### 7.5 Combined EMG + video spine analysis
 
-**Gap:** Per the AuraLink two-layer thesis, the camera sees movement but only muscles tell the truth. For the spine specifically, erector spinae EMG during rollup reveals whether the user is actively controlling the descent or hanging on passive structures (flexion-relaxation phenomenon). This is the ultimate premium tier — sEMG compression garment + video combined.
+**Gap:** Per the BioLiminal two-layer thesis, the camera sees movement but only muscles tell the truth. For the spine specifically, erector spinae EMG during rollup reveals whether the user is actively controlling the descent or hanging on passive structures (flexion-relaxation phenomenon). This is the ultimate premium tier — sEMG compression garment + video combined.
 
 **What to find:**
 - Marras & Granata (already cited in complete-research-document.md) — EMG-assisted spinal loading models

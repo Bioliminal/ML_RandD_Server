@@ -1,6 +1,6 @@
 # BlazePose Landmark Reference (Server)
 
-Internal reference for the BlazePose 33-landmark ordering assumed by the AuraLink server's analysis pipeline. The canonical model interface contract is `custom_model_contract.md` (owned by the Flutter team). This doc is the server's view of the landmark schema.
+Internal reference for the BlazePose 33-landmark ordering assumed by the BioLiminal server's analysis pipeline. The canonical model interface contract is `custom_model_contract.md` (owned by the Flutter team). This doc is the server's view of the landmark schema.
 
 ## Canonical Spec — BlazePose 33 Landmarks
 
@@ -65,7 +65,7 @@ Landmarks 0-32 follow the canonical BlazePose body ordering:
 | 31 | left_foot_index |
 | 32 | right_foot_index |
 
-Landmarks 33-38 are auxiliary (used internally by BlazePose for next-frame ROI prediction). They are ignored by AuraLink.
+Landmarks 33-38 are auxiliary (used internally by BlazePose for next-frame ROI prediction). They are ignored by BioLiminal.
 
 Reference: https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/pose.md
 
@@ -101,4 +101,4 @@ The canonical Flutter-side model interface contract is `custom_model_contract.md
 
 ## Why This Matters
 
-Every downstream reference in AuraLink — joint angle math, chain reasoning, threshold tables, test fixtures, research paper citations — assumes BlazePose 33-landmark ordering. Deviating creates permanent tax on every future integration.
+Every downstream reference in BioLiminal — joint angle math, chain reasoning, threshold tables, test fixtures, research paper citations — assumes BlazePose 33-landmark ordering. Deviating creates permanent tax on every future integration.
