@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2.9.0",
     "pydantic-settings>=2.6.0",
     "numpy>=1.26.0",
+    "dtaidistance>=2.4.0,<3",
     "python-multipart>=0.0.17",
     "pyyaml>=6.0",
 ]

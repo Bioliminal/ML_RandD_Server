@@ -38,6 +38,7 @@ name = "auralink-server"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "dtaidistance" },
     { name = "fastapi" },
     { name = "numpy" },
     { name = "pydantic" },
@@ -58,6 +59,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "dtaidistance", specifier = ">=2.4.0,<3" },
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "numpy", specifier = ">=1.26.0" },
     { name = "pydantic", specifier = ">=2.9.0" },
@@ -131,6 +133,25 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44", size = 27697, upload-time = "2022-10-25T02:36:22.414Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6", size = 25335, upload-time = "2022-10-25T02:36:20.889Z" },
+]
+
+[[package]]
+name = "dtaidistance"
+version = "2.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cd/01/aa26cc97b64d397ff03b9576b0a04cc79d0e3bae512eb087cfab7d98f4ec/dtaidistance-2.4.0.tar.gz", hash = "sha256:bd4066800254fbd5b620e6462bb759c9d85b79ac2080b354cedc901f446b6c82", size = 1316462, upload-time = "2026-02-12T22:23:56.35Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/47/ec/fa410cb539ce29bc324140ecc6079890b9d7def5056d4595318988314054/dtaidistance-2.4.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:b7e054baadcd4ae54ec87b0ecb0d9aa0d41682ccc376ffd9b57ee29ff5e615f4", size = 2108362, upload-time = "2026-02-12T22:23:33.206Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/f3/91ecf5ae5321ee14236c394fb673db5d64bccfa643c17ec889e72b5b75fa/dtaidistance-2.4.0-cp311-cp311-macosx_15_0_arm64.whl", hash = "sha256:3838dbcc0a9b5f513aa5f1a158ac82f924651a163801cb63f5dc6c1999e6e6b6", size = 1657675, upload-time = "2026-02-13T08:14:42.994Z" },
+    { url = "https://files.pythonhosted.org/packages/66/ff/e9f7ce427d45171a78104e785ba25ddc1d112d7a695741ef6609d8c51d99/dtaidistance-2.4.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bc756c0b305f72357aae2c48d52f6c80a651c43b06dfb740bfaf76a3fd97a114", size = 4356748, upload-time = "2026-02-12T22:23:35.889Z" },
+    { url = "https://files.pythonhosted.org/packages/e9/94/2fa6f8c637685369a5b9c4b9efe3c414207f74c6fa02525f58a1b6369a1c/dtaidistance-2.4.0-cp311-cp311-win_amd64.whl", hash = "sha256:b17f853aa274bf02e00f9461013ec50882d7ea093587c126c74f38b119f5a1dc", size = 1445182, upload-time = "2026-02-12T22:23:37.87Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/63/c1546dc5a4a98f77ca044206e8d8b7604349d36d0b76d5c03ab393a55e60/dtaidistance-2.4.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:64d54f910b53cd7a56b215e06d2b24b22090af836102d48558d3e9569ded2b66", size = 2124723, upload-time = "2026-02-12T22:23:39.482Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/9a/4c0cb726c3c93436c993f55fc59d5fd2142c1a0fe6fe9ec06cc7bf25ab15/dtaidistance-2.4.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:3afb229f4524f8bbf835a5dc3e07abcee9b6b9c6af4f14436cad19639102243c", size = 1549051, upload-time = "2026-02-13T08:14:46.866Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/8e/ccdd057e4ff71cf0b6fe34220cbd214d469f831b45acbbb4366fdfef6330/dtaidistance-2.4.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:349d6765e10ddbb5e22e937cf1bc42394f5f8d36bc127f8af24a0cd0259f4804", size = 4361729, upload-time = "2026-02-12T22:23:41.184Z" },
+    { url = "https://files.pythonhosted.org/packages/00/cf/ef215e8864c21eb14872f98987d9736ebbbe5049d429039e2a93adcacad4/dtaidistance-2.4.0-cp312-cp312-win_amd64.whl", hash = "sha256:6ab9431a5b66aafd37ab4dfcfe563b66694ed192019c1632d2de7a431a883bcd", size = 1443363, upload-time = "2026-02-12T22:23:43.706Z" },
 ]
 
 [[package]]
