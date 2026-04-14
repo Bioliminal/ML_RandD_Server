@@ -1,0 +1,20 @@
+# Temporal analysis thresholds for Plan 3 rep_comparison stage.
+#
+# NCC thresholds from gait biomechanics literature review
+# (docs/research/ncc-implementation-2026-04-14.md section 4):
+#   Kavanagh et al. 0.85-0.95 intra-subject XCC
+#   Ferrari et al. CMC >0.90 excellent / 0.75-0.90 good
+#   Iosa 2014 clinical gait 0.8-0.9 acceptable / >0.9 strong
+#
+# ROM deviation thresholds: 15% concern (noticeable but within ordinary
+# intra-subject variation) / 25% flag (meaningful partial-range compensation).
+#
+# form_drift_ncc_slope_threshold: polyfit slope over NCC across reps.
+# -0.02 per rep means a ~2% drop per rep; over 5 reps that is a 10% decline.
+
+ncc_clean_min: 0.95
+ncc_concern_min: 0.75
+rom_deviation_concern_pct: 15.0
+rom_deviation_flag_pct: 25.0
+form_drift_ncc_slope_threshold: -0.02
+form_drift_rom_mean_deviation_pct: 15.0
