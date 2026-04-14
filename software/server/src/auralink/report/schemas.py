@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from auralink.pipeline.artifacts import (
     AngleTimeSeries,
     LiftedAngleTimeSeries,
+    MovementTemporalSummary,
     NormalizedAngleTimeSeries,
     PerRepMetrics,
     PhaseBoundaries,
@@ -12,14 +13,19 @@ from auralink.pipeline.artifacts import (
     WithinMovementTrend,
 )
 from auralink.reasoning.observations import ChainObservation
+from auralink.protocol.schemas import CrossMovementMetric
 
 
 class TemporalSection(BaseModel):
-    """Placeholder slot — Plan 3 populates with DTW/temporal analysis."""
+    """Plan 3 temporal analysis slot. Populated for rep-based movements."""
+
+    movement_temporal_summary: MovementTemporalSummary | None = None
 
 
 class CrossMovementSection(BaseModel):
-    """Placeholder slot — Plan 3 populates with cross-movement aggregation."""
+    """Plan 3 cross-movement slot. Populated only by the protocol aggregator."""
+
+    cross_movement_metrics: list[CrossMovementMetric] = Field(default_factory=list)
 
 
 class ReportMetadata(BaseModel):
@@ -40,6 +46,7 @@ class MovementSection(BaseModel):
     skeleton_result: SkeletonBundle | None = None
     phase_boundaries: PhaseBoundaries | None = None
     chain_observations: list[ChainObservation] = Field(default_factory=list)
+    movement_temporal_summary: MovementTemporalSummary | None = None
 
 
 class Report(BaseModel):

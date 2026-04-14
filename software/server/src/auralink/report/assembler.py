@@ -3,6 +3,7 @@ from auralink.report.schemas import (
     MovementSection,
     Report,
     ReportMetadata,
+    TemporalSection,
 )
 
 
@@ -47,7 +48,13 @@ def assemble_report(
         skeleton_result=artifacts.skeleton_result,
         phase_boundaries=artifacts.phase_boundaries,
         chain_observations=artifacts.chain_observations or [],
+        movement_temporal_summary=artifacts.movement_temporal_summary,
     )
+    temporal_section: TemporalSection | None = None
+    if artifacts.movement_temporal_summary is not None:
+        temporal_section = TemporalSection(
+            movement_temporal_summary=artifacts.movement_temporal_summary,
+        )
     return Report(
         metadata=ReportMetadata(
             session_id=session_id,
@@ -56,4 +63,6 @@ def assemble_report(
         ),
         movement_section=movement_section,
         overall_narrative=_build_overall_narrative(movement_section),
+        temporal_section=temporal_section,
+        cross_movement_section=None,
     )
