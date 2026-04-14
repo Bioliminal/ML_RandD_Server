@@ -13,9 +13,10 @@ def test_get_report_returns_artifacts_after_post(tmp_path, monkeypatch):
     response = client.get(f"/sessions/{session_id}/report")
     assert response.status_code == 200
     body = response.json()
-    assert body["quality_report"]["passed"] is True
-    assert body["angle_series"] is not None
-    assert body["within_movement_trend"] is not None
+    section = body["movement_section"]
+    assert section["quality_report"]["passed"] is True
+    assert section["angle_series"] is not None
+    assert section["within_movement_trend"] is not None
 
 
 def test_get_report_404_when_session_missing(tmp_path, monkeypatch):

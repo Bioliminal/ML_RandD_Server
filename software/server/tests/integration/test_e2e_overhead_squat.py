@@ -17,9 +17,10 @@ def test_overhead_squat_round_trip_produces_populated_report(tmp_path, monkeypat
     assert report.status_code == 200
     body = report.json()
 
-    assert body["quality_report"]["passed"] is True
-    assert body["angle_series"]["angles"]["left_knee_flexion"]
-    assert body["normalized_angle_series"]["scale_factor"] > 0
-    assert len(body["rep_boundaries"]["by_angle"]["left_knee_flexion"]) == 3
-    assert len(body["per_rep_metrics"]["reps"]) == 3
-    assert "fatigue_detected" in body["within_movement_trend"]
+    section = body["movement_section"]
+    assert section["quality_report"]["passed"] is True
+    assert section["angle_series"]["angles"]["left_knee_flexion"]
+    assert section["normalized_angle_series"]["scale_factor"] > 0
+    assert len(section["rep_boundaries"]["by_angle"]["left_knee_flexion"]) == 3
+    assert len(section["per_rep_metrics"]["reps"]) == 3
+    assert "fatigue_detected" in section["within_movement_trend"]

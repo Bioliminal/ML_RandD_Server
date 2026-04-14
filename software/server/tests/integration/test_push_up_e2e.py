@@ -17,12 +17,13 @@ def test_push_up_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
     assert report.status_code == 200
     body = report.json()
 
-    assert body["quality_report"]["passed"] is True
-    assert body["lift_result"] is not None
-    assert body["skeleton_result"] is not None
+    section = body["movement_section"]
+    assert section["quality_report"]["passed"] is True
+    assert section["lift_result"] is not None
+    assert section["skeleton_result"] is not None
     # push_up pipeline stops at skeleton — rep-based stages require
     # elbow_flexion (deferred). See Task 9 and the stage composition matrix.
-    assert body["rep_boundaries"] is None
-    assert body["per_rep_metrics"] is None
-    assert body["within_movement_trend"] is None
-    assert body["phase_boundaries"] is None
+    assert section["rep_boundaries"] is None
+    assert section["per_rep_metrics"] is None
+    assert section["within_movement_trend"] is None
+    assert section["phase_boundaries"] is None

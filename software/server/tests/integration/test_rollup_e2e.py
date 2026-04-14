@@ -17,14 +17,15 @@ def test_rollup_clean_fixture_runs_end_to_end_with_single_phase(tmp_path, monkey
     assert report.status_code == 200
     body = report.json()
 
-    assert body["quality_report"]["passed"] is True
-    assert body["lift_result"] is not None
-    assert body["skeleton_result"] is not None
+    section = body["movement_section"]
+    assert section["quality_report"]["passed"] is True
+    assert section["lift_result"] is not None
+    assert section["skeleton_result"] is not None
 
-    assert body["phase_boundaries"] is not None
-    assert len(body["phase_boundaries"]["phases"]) == 1
-    assert body["phase_boundaries"]["phases"][0]["label"] == "full_movement"
+    assert section["phase_boundaries"] is not None
+    assert len(section["phase_boundaries"]["phases"]) == 1
+    assert section["phase_boundaries"]["phases"][0]["label"] == "full_movement"
 
-    assert body["rep_boundaries"] is None
-    assert body["per_rep_metrics"] is None
-    assert body["within_movement_trend"] is None
+    assert section["rep_boundaries"] is None
+    assert section["per_rep_metrics"] is None
+    assert section["within_movement_trend"] is None

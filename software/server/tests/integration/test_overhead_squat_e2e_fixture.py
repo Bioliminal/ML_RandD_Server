@@ -18,11 +18,12 @@ def test_overhead_squat_clean_fixture_runs_end_to_end(tmp_path, monkeypatch):
     assert report.status_code == 200
     body = report.json()
 
-    assert body["quality_report"]["passed"] is True
-    assert body["lift_result"] is not None
-    assert body["lift_result"]["is_3d"] is False
-    assert body["skeleton_result"] is not None
-    assert body["skeleton_result"]["fitted"] is False
-    assert body["per_rep_metrics"] is not None
-    assert len(body["per_rep_metrics"]["reps"]) == 2
-    assert body["phase_boundaries"] is None
+    section = body["movement_section"]
+    assert section["quality_report"]["passed"] is True
+    assert section["lift_result"] is not None
+    assert section["lift_result"]["is_3d"] is False
+    assert section["skeleton_result"] is not None
+    assert section["skeleton_result"]["fitted"] is False
+    assert section["per_rep_metrics"] is not None
+    assert len(section["per_rep_metrics"]["reps"]) == 2
+    assert section["phase_boundaries"] is None
