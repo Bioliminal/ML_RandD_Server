@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from auralink.reasoning.observations import ChainObservation
@@ -58,6 +60,46 @@ class WithinMovementTrend(BaseModel):
     valgus_slope_deg_per_rep: float
     trunk_lean_slope_deg_per_rep: float
     fatigue_detected: bool
+
+
+class RepComparison(BaseModel):
+    """One rep scored against the movement's reference rep.
+
+    ncc_score may be NaN when the user rep is a flat signal (zero variance);
+    callers must handle NaN before arithmetic. rom_deviation_pct is a signed
+    percentage: positive means the user's range of motion exceeds the
+    reference, negative means it falls short. status is the combined
+    classification from NCC and ROM thresholds (NCC amplitude-guard rule —
+    see plan architectural decision 5).
+    """
+
+    rep_index: int = Field(ge=0)
+    angle: str
+    ncc_score: float
+    dtw_distance: float = Field(ge=0.0)
+    rom_user_deg: float = Field(ge=0.0)
+    rom_reference_deg: float = Field(ge=0.0)
+    rom_deviation_pct: float
+    status: Literal["clean", "concern", "flag"]
+
+
+class MovementTemporalSummary(BaseModel):
+    """Within-movement temporal aggregation over a list of RepComparisons.
+
+    ncc_slope_per_rep is fit with numpy.polyfit over the NCC scores treating
+    rep index as x; a negative slope means shape is drifting away from the
+    reference across the set. mean_rom_deviation_pct is a plain mean of the
+    rom_deviation_pct field. form_drift_detected is a joint condition — both
+    a sufficiently negative NCC slope AND a large mean ROM deviation must be
+    present — to avoid false positives from a single noisy rep.
+    """
+
+    primary_angle: str
+    rep_comparisons: list[RepComparison] = Field(default_factory=list)
+    mean_ncc: float
+    ncc_slope_per_rep: float
+    mean_rom_deviation_pct: float
+    form_drift_detected: bool
 
 
 class LiftedAngleTimeSeries(BaseModel):
