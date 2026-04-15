@@ -33,13 +33,15 @@ See `CLAUDE.md` for the full file-placement rules and tiebreakers between direct
 | `docs/operations/BRAINLIFT.pdf` | Cognitive design + SPOVs |
 | `docs/operations/gtm.md` | Go-to-market plan |
 | `docs/operations/comms/research-integration-report.md` | Authoritative technical context for the sensing/ML layer |
-| `docs/research/model-framework-recommendations-2026-04-10.md` | Current model/framework recommendations (supersedes pipeline section of the integration report) |
-| `docs/research/complete-research-document.md` | Foundational two-layer research synthesis |
+| `docs/research/model-framework-recommendations-2026-04-10.md` | Model/framework recommendations (TEMP — pending re-processing) |
+| `docs/research/license-audit-2026-04-11.md` / `-v2` | ML model/dataset license audit |
+| `docs/research/stack-options-matrix-2026-04-11.md` | Pose/biomech stack selection matrix |
+| `docs/research/dtw-library-comparison-2026-04-14.md` | DTW library selection |
+| `docs/research/ncc-implementation-2026-04-14.md` | NCC algorithm implementation notes |
 | `docs/research/market/market-analysis.md` | Competitive landscape + TAM/SAM/SOM |
 | `docs/decisions/decisions.md` | HW/SW/ML tradeoff log |
 | `hardware/bom/final-buy-list-with-local.md` | Current buy list ($745 budget) |
 | `hardware/bom/component-database.csv` | Consolidated equipment database |
-| `hardware/hardware-decision-handover.md` | Sensor architecture options |
 | `software/mobile-handover/README.md` | Phone teammate's integration guide |
 
 ## Quick Start

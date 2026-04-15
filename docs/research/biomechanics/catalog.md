@@ -37,4 +37,4 @@ Reference models for server-side dynamics estimation (premium tier).
 - `core-muscles-research.md` — abdominal musculature evidence review (McGill, Hodges).
 - `yijinjing-fascial-chain-remodeling.md` — fascial remodeling literature.
 - `../sensing/catalog.md` — pose estimation and ML sensing PDFs.
-- `../capstone-complete.md` — Master Reference List (alphabetical).
+- Literature synthesis (cross-paper deep reads, Master Reference List) is canonical in the sibling `research/` repo.

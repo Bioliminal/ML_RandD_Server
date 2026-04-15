@@ -36,17 +36,13 @@ Files go where their **primary purpose** lives. When a file could belong in mult
 
 ### The Key Distinction
 
-**`hardware/` vs `docs/research/`** is the most common ambiguity:
-- If the file answers "what should we build or buy?" → `hardware/`
-- If the file answers "what does the science say?" → `docs/research/`
-- Example: `torso-justification.md` is in `hardware/` because its purpose is justifying the torso-first hardware design, even though it's full of citations. The citations serve the hardware decision.
-- Example: `complete-research-document.md` is in `docs/research/` because it's a standalone research synthesis that informs multiple domains.
+**Three-repo boundary.** Hardware content belongs in the sibling `esp32-firmware/` repo (teammate's GitLab repo, `hardware/` directory there). Literature-synthesis content belongs in the sibling `research/` repo. This repo (`RnD_Server/`) is for **ML/engineering decisions** — license audits, stack/framework selection, library evaluation, algorithm implementation notes, and the active ML training workspace. See `memory/bioliminal-repo-roles.md` (in the olorin workspace) for the canonical three-repo role distinction.
 
-**Research subdirectory tiebreakers:**
+**Research subdirectory tiebreakers (within `docs/research/`):**
 - `biomechanics/` — The body. Fascial chains, muscle anatomy, injury mechanisms, clinical thresholds, movement patterns. If it cites Wilke, McGill, Hewett, Schleip, or discusses force transmission → biomechanics.
 - `sensing/` — The measurement. sEMG signal chains, MediaPipe accuracy, sensor validation, gap analysis of what's measurable vs claimed. If it's about whether we *can* detect something → sensing.
 - `market/` — The business. Competitors, TAM/SAM, FDA/regulatory, pricing, practitioner counts. If it's about who else does this or whether we can sell it → market.
-- Root (`docs/research/`) — Cross-cutting synthesis docs (`capstone-complete.md`, `complete-research-document.md`), per-paper deep reads (`deep-read-*-YYYY-MM-DD.md`), and model/framework recommendation docs that span all three subdirectories.
+- Root (`docs/research/`) — Engineering-decision artifacts: license audits, stack-options matrices, library comparisons, algorithm implementation notes, and model/framework recommendation docs.
 
 **`docs/operations/` vs `docs/research/`** — operations is about *what we're building and why*; research is about *what the science says*.
 - If it frames the product (BrainLift, SPOVs, GTM, mission) → `docs/operations/`

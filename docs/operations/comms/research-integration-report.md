@@ -16,7 +16,7 @@ This document is intentionally dense. It is the authoritative technical context 
 **Source materials synthesized:**
 - 14 peer-reviewed papers in `docs/research/sensing/` (PDFs)
 - 7 web/reference HTML docs in `docs/research/sensing/`
-- `docs/research/complete-research-document.md` — the foundational two-layer thesis (camera + sEMG)
+- `research/synthesis/deep-read-capstone-complete-reference-2026-04-15.md` (sibling literature-synthesis repo) — the foundational two-layer thesis (camera + sEMG), formerly `docs/research/complete-research-document.md` here
 - `docs/operations/BRAINLIFT.pdf` — cognitive design and SPOVs
 - `docs/operations/gtm.md` — go-to-market plan
 - `docs/research/sensing/ML.json` — CSL JSON bibliography (Zotero export)
@@ -579,7 +579,7 @@ These are gaps in our current literature that require further investigation befo
 | Document | Purpose | Relevance |
 |----------|---------|-----------|
 | `docs/operations/BRAINLIFT.pdf` | Cognitive design and SPOVs | Baseline product framing; SPOVs 1-4 |
-| `docs/research/complete-research-document.md` | Two-layer thesis (camera + sEMG) | Injury mechanics, EMG signals, opposing research |
+| `research/synthesis/deep-read-capstone-complete-reference-2026-04-15.md` (sibling repo) | Two-layer thesis (camera + sEMG) | Injury mechanics, EMG signals, opposing research |
 | `docs/operations/gtm.md` | Go-to-market plan | 100 GitHub stars in 3 weeks; open-source chain reasoning engine |
 | `docs/research/sensing/ML.json` | CSL JSON Zotero bibliography | Full bibliographic data for all sensing papers |
 | `docs/research/sensing/catalog.md` | File catalog with tier assignments | Per-file relevance scoring |

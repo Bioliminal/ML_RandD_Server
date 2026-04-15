@@ -92,16 +92,16 @@ All subdirs (`datasets/`, `evaluation/`, `experiments/`, `models/`, `training/`)
 - `2026-04-10-analysis-pipeline-epoch.md` — L1 epoch plan for analysis pipeline.
 - `2026-04-10-L2-1-pipeline-framework.md` through `L2-5-operations.md` — L2 tactical plans.
 
-**`docs/research/` (root)**:
+**`docs/research/` (root)** — engineering-decision artifacts (literature-synthesis content is in the sibling `research/` repo):
 
 | File | Status | Purpose |
 |---|---|---|
-| `capstone-complete.md` | tracked | Cross-cutting research synthesis. |
-| `deep-read-biomech-2026-04-10.md` | tracked | Per-paper deep read, biomechanics. |
-| `deep-read-sensing-2026-04-10.md` | tracked | Per-paper deep read, sensing. |
 | `license-audit-2026-04-11.md` | tracked | License audit for models/frameworks. |
-| `model-framework-recommendations-2026-04-10.md` | tracked | Model/framework recommendations spanning all research subdirs. |
-| `complete-research-document.md` | untracked | Full lifting-sciences synthesis doc (DOK 1/2). |
+| `license-audit-2026-04-11-v2.md` | tracked | License audit v2 (expanded to datasets). |
+| `stack-options-matrix-2026-04-11.md` | tracked | Pose/biomech stack-selection matrix. |
+| `dtw-library-comparison-2026-04-14.md` | tracked | DTW library selection. |
+| `ncc-implementation-2026-04-14.md` | tracked | NCC algorithm implementation notes. |
+| `model-framework-recommendations-2026-04-10.md` | tracked | Model/framework recommendations (TEMP — pending re-processing). |
 | `citations-zotero-export.json` | untracked | Zotero library export (JSON). |
 | `citations.ris` | untracked | Zotero library export (RIS). |
 | `unsorted/` | untracked (empty) | Staging area, currently empty. |
@@ -196,7 +196,11 @@ Column `rule` is the CLAUDE.md tiebreaker row that governs placement. Verdicts: 
 
 | File | Current location | Rule | Verdict |
 |---|---|---|---|
-| `complete-research-document.md` | `docs/research/` | explicit example: "`complete-research-document.md` is in `docs/research/` because it's a standalone research synthesis that informs multiple domains" | correct |
+| `license-audit-2026-04-11.md` / `-v2` | `docs/research/` | engineering decision — ML model/dataset licensing | correct |
+| `stack-options-matrix-2026-04-11.md` | `docs/research/` | engineering decision — pose/biomech stack selection | correct |
+| `dtw-library-comparison-2026-04-14.md` | `docs/research/` | engineering decision — library evaluation | correct |
+| `ncc-implementation-2026-04-14.md` | `docs/research/` | engineering decision — algorithm implementation notes | correct |
+| `model-framework-recommendations-2026-04-10.md` | `docs/research/` | engineering recommendation (TEMP — pending re-processing) | correct |
 | `citations-zotero-export.json` | `docs/research/` | **rule gap** — Zotero/RIS exports aren't covered by any tiebreaker. Root is defensible because citations span all three subdirs. | ambiguous (rule gap) |
 | `citations.ris` | `docs/research/` | same as above | ambiguous (rule gap) |
 
