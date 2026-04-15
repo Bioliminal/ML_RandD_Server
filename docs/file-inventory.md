@@ -101,7 +101,7 @@ All subdirs (`datasets/`, `evaluation/`, `experiments/`, `models/`, `training/`)
 | `stack-options-matrix-2026-04-11.md` | tracked | Pose/biomech stack-selection matrix. |
 | `dtw-library-comparison-2026-04-14.md` | tracked | DTW library selection. |
 | `ncc-implementation-2026-04-14.md` | tracked | NCC algorithm implementation notes. |
-| `model-framework-recommendations-2026-04-10.md` | tracked | Model/framework recommendations (TEMP — pending re-processing). |
+| `pipeline-architecture-decision-2026-04-10.md` | tracked | Authoritative pipeline + stack engineering decision. |
 | `citations-zotero-export.json` | untracked | Zotero library export (JSON). |
 | `citations.ris` | untracked | Zotero library export (RIS). |
 | `unsorted/` | untracked (empty) | Staging area, currently empty. |
@@ -200,7 +200,7 @@ Column `rule` is the CLAUDE.md tiebreaker row that governs placement. Verdicts: 
 | `stack-options-matrix-2026-04-11.md` | `docs/research/` | engineering decision — pose/biomech stack selection | correct |
 | `dtw-library-comparison-2026-04-14.md` | `docs/research/` | engineering decision — library evaluation | correct |
 | `ncc-implementation-2026-04-14.md` | `docs/research/` | engineering decision — algorithm implementation notes | correct |
-| `model-framework-recommendations-2026-04-10.md` | `docs/research/` | engineering recommendation (TEMP — pending re-processing) | correct |
+| `pipeline-architecture-decision-2026-04-10.md` | `docs/research/` | authoritative engineering decision grounded in the sibling research repo's literature synthesis | correct |
 | `citations-zotero-export.json` | `docs/research/` | **rule gap** — Zotero/RIS exports aren't covered by any tiebreaker. Root is defensible because citations span all three subdirs. | ambiguous (rule gap) |
 | `citations.ris` | `docs/research/` | same as above | ambiguous (rule gap) |
 

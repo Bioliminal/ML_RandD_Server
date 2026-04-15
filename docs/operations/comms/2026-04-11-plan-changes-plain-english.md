@@ -3,9 +3,9 @@
 **Date:** 2026-04-11
 **For:** BioLiminal team + anyone catching up on the project.
 **Source documents (if you want the long versions):**
-- `docs/research/model-framework-recommendations-2026-04-10.md`
-- `docs/research/deep-read-sensing-2026-04-10.md`
-- `docs/research/deep-read-biomech-2026-04-10.md`
+- `docs/research/pipeline-architecture-decision-2026-04-10.md` (replaces the former `model-framework-recommendations-2026-04-10.md` draft)
+- `research/synthesis/deep-read-sensing-2026-04-10.md` (sibling research repo)
+- `research/synthesis/deep-read-biomech-2026-04-10.md` (sibling research repo)
 - `software/mobile-handover/README.md`
 
 ---
@@ -183,10 +183,10 @@ Short version you can paste into Slack/Discord:
 > 6. **Chain reasoner:** rule-based at launch. GNN is post-launch once we have
 >    labeled data.
 >
-> Long version: `docs/research/model-framework-recommendations-2026-04-10.md`.
+> Long version: `docs/research/pipeline-architecture-decision-2026-04-10.md`.
 > Plain-English version: `docs/operations/comms/2026-04-11-plan-changes-plain-english.md`.
-> Full per-paper notes: `docs/research/deep-read-sensing-2026-04-10.md` and
-> `docs/research/deep-read-biomech-2026-04-10.md`.
+> Full per-paper notes: `research/synthesis/deep-read-sensing-2026-04-10.md` and
+> `research/synthesis/deep-read-biomech-2026-04-10.md` (sibling research repo).
 
 ---
 

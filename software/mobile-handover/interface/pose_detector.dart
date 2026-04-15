@@ -3,7 +3,7 @@
 // Why this file exists:
 // The app should not bind directly to MediaPipe at the UI layer. We ship
 // BlazePose at launch, but the pipeline plan (see
-// docs/research/model-framework-recommendations-2026-04-10.md §2.1) keeps
+// docs/research/pipeline-architecture-decision-2026-04-10.md §2.1) keeps
 // MoveNet Thunder and HRPose-small as alternates. Hiding the backend behind
 // this interface means swapping models is a constructor change, not an app
 // release.

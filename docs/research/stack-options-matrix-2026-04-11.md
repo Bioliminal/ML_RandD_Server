@@ -8,8 +8,8 @@ No row contains a recommendation. Every cell is either a metric with a source or
 
 **Sources abbreviated in footnotes:**
 - `[v2]` = `docs/research/license-audit-2026-04-11-v2.md`
-- `[DRS]` = `docs/research/deep-read-sensing-2026-04-10.md`
-- `[MFR]` = `docs/research/model-framework-recommendations-2026-04-10.md`
+- `[DRS]` = `research/synthesis/deep-read-sensing-2026-04-10.md` (sibling research repo)
+- `[MFR]` = `docs/research/pipeline-architecture-decision-2026-04-10.md` (replaces the former `model-framework-recommendations-2026-04-10.md` draft)
 - `[CAT]` = `docs/research/sensing/catalog.md`
 - `[Gilon26]` = Gilon et al. 2026, OpenCap Monocular (`sensing/Gilon et al. - 2026 - OpenCap Monocular*.pdf`)
 - `[Shin24]` = Shin et al. 2024, WHAM (CVPR 2024)

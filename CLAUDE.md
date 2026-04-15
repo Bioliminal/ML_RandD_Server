@@ -48,7 +48,7 @@ Files go where their **primary purpose** lives. When a file could belong in mult
 - If it frames the product (BrainLift, SPOVs, GTM, mission) → `docs/operations/`
 - If it cites papers and synthesizes evidence → `docs/research/`
 - Example: `gtm.md` is in `docs/operations/` because it's a product strategy document, even though it cites market research.
-- Example: `model-framework-recommendations-2026-04-10.md` is in `docs/research/` because it's a synthesis of paper findings, even though it drives implementation choices.
+- Example: `pipeline-architecture-decision-2026-04-10.md` is in `docs/research/` because it's an engineering decision grounded in paper findings — it drives implementation choices for the sensing/ML layer.
 
 **`docs/operations/` vs `docs/operations/comms/`** — operations holds living strategy/framing docs that the team owns over time; `comms/` holds the artifacts produced *for* communicating between humans (or between Aaron and parallel coding sessions).
 - Living, owned by the team, updated as the project evolves → `docs/operations/` (root)

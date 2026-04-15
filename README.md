@@ -33,7 +33,7 @@ See `CLAUDE.md` for the full file-placement rules and tiebreakers between direct
 | `docs/operations/BRAINLIFT.pdf` | Cognitive design + SPOVs |
 | `docs/operations/gtm.md` | Go-to-market plan |
 | `docs/operations/comms/research-integration-report.md` | Authoritative technical context for the sensing/ML layer |
-| `docs/research/model-framework-recommendations-2026-04-10.md` | Model/framework recommendations (TEMP — pending re-processing) |
+| `docs/research/pipeline-architecture-decision-2026-04-10.md` | Authoritative pipeline + stack engineering decision |
 | `docs/research/license-audit-2026-04-11.md` / `-v2` | ML model/dataset license audit |
 | `docs/research/stack-options-matrix-2026-04-11.md` | Pose/biomech stack selection matrix |
 | `docs/research/dtw-library-comparison-2026-04-14.md` | DTW library selection |

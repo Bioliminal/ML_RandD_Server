@@ -151,12 +151,12 @@ So you don't waste time double-checking:
 
 ## Document trail (for if you want the long version)
 
-- `docs/research/model-framework-recommendations-2026-04-10.md` — the
-  authoritative recommendation doc; supersedes `research-integration-report.md`
+- `docs/research/pipeline-architecture-decision-2026-04-10.md` — the
+  authoritative engineering-decision doc; supersedes `research-integration-report.md`
   pipeline section.
-- `docs/research/deep-read-sensing-2026-04-10.md` — per-paper notes on the 8
+- `research/synthesis/deep-read-sensing-2026-04-10.md` (sibling research repo) — per-paper notes on the 8
   ML/vision papers.
-- `docs/research/deep-read-biomech-2026-04-10.md` — per-paper notes on the 9
+- `research/synthesis/deep-read-biomech-2026-04-10.md` (sibling research repo) — per-paper notes on the 9
   biomechanics papers + the MSI cherry-pick verdict.
 - `docs/operations/comms/2026-04-11-plan-changes-plain-english.md` — plain-English summary
   for the team.
