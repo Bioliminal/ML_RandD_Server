@@ -1,40 +1,24 @@
 # Biomechanics Research — File Catalog
 
-Pointer doc for PDFs and topical research in `docs/research/biomechanics/`. Topical deep-dives live in `core-muscles-research.md` and `yijinjing-fascial-chain-remodeling.md`; this file indexes the primary-source PDFs.
+**All primary-source biomechanics papers are now canonical in the sibling `research/` repo.** This directory retains topic-specific hand-authored notes (`core-muscles-research.md`, `yijinjing-fascial-chain-remodeling.md`) and research metadata (`*.json`) that support engineering decisions in this repo.
 
-## Movement System / Sahrmann Framework
+## Where the papers live
 
-Clinical reasoning foundation for mapping observed movement impairments to fascial chain rule sets.
+The Sahrmann / Movement System Impairment corpus, the Van Dillen / Harris-Hayes movement-pattern-training clinical trials, the Rajagopal 2016 MSK model, and the Uhlrich 2022 muscle-coordination retraining paper were migrated to `research/biomechanics/` in the sibling research repo on 2026-04-15. Each has a citekey, full frontmatter, and a stub synopsis awaiting deep-read authoring.
 
-| File | Citation | Relevance |
-|------|----------|-----------|
-| `ijspt-12-862.pdf` | Sahrmann, S. (2017). The How and Why of the Movement System as the Identity of Physical Therapy. *IJSPT* 12(6):862–869. | Foundational kinesiopathologic framing — grounds the rule-based chain logic the tool operationalizes. |
-| `Defining Our Diagnostic Labels Will Help Define Our Movement Expertise and Guide Our Next 100 Years.pdf` | Sahrmann, S. (2021). *Physical Therapy* 101:pzaa196. DOI 10.1093/ptj/pzaa196. | Argument for movement-diagnosis labels as PT identity. Paired with Joyce 2023 for balanced framing. |
-| `Joyce et al. - 2023 - Concerns on the Science and Practice of a Movement System.pdf` | Joyce, C.T. et al. (2023). *Physical Therapy* 103:pzad087. DOI 10.1093/ptj/pzad087. | Skeptical counterpoint — diagnostic categories lack predictive validity. Required for honest framing. |
-| `Classification_Of_Low_Back_Pain_Using_Shirley_Sahrmann's_Movement_System_Impairments,_An_Over.html` | Physiopedia (n.d.). | Practitioner-oriented summary of Sahrmann MSI classification applied to LBP. |
+To look up a specific paper by author/year, use the research repo's regenerated indexes (`research/indexes/by-author.md`, `research/indexes/by-year.md`) or the bibliography (`research/bibliography/bibliography.json`).
 
-## Clinical Trials — Movement Pattern Training
+## Practitioner-oriented HTML references (stay here)
 
-Evidence base for treatment effects of correcting movement-system impairments.
+These are not primary sources and do not belong in the research repo — they are developer/practitioner references consulted during engineering decisions.
 
-| File | Citation | Key Finding |
-|------|----------|-------------|
-| `nihms793173.pdf` | Van Dillen, L.R., Norton, B.J., Sahrmann, S.A. et al. (2016). *Manual Therapy* 24:52–64. DOI 10.1016/j.math.2016.04.003. | RCT: classification-specific treatment + adherence improves chronic LBP outcomes at 1-year follow-up. |
-| `Harris-Hayes et al. - 2016 - Movement Pattern Training To Improve Function in People with Chronic Hip Joint Pain A Feasibility R.pdf` | Harris-Hayes, M. et al. (2016). *JOSPT* 46(6):452–461. DOI 10.2519/jospt.2016.6279. | Feasibility RCT: movement pattern training for chronic hip joint pain — demonstrates trainable compensatory pattern correction. |
-| `nihms971315.pdf` | Harris-Hayes, M. et al. (2018). *JOSPT* 48(4):316–324. DOI 10.2519/jospt.2018.7810. | Reduced hip adduction after movement pattern training associated with improved function. Direct pattern→outcome evidence. |
-
-## Musculoskeletal Modeling
-
-Reference models for server-side dynamics estimation (premium tier).
-
-| File | Citation | Key Finding |
-|------|----------|-------------|
-| `nihms818926.pdf` | Rajagopal, A. et al. (2016). *IEEE TBME* 63(10):2068–2079. DOI 10.1109/TBME.2016.2586891. | Full-body open-source MSK model for gait simulation. Foundation for OpenCap/OpenSim pipelines. |
-| `Muscle coordination retraining inspired by musculoskeletal simulations reduces knee contact force .pdf` | Uhlrich, S.D. et al. (2022). *Scientific Reports*. | MSK-simulation-driven gait retraining (gastrocnemius-avoidance) cuts knee contact force 12% via EMG biofeedback. Mechanistic template for chain-logic interventions. |
+| File | Purpose |
+|------|---------|
+| `Classification_Of_Low_Back_Pain_Using_Shirley_Sahrmann's_Movement_System_Impairments,_An_Over.html` | Physiopedia practitioner summary of Sahrmann MSI classification for LBP. Pending follow-up: re-intake into the research repo as a proper paper entry if/when the original Sahrmann Hodges 2018 PDF is sourced. |
 
 ## See Also
 
 - `core-muscles-research.md` — abdominal musculature evidence review (McGill, Hodges).
-- `yijinjing-fascial-chain-remodeling.md` — fascial remodeling literature.
-- `../sensing/catalog.md` — pose estimation and ML sensing PDFs.
-- Literature synthesis (cross-paper deep reads, Master Reference List) is canonical in the sibling `research/` repo.
+- `yijinjing-fascial-chain-remodeling.md` — fascial remodeling literature notes.
+- `../sensing/catalog.md` — pose-estimation catalog (same migration status).
+- Sibling research repo — canonical for all primary-source papers and cross-paper deep reads.

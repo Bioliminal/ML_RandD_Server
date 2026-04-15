@@ -109,16 +109,18 @@ All subdirs (`datasets/`, `evaluation/`, `experiments/`, `models/`, `training/`)
 **`docs/research/biomechanics/`**:
 - tracked: `catalog.md`.
 - untracked markdown/json: `core-muscles-research.md`, `yijinjing-fascial-chain-remodeling.md`, `adversarial_counter_evidence.json`, `research_interoception_attention_fascia_schleip.json`, `research_intervention_gap.json`, `research_mechanotransduction_sustained_loading.json`.
-- untracked PDFs/HTML (source papers): `Classification_Of_Low_Back_Pain_..._Sahrmann....html`, `Defining Our Diagnostic Labels....pdf`, `Harris-Hayes et al. - 2016 ... Movement Pattern Training....pdf`, `Joyce et al. - 2023 - Concerns on the Science and Practice of a Movement System.pdf`, `Muscle coordination retraining ... knee contact force.pdf`, `ijspt-12-862.pdf`, `nihms793173.pdf`, `nihms818926.pdf`, `nihms971315.pdf`.
+- untracked HTML references: `Classification_Of_Low_Back_Pain_..._Sahrmann....html` (Physiopedia practitioner summary — pending re-intake as a proper paper if/when the primary source is sourced).
+- **Source PDFs migrated out 2026-04-15** — all Sahrmann, Van Dillen, Harris-Hayes, Rajagopal, and Uhlrich papers are now canonical in the sibling `research/` repo with citekeys and frontmatter.
 
 **`docs/research/market/`** — all untracked:
-- `market-analysis.md`, `market-analysis.pdf` — competitor/market analysis (Hinge, Sword, DARI, PostureScreen, etc).
+- `market-analysis.md`, `market-analysis.pdf` — competitor/market analysis (Hinge, Sword, DARI, PostureScreen, etc). Retained here because the `.md` is an internal analysis synthesis, not a primary source paper.
 
 **`docs/research/sensing/`**:
-- tracked: `catalog.md`.
+- tracked: `catalog.md` (rewritten 2026-04-15 to point at the sibling research repo for primary sources).
 - untracked markdown/json: `research-gaps.md`, `verification-results.md`, `ML.json` (Zotero export of sensing ML papers).
-- untracked PDFs (papers): OpenCap (Uhlrich 2023, Gilon 2026), TCPFormer (Liu 2025), ViTPose (Xu 2022), WHAM (Shin 2024), Beighton score vision tool (Sabo 2026), Miller 2025 ML+musculoskeletal, `biomechanically-accurate-skeleton.pdf`, `deep-learning-pose-estimation-survey.pdf`, `dynamic-pose-estimation-hrpose.pdf`, `enhanced-skeleton-tracking-rehab.pdf`, `ergonomic-risk-mediapipe.pdf`, `graph-network-skeleton-survey.pdf`, `kinematic-skeleton-extraction-3d.pdf`, `markerless-mediapipe-joint-moments.pdf`, `multi-view-gait-database.pdf`, `pose-estimation-joint-angle-deep-learning.pdf`, `pose-recognition-rehab-scoring.pdf`, `realtime-pose-estimation-review.pdf`, `skeleton-integrity-pose-fine-tuning.pdf`, `vision-sensors-markerless-motion-review.pdf`.
-- untracked HTML (saved web sources): `2506.html` (arXiv 2506.18368), `2602.html`, `Mediapipe-Poses-position-detection....html`, `android-sdk.html`, `best-pose-estimation-models.html`, `best-practices.html`, `human-pose-estimation-technology-guide.html`, `unity-isdk-body-pose-detection.html`.
+- untracked HTML (saved web sources retained for engineering reference): `Mediapipe-Poses-position-detection....html`, `android-sdk.html`, `best-pose-estimation-models.html`, `best-practices.html`, `human-pose-estimation-technology-guide.html`, `unity-isdk-body-pose-detection.html`.
+- untracked HTML pending re-intake: `2506.html` (arxiv 2506.18368, Sequential keypoint density estimator) and `2602.html` (arxiv 2602.23231, Skarimva multi-view action recognition) — to be re-downloaded as PDFs and intaked into the research repo.
+- **Source PDFs migrated out 2026-04-15** — OpenCap (Uhlrich 2023, Gilon 2026), WHAM, TCPFormer, ViTPose, Miller 2025, Sabo 2026 Beighton, HSMR, and the 13 other pose-estimation / rehab PDFs are now canonical in the sibling `research/` repo.
 
 **`docs/operations/`**:
 - tracked: none (dir itself is only populated via comms files).
