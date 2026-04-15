@@ -1,3 +1,5 @@
+> **TEMPORARY — needs re-processing.** This doc is a point-in-time working draft. It should be split into two permanent project-defining docs: a literature-facing version in the research repo and an ML-engineering-facing version here in RnD_Server. Do not treat as authoritative until that re-processing happens.
+
 # Model + Framework Recommendations — BioLiminal 2026-04-10
 
 **Audience:** BioLiminal team.
