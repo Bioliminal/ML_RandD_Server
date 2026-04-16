@@ -37,6 +37,7 @@ MovementType = Literal[
     "single_leg_squat",
     "push_up",
     "rollup",
+    "bicep_curl",
 ]
 
 
