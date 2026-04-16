@@ -2,7 +2,9 @@
 
 AI-powered movement screening + sEMG compression garment for injury prevention. Gauntlet AI capstone project.
 
-**Two-layer system:**
+> **Current focus (until Mon 2026-04-20):** single bicep curl demo. Project-wide scope and model picks live in `../CLAUDE.md` (project root) and `docs/research/model-commercial-viability-matrix-2026-04-16.md`. The "Two-layer system" description below is the full-product roadmap, not demo-day scope.
+
+**Two-layer system (full product, post-demo):**
 1. Free phone-camera app (MediaPipe pose estimation + fascial chain reasoning)
 2. Premium sEMG garment with haptic cueing for real-time muscle activation feedback
 
@@ -33,9 +35,10 @@ See `CLAUDE.md` for the full file-placement rules and tiebreakers between direct
 | `docs/operations/BRAINLIFT.pdf` | Cognitive design + SPOVs |
 | `docs/operations/gtm.md` | Go-to-market plan |
 | `docs/operations/comms/research-integration-report.md` | Authoritative technical context for the sensing/ML layer |
-| `docs/research/pipeline-architecture-decision-2026-04-10.md` | Authoritative pipeline + stack engineering decision |
-| `docs/research/license-audit-2026-04-11.md` / `-v2` | ML model/dataset license audit |
-| `docs/research/stack-options-matrix-2026-04-11.md` | Pose/biomech stack selection matrix |
+| `docs/research/model-commercial-viability-matrix-2026-04-16.md` | **Authoritative model picks (Demo/Commercial-now/Commercial-stretch) + IC-2 implications. Read first.** |
+| `docs/research/pipeline-architecture-decision-2026-04-10.md` | ⚠️ Disputed/stale — superseded by the 2026-04-16 viability matrix for demo + near-term commercial |
+| `docs/research/license-audit-2026-04-11.md` / `-v2` | ML model/dataset license audit (raw facts, cited by viability matrix) |
+| `docs/research/stack-options-matrix-2026-04-11.md` | Pose/biomech stack selection matrix (raw tables, cited by viability matrix) |
 | `docs/research/dtw-library-comparison-2026-04-14.md` | DTW library selection |
 | `docs/research/ncc-implementation-2026-04-14.md` | NCC algorithm implementation notes |
 | `docs/research/market/market-analysis.md` | Competitive landscape + TAM/SAM/SOM |
