@@ -1,14 +1,6 @@
-# BioLiminal Capstone
+# RnD_Server — ML & Analysis Server
 
-AI movement screening + sEMG compression garment for injury prevention. 5-person Gauntlet AI capstone team (Rajiv, Rajat, Kelsi, Aaron, Leo). ~$745 budget.
-
-## Project Direction
-
-Two-layer system:
-1. **Free tier:** Phone-camera app — MediaPipe pose estimation + fascial chain reasoning (SBL/BFL/FFL only)
-2. **Premium tier:** sEMG compression garment with haptic cueing for real-time muscle activation feedback
-
-Positioned as wellness/fitness (not clinical) to stay outside FDA device territory. "Movement patterns" and "body connections" language — never "diagnosis," "dysfunction," or "drivers of pain."
+Project-wide context (team, pipeline architecture, constraints, GitLab label taxonomy) lives in the parent `CLAUDE.md` at `projects/bioliminal/CLAUDE.md`. This file covers repo-specific file organization and conventions.
 
 ## File Organization
 
@@ -34,11 +26,9 @@ Files go where their **primary purpose** lives. When a file could belong in mult
 | Mobile/server contract handoffs (Dart interfaces, JSON schemas, fixtures) | `software/mobile-handover/` | Implementation details inside `software/server/` |
 | Build tooling, CI, Docker, scripts | `tools/` | Any domain it automates |
 
-### The Key Distinction
+### Research Subdirectory Tiebreakers
 
-**Three-repo boundary.** Hardware content belongs in the sibling `esp32-firmware/` repo (teammate's GitLab repo, `hardware/` directory there). Literature-synthesis content belongs in the sibling `research/` repo. This repo (`RnD_Server/`) is for **ML/engineering decisions** — license audits, stack/framework selection, library evaluation, algorithm implementation notes, and the active ML training workspace. See `memory/bioliminal-repo-roles.md` (in the olorin workspace) for the canonical three-repo role distinction.
-
-**Research subdirectory tiebreakers (within `docs/research/`):**
+Within `docs/research/`:
 - `biomechanics/` — The body. Fascial chains, muscle anatomy, injury mechanisms, clinical thresholds, movement patterns. If it cites Wilke, McGill, Hewett, Schleip, or discusses force transmission → biomechanics.
 - `sensing/` — The measurement. sEMG signal chains, MediaPipe accuracy, sensor validation, gap analysis of what's measurable vs claimed. If it's about whether we *can* detect something → sensing.
 - `market/` — The business. Competitors, TAM/SAM, FDA/regulatory, pricing, practitioner counts. If it's about who else does this or whether we can sell it → market.
@@ -67,11 +57,3 @@ Files go where their **primary purpose** lives. When a file could belong in mult
 
 Status values: `current` (latest buy list), `superseded` (replaced by newer choice), `alternative` (valid option not selected).
 
-## Constraints
-
-- Budget: ~$745 across 5 team member Ramp cards
-- Timeline: Capstone semester (Apr 2026)
-- Regulatory: Wellness positioning only — no clinical claims
-- Hardware: 10-channel sEMG (AD8232 sensors), ESP32-S3, coin vibration motors
-- Software: Flutter web app, MediaPipe BlazePose
-- Fascial chains: Only SBL, BFL, FFL (strong evidence). Spiral, Lateral, SFL excluded.
