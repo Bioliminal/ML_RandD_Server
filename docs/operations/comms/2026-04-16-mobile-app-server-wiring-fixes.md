@@ -1,6 +1,6 @@
 # Mobile App → Server Wiring Fixes — Handover Brief (2026-04-16)
 
-**Audience:** Leo (Flutter dev) or a Claude Code helping him. Aaron's authoring this from the server side; changes land in `bioliminal-mobile-application`.
+**Audience:** Kelsi (mobile owner) or a Claude Code helping her. Aaron's authoring this from the server side; changes land in `bioliminal-mobile-application`.
 **Goal:** three concrete fixes so the phone app can actually talk to the demo server for the 2026-04-20 bicep curl demo. Without them, the phone will upload successfully but the report fetch will fail silently.
 **Scope boundary:** client wiring only. No UI redesign, no consent flow, no sEMG upload — those are separate, tracked in gitlab.
 

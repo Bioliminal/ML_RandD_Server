@@ -1,6 +1,6 @@
 # Model Stack — Plain English (2026-04-16)
 
-**For:** Kelsi, Rajat, Rajiv, Leo.
+**For:** Kelsi, Rajat, Rajiv.
 **Why this doc exists:** if anyone asks "what's our stack, and can we actually ship it?" — this is the answer. One page. No jargon.
 
 **Long version:** `docs/research/model-commercial-viability-matrix-2026-04-16.md` (476 lines — only read if you need to defend a specific choice).
