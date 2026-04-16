@@ -2,6 +2,12 @@
 
 Project-wide context (team, pipeline architecture, constraints, GitLab label taxonomy) lives in the parent `CLAUDE.md` at `projects/bioliminal/CLAUDE.md`. This file covers repo-specific file organization and conventions.
 
+## Compliance & Privacy Posture
+
+**Not HIPAA.** Binding regimes: WA MHMDA (opt-in, $7,500/violation, private right of action), FTC HBNR (~$53k/violation), GDPR Art 9 in EU (no wellness exception). IL BIPA HB 2984 pending would add neural data. **sEMG is functionally biometric — 90–97% re-id from 0.8s of 4-channel data.** Schema changes that touch sEMG, session consent, or retention must treat these as load-bearing constraints, not compliance theater.
+
+**Full analysis (always read, do not restate from memory):** `projects/bioliminal/research/synthesis/deep-read-semg-privacy-regulation-2026-04-15.md`. Parent hub: `projects/bioliminal/CLAUDE.md` § "Compliance & Privacy Posture".
+
 ## File Organization
 
 ### Placement Rules

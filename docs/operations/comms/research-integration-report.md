@@ -1,11 +1,21 @@
 # Research Integration Report — Technical Context Document
 
+> ## 🪦 ARCHIVED 2026-04-16 — do not rely on for current decisions.
+>
+> This document is a 2026-04-09 snapshot. Its shelf life has expired. **Nearly every architectural recommendation in §2–§6 has been superseded** by later work:
+>
+> - **Current model picks (phone + server, demo + commercial trajectory):** `docs/research/model-commercial-viability-matrix-2026-04-16.md` — this is the authoritative decision layer. It supersedes this doc AND the 4-10 decision doc for both the demo and the near-term commercial path.
+> - **Plain-English version for teammates:** `docs/operations/comms/2026-04-16-model-lockdown-plain-english.md`.
+> - **Per-paper deep reads:** `research/synthesis/*` in the sibling research repo (paths moved 2026-04-15 during the research-repo split; any `docs/research/complete-research-document.md` / `docs/research/synthesis/*` references below are stale).
+> - **Post-demo 4-movement + WHAM/OpenCap/HSMR scope:** `docs/research/pipeline-architecture-decision-2026-04-10.md` (itself flagged stale/disputed and deferred until after the 2026-04-20 bicep curl demo).
+> - **Current project focus:** `projects/bioliminal/CLAUDE.md` § Current Focus.
+>
+> The body content is preserved for history. §1 (MediaPipe per-joint accuracy envelope) still cites valid research. §2.4 (MotionBERT-first pipeline), §2.5 (GNN reasoner), §3–§6 (rollup, fatigue, body-type adaptation) are all post-demo scope and the architectural decisions they propose have been overturned. **Do not cite this doc for engineering choices** — cite the matrix or the current research synthesis docs instead.
+
 **Project:** BioLiminal (Gauntlet AI capstone, 5-person team)
 **Date:** 2026-04-09
-**Status:** Research synthesis — pre-implementation
-**Purpose:** Technical context document for team members and their AI agents. Captures the state of sensing/ML research, product architecture changes based on new findings, and open research directions. Companion to the plain-English PDF at `docs/operations/comms/research-integration-report.pdf`.
-
-> **⚠️ 2026-04-10 revision pointer.** After deep-reading 16 newly added papers (OpenCap / OpenCap Monocular / WHAM / Miller hybrid ML+MSK / Sahrmann MSI series / Van Dillen 2016 RCT / Harris-Hayes 2016 & 2018 / Joyce 2023 / Rajagopal 2016 / Uhlrich coordination retraining / TCPFormer / ViTPose / Sabo Beighton), several architectural decisions in §2.4, §5, §6, §10 are **superseded** by `docs/research/pipeline-architecture-decision-2026-04-10.md`. Key changes: premium pipeline switches from `MediaPipe → MotionBERT → HSMR` to `MediaPipe → WHAM → OpenCap Monocular` (HSMR retained as parallel branch for rollup spine sequencing only); intake questionnaire removed per team decision; MSI framework cherry-picked (kinematic rules yes, diagnostic labels no) per Van Dillen 2016 RCT negative result. Read that file before acting on this one. Per-paper extractions live in `research/synthesis/deep-read-sensing-2026-04-10.md` and `research/synthesis/deep-read-biomech-2026-04-10.md` (sibling research repo).
+**Status:** ARCHIVED — see tombstone above. Kept for provenance only.
+**Purpose (original):** Technical context document for team members and their AI agents. Captures the state of sensing/ML research, product architecture changes based on new findings, and open research directions. Companion to the plain-English PDF at `docs/operations/comms/research-integration-report.pdf`.
 
 ---
 
