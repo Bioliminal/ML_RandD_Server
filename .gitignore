@@ -45,6 +45,11 @@ ml/models/*.h5
 *.checkpoint
 *.ckpt
 
+# Cloned upstream model repos — tracked locally for inspection, not in git.
+# Only the index README at ml/models/README.md is committed.
+ml/models/*/
+!ml/models/README.md
+
 # Node
 node_modules/
 .next/
