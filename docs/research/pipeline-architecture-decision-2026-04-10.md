@@ -1,7 +1,15 @@
 # Pipeline Architecture Decision — BioLiminal 2026-04-10
 
+> ⚠️ **STALE / DISPUTED — DO NOT TREAT AS SETTLED.** This doc describes a **post-demo** full-product architecture (WHAM + OpenCap Monocular + 4-movement protocol) that was drafted unilaterally and **not confirmed by Aaron**. Aaron's mental model has been MotionBERT + HSMR. Reconciliation is deferred until after the Mon 2026-04-20 bicep curl demo.
+>
+> **For the 4/20 demo, this doc is not on the critical path.** The demo uses phone BlazePose landmarks + 2-ch sEMG + a bicep-curl-specific rule YAML (`gitlab issue ML_RandD_Server#12`). No WHAM, no OpenCap, no HSMR, no 4-movement protocol.
+>
+> Current project focus: `projects/bioliminal/CLAUDE.md` § Current Focus.
+
+---
+
 **Audience:** BioLiminal team (Aaron + phone teammate + hardware teammate).
-**Status:** Authoritative engineering decision. Supersedes the pipeline-choice section of `docs/operations/comms/research-integration-report.md` (§2.4) and replaces the former `model-framework-recommendations-2026-04-10.md` draft.
+**Status (original, preserved for history):** claimed "Authoritative engineering decision" — see warning above. Supersedes the pipeline-choice section of `docs/operations/comms/research-integration-report.md` (§2.4) and replaces the former `model-framework-recommendations-2026-04-10.md` draft.
 **Paired literature synthesis:** `research/synthesis/deep-read-monocular-pipeline-landscape-2026-04-10.md` in the sibling research repo. The literature rationale for every claim in this doc is anchored there — this doc is the *decision*, that doc is the *why*.
 
 ---
