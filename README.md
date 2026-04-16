@@ -1,6 +1,6 @@
 # BioLiminal Capstone
 
-AI-powered movement screening + sEMG compression garment for injury prevention. UT Austin capstone project.
+AI-powered movement screening + sEMG compression garment for injury prevention. Gauntlet AI capstone project.
 
 **Two-layer system:**
 1. Free phone-camera app (MediaPipe pose estimation + fascial chain reasoning)

@@ -1,6 +1,6 @@
 # Research Integration Report — Technical Context Document
 
-**Project:** BioLiminal (UT Austin capstone, 5-person team)
+**Project:** BioLiminal (Gauntlet AI capstone, 5-person team)
 **Date:** 2026-04-09
 **Status:** Research synthesis — pre-implementation
 **Purpose:** Technical context document for team members and their AI agents. Captures the state of sensing/ML research, product architecture changes based on new findings, and open research directions. Companion to the plain-English PDF at `docs/operations/comms/research-integration-report.pdf`.

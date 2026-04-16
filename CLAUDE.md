@@ -1,6 +1,6 @@
 # BioLiminal Capstone
 
-AI movement screening + sEMG compression garment for injury prevention. 5-person UT Austin team (Rajiv, Rajat, Kelsi, Aaron, Leo). ~$745 budget.
+AI movement screening + sEMG compression garment for injury prevention. 5-person Gauntlet AI capstone team (Rajiv, Rajat, Kelsi, Aaron, Leo). ~$745 budget.
 
 ## Project Direction
 
