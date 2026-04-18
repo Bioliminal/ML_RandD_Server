@@ -43,3 +43,7 @@ Files go where their **primary purpose** lives. This repo is public; internal st
 
 Status values: `current` (latest buy list), `superseded` (replaced by newer choice), `alternative` (valid option not selected).
 
+## Cross-repo centralization
+
+Strategy, L1/L2 plans, decisions, session progress, and internal comms live in the private `bioliminal-ops` repo. Literature, paper synopses, and synthesis docs live in the private `research` repo. Check those repos before creating strategy or literature artifacts here. Engineering hygiene safe for public view (license audits, algorithm notes, library comparisons) stays in `docs/research/` in this repo per the placement table above.
+
