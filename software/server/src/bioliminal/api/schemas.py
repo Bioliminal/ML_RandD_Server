@@ -88,7 +88,7 @@ class ConsentMetadata(BaseModel):
 class SessionMetadata(BaseModel):
     movement: MovementType
     device: str
-    model: str  # e.g. "mlkit_pose_detection", "mediapipe_blazepose_full"
+    model: str  # e.g. "mediapipe_blazepose_full"
     frame_rate: float = Field(gt=0)
     captured_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 

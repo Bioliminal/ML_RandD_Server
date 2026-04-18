@@ -2,7 +2,7 @@
 
 Reference: https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/pose.md
 This ordering is the canonical contract between the Flutter capture layer
-(MLKit / MediaPipe) and the server-side analysis pipeline.
+(direct MediaPipe Tasks) and the server-side analysis pipeline.
 """
 
 from enum import IntEnum

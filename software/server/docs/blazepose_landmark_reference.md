@@ -78,7 +78,7 @@ The server consumes JSON sessions matching the pydantic schema in `bioliminal.ap
   "metadata": {
     "movement": "overhead_squat",
     "device": "Pixel 8",
-    "model": "mlkit_pose_detection",
+    "model": "mediapipe_blazepose_full",
     "frame_rate": 30.0,
     "captured_at": "2026-04-09T14:32:00Z"
   },

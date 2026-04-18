@@ -6,8 +6,9 @@ integration and pipeline tests.
 ## Golden captures (from Flutter team)
 
 The Flutter capture layer ships with a golden-capture test harness that records
-raw MLKit landmark streams for reference movements on real devices. These
-recordings become the canonical fixtures for server-side pipeline validation.
+raw BlazePose landmark streams (direct MediaPipe Tasks) for reference movements
+on real devices. These recordings become the canonical fixtures for server-side
+pipeline validation.
 
 Expected format: JSON matching `bioliminal.api.schemas.Session`. Filename pattern:
 

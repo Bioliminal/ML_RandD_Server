@@ -31,7 +31,7 @@ def test_session_metadata():
     meta = SessionMetadata(
         movement="overhead_squat",
         device="Pixel 8",
-        model="mlkit_pose_detection",
+        model="mediapipe_blazepose_full",
         frame_rate=30.0,
     )
     assert meta.movement == "overhead_squat"
@@ -43,7 +43,7 @@ def test_session_round_trip():
         metadata=SessionMetadata(
             movement="overhead_squat",
             device="Pixel 8",
-            model="mlkit_pose_detection",
+            model="mediapipe_blazepose_full",
             frame_rate=30.0,
         ),
         frames=[Frame(timestamp_ms=0, landmarks=landmarks)],

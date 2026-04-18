@@ -11,7 +11,7 @@ def sample_session() -> Session:
         metadata=SessionMetadata(
             movement="overhead_squat",
             device="Pixel 8",
-            model="mlkit_pose_detection",
+            model="mediapipe_blazepose_full",
             frame_rate=30.0,
         ),
         frames=[Frame(timestamp_ms=i * 33, landmarks=landmarks) for i in range(5)],

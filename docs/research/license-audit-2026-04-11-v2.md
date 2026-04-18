@@ -65,7 +65,7 @@ Net: three independent non-commercial licenses stack. Research-only. Unchanged c
 
 - **MediaPipe Pose Landmarker** remains the recommended default. v2 confirms the ai.google.dev page is Apache 2.0 (code) + CC BY 4.0 (docs). The BlazePose GHUM 3D Model Card PDF was downloaded but not parseable in this sandbox — a human should open it in a browser before final ship. Confidence is now Medium-High on the model file itself, up from Medium in v1.
 - **MotionBERT + ViTPose code** are Apache 2.0 but all released checkpoints are trained on Human3.6M, AMASS, or COCO. With v2's stricter confirmation of those dataset licenses, retraining from scratch is even more clearly required before any commercial deployment. Budget 3–6 months of engineering.
-- **Commercial SDKs** (Apple Vision, Google ML Kit, Wrnch/Sports Data Labs) remain the cleanest paid option.
+- **Commercial SDKs** (Apple Vision, Google ML Kit, Wrnch/Sports Data Labs) remain documented alternatives. Ship path is direct MediaPipe Tasks (GA, Apache 2.0). Google ML Kit is still beta (no SLA) and is held as a post-ship review item only.
 - **New note:** The Rajagopal 2016 MSK model is now High-confidence MIT Use Agreement, so any OpenCap-Core-style musculoskeletal post-processing stage of the pipeline (Apache 2.0 code + MIT full-body MSK model) is commercial-clean. The blocker is purely the front-end pose estimator, not the downstream biomechanics.
 
 ## Critical question 3: Does the opencap.ai hosted service allow commercial use, even if we don't redistribute the models?
