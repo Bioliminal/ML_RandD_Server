@@ -26,7 +26,7 @@ Files go where their **primary purpose** lives. This repo is public; internal st
 | Engineering decisions safe for public view: license audits, algorithm implementation notes, library comparisons | `docs/research/` in this repo |
 | Training scripts, model configs, dataset processing | `ml/` in this repo |
 | Application code, UI, API | `software/` in this repo |
-| Mobile/server contract handoffs (Dart interfaces, JSON schemas, fixtures) | `software/mobile-handover/` in this repo |
+| Mobile/server contract handoffs (Dart interfaces, JSON schemas, fixtures) | `operations/handover/mobile/` in `bioliminal-ops` |
 | Build tooling, CI, Docker, scripts | `tools/` in this repo |
 | Literature: papers, synopses, synthesis docs, deep reads | [`research`](https://gitlab.com/bioliminal/research) repo (private) |
 | Strategy: commercial viability, GTM, investor-facing framing, L1/L2 plans, cross-domain decisions | [`bioliminal-ops`](https://gitlab.com/bioliminal/bioliminal-ops) repo (private) |
@@ -35,7 +35,7 @@ Files go where their **primary purpose** lives. This repo is public; internal st
 
 **`hardware/bom/` vs `hardware/`** — BOMs, shopping lists, and pricing docs go in `bom/`. Specs, evaluation docs, and architecture decisions stay in `hardware/`.
 
-**`software/mobile-handover/` vs `software/server/`** — `software/server/` holds the running FastAPI service. `software/mobile-handover/` holds the **contract** that the Flutter teammate's app needs to satisfy: Dart data classes mirroring the pydantic schema, an exported JSON schema, a sample valid payload, the MediaPipe model fetch instructions, and a smoke-test script. The mobile-handover package is treated as derived output — when the server pydantic schema changes, regenerate via `software/mobile-handover/tools/export_schemas.py` and update `interface/models.dart` to match. Do not put running mobile code there; the Flutter app lives in its own repo.
+**Mobile handover lives in ops, not here.** `software/server/` holds the running FastAPI service. The **contract** the Flutter teammate consumes (Dart interface, exported JSON schemas, sample payload, MediaPipe fetch instructions, smoke-test script) lives at `bioliminal-ops/operations/handover/mobile/` so both teams pull from a single cross-team coordination source. When the server pydantic schema changes, regenerate via `bioliminal-ops/operations/handover/mobile/tools/export_schemas.py` (auto-finds this repo as a sibling) and update `interface/models.dart` to match. The Flutter app itself lives in its own repo.
 
 ### Equipment Database
 

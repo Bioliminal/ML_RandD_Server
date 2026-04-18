@@ -16,7 +16,6 @@ AI-powered movement screening + sEMG compression garment for injury prevention. 
 | `hardware/` | Specs, sensor research, cueing research, form factor evaluation |
 | `hardware/bom/` | Buy lists, component database (CSV), MVP decisions |
 | `software/` | Application code, tests, config (server lives in `software/server/`) |
-| `software/mobile-handover/` | Contract package for the Flutter teammate — Dart interface, JSON schema, sample fixture, MediaPipe model fetch |
 | `ml/` | Datasets, experiments, models, training, evaluation |
 | `docs/research/` | Engineering-decision research safe for public view — license audits, algorithm notes |
 | `tools/` | Build scripts, CI helpers |
@@ -32,7 +31,7 @@ See `CLAUDE.md` for the full file-placement rules and tiebreakers between direct
 | `docs/research/ncc-implementation-2026-04-14.md` | NCC algorithm implementation notes |
 | `hardware/bom/final-buy-list-with-local.md` | Current buy list |
 | `hardware/bom/component-database.csv` | Consolidated equipment database |
-| `software/mobile-handover/README.md` | Phone teammate's integration guide |
+| `bioliminal-ops/operations/handover/mobile/README.md` | Phone teammate's integration guide (moved to ops) |
 
 ## Quick Start
 

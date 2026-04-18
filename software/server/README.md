@@ -37,7 +37,7 @@ Standup + tunnel runbooks:
 - `bioliminal-ops/operations/comms/2026-04-16-demo-server-standup.md`
 - `bioliminal-ops/operations/comms/2026-04-18-cloudflare-tunnel-setup.md`
 
-Mobile-facing contract: `software/mobile-handover/README.md` and the
-machine-readable schemas under `software/mobile-handover/schemas/`
+Mobile-facing contract: `bioliminal-ops/operations/handover/mobile/README.md`
+and the machine-readable schemas under `.../handover/mobile/schemas/`
 (`session.schema.json` for the request, `report.schema.json` for the
-response).
+response). See `software/MOBILE_HANDOVER.md` for the move rationale.
