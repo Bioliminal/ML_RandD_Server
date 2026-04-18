@@ -45,13 +45,23 @@ cloudflared tunnel list
 
 ## Step 4 — Add the public hostname route (Aaron does this)
 
-Back in the Cloudflare dashboard on the tunnel's detail page → **Public Hostname** tab → **Add a public hostname**:
-- Subdomain: `bioliminal-demo`
-- Domain: `aaroncarney.me`
-- Type: `HTTP`
-- URL: `localhost:8000`
+Cloudflare renamed "Public Hostname" to **"Published applications"** in the current (2025–2026) Zero Trust dashboard — if you follow older guides looking for a "Public Hostname" tab, you won't find one. The concept is the same; the label changed.
 
-Save. Cloudflare creates the DNS record and starts routing traffic to the connector automatically. No CLI work, no config.yml, no cert.pem.
+Navigation:
+`one.dash.cloudflare.com` → **Networks → Connectors → Cloudflare Tunnels** → click the tunnel → **Published applications** tab → **Add a published application**.
+
+Fill in:
+- **Subdomain:** `bioliminal-demo`
+- **Domain:** `aaroncarney.me` (select from dropdown)
+- **Path:** leave blank
+- **Service type:** `HTTP`
+- **URL:** `http://localhost:8000`
+
+Save. Cloudflare auto-creates the CNAME `bioliminal-demo.aaroncarney.me → <tunnel-id>.cfargotunnel.com` in the `aaroncarney.me` zone. DNS may take 1–2 minutes to propagate.
+
+**Do NOT** click into the "Private Networks" tab. That's WARP / Cloudflare One Client / 100.64.x.x CGNAT stuff — different feature, requires device profiles, unrelated to public hostname routing. If the dashboard throws a warning about configuring a "Cloudflare One Client device profile" or the 100.64.0.0/10 range, you're on the wrong tab.
+
+The **Add a published application** button is greyed out unless the tunnel shows **HEALTHY** / **Connected** status. If it's greyed, go back to step 3 — the connector isn't registered.
 
 ## Step 5 — Verify from outside
 
