@@ -38,21 +38,13 @@ What's demo-specific:
 
 - **`metadata.movement` = `"bicep_curl"`.** Added to `MovementType` alongside
   the four post-demo movements.
-- **Server URL is a Cloudflare tunnel.** The demo server runs on a separate
-  Windows workstation and is exposed via HTTPS. Tunnel URL is posted on gitlab
-  `ML_RandD_Server#11` when standup completes.
-- **Build-time base URL.** The current placeholder `https://api.bioliminal.ai`
-  in `bioliminal_client.dart` must be swapped for the tunnel URL — recommended
-  via `--dart-define=SERVER_URL=...`. See the wiring-fixes brief below.
+- **Demo server URL:** `https://bioliminal-demo.aaroncarney.me` (Cloudflare tunnel
+  to the demo Windows workstation). Build with `--dart-define=SERVER_URL=https://bioliminal-demo.aaroncarney.me`.
 - **Report content is sparse until `#12` lands.** `chain_observations` will
   come back empty for bicep curl until the rule YAML ships. Render gracefully.
 - **sEMG in the payload is still pending `#13`.** Schema supports it; whether
   the demo upload carries `emg` depends on the `#13` decision and hardware
   readiness. Pose-only bicep curl sessions work end-to-end today.
-
-**Known mobile-side wiring issues** — documented with concrete fixes in
-`docs/operations/comms/2026-04-16-mobile-app-server-wiring-fixes.md`. A Claude
-Code integrating the mobile side should read that first.
 
 ---
 
@@ -237,18 +229,69 @@ is not "consumer health data" under MHMDA's definition.
 
 ## Known mobile-side wiring issues
 
-See `docs/operations/comms/2026-04-16-mobile-app-server-wiring-fixes.md` in
-this repo for the authoritative list. As of 2026-04-16 there are three:
+Three issues in the current mobile app code that need fixing before the
+phone can talk to the server successfully. The server is correct; these
+are all client-side bugs.
 
-1. `bioliminal_client.dart` baseUrl is a placeholder (`https://api.bioliminal.ai`) —
-   swap for `--dart-define=SERVER_URL=...`.
-2. `fetchReport` calls `/reports/{id}` — the server serves
-   `/sessions/{id}/report`. Will 404 today.
-3. Mobile `Report.fromJson` expects `findings[]` / `practitioner_points[]`;
-   the server returns `metadata` / `movement_section` / `overall_narrative`.
-   Will throw on any real response.
+### 1. `bioliminal_client.dart` baseUrl is a placeholder
 
-The fixes brief has file paths, line numbers, and minimum-viable patches.
+Currently hardcoded to `https://api.bioliminal.ai`. Replace with a
+build-time define:
+
+```dart
+static const String _baseUrl = String.fromEnvironment(
+  'SERVER_URL',
+  defaultValue: 'http://localhost:8000',
+);
+```
+
+Then build with `--dart-define=SERVER_URL=https://bioliminal-demo.aaroncarney.me`
+for the demo.
+
+### 2. `fetchReport` calls the wrong path
+
+Client calls `GET /reports/{id}` → server returns 404.
+Server actually serves the report at `GET /sessions/{id}/report`.
+
+Fix in the report fetch:
+
+```dart
+// before
+final url = Uri.parse('$_baseUrl/reports/$sessionId');
+// after
+final url = Uri.parse('$_baseUrl/sessions/$sessionId/report');
+```
+
+### 3. `Report.fromJson` expects fields that the server doesn't return
+
+Client currently expects `findings[]` and `practitioner_points[]`.
+Server actually returns `metadata`, `movement_section`, `overall_narrative`.
+
+The server's response shape (see `software/server/src/auralink/report/schemas.py`
+on the server side or re-generate `session.schema.json` in this package):
+
+```json
+{
+  "metadata": { "session_id": "...", "movement": "bicep_curl", "generated_at": "..." },
+  "movement_section": {
+    "summary": "...",
+    "rep_scores": [ { "rep_index": 0, "quality": "good", "narrative": "..." }, ... ],
+    "chain_observations": [ ... ]
+  },
+  "overall_narrative": "..."
+}
+```
+
+Update the Dart `Report.fromJson` to map those fields. Until `#12` (rule YAML)
+lands, `chain_observations` will be empty — render gracefully.
+
+---
+
+All three must be fixed before the phone can complete a full round-trip
+against the demo server. Items 1 and 2 are mechanical; item 3 requires
+matching the response schema exactly (the JSON schema in
+`schemas/session.schema.json` and the fixtures in `fixtures/` are the
+source of truth).
 
 ---
 
