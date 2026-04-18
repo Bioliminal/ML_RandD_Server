@@ -1,6 +1,11 @@
 # RnD_Server — ML & Analysis Server
 
+**Updated:** 2026-04-18
+**Owner:** AaronCarney
+
 Project-wide context (team, pipeline architecture, constraints, GitLab label taxonomy) lives in the parent `CLAUDE.md` at `projects/bioliminal/CLAUDE.md`. This file covers repo-specific file organization and conventions.
+
+**Documentation conventions:** see https://gitlab.com/bioliminal/bioliminal/-/blob/main/CONVENTIONS.md — header schema (`Status` / `Created` / `Updated` / `Owner`), git-author → gitlab-handle mapping, and the delete-over-archive rule for superseded content. Follow the header schema for every new doc under `docs/`.
 
 ## Compliance & Privacy Posture
 
