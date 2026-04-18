@@ -1,5 +1,10 @@
 # Stack Options Matrix — 2026-04-11 (rewrite)
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-15
+**Owner:** AaronCarney
+
 **Scope.** This matrix evaluates pose-estimation and biomechanics-backend options for the BioLiminal capstone **prototype**. Every row is scored against four things: (a) does it run on-device on a phone for inference, (b) can the team realistically integrate it in one capstone semester, (c) does it plug into the planned ESP32-S3 + 10-channel AD8232 sEMG fusion, and (d) can it be used under an **academic** license. Commercial licensing is captured for reference only and is explicitly **not a decision factor** for the prototype — the team will retrain or replace components downstream if the project pivots commercial. On-device *training* is out of scope (the team will train downstream classifiers once, on a laptop, not on phones). **Federated learning is out of scope** and is addressed only in the short "Deferred" section at the bottom.
 
 HIPAA concern for user video is handled architecturally by keeping inference local: raw phone-camera frames → pose landmarks happens on-device, raw video never leaves the device. That is the only privacy claim this matrix relies on.

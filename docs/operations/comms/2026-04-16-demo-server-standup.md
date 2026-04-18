@@ -1,5 +1,10 @@
 # Demo Server Standup — Handover Brief (2026-04-16)
 
+**Status:** current
+**Created:** 2026-04-16
+**Updated:** 2026-04-16
+**Owner:** AaronCarney
+
 **Audience:** Windows-side Claude Code instance on the demo server workstation.
 **Goal:** stand up the BioLiminal analysis server + Cloudflare tunnel + prove phone-to-server reachability. One-shot setup for the 2026-04-20 bicep curl demo.
 **Scope boundary:** server + tunnel + smoke test only. Do not touch ML models, rule YAML, mobile app, or anything labeled `post-demo`.

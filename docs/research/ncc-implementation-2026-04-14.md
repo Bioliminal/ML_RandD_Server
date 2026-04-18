@@ -1,5 +1,10 @@
 # Normalized Cross-Correlation (NCC) Implementation
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-14
+**Owner:** AaronCarney
+
 **Date:** 2026-04-14
 **Context:** BioLiminal capstone — similarity scoring of DTW-aligned 1D joint-angle rep pairs (30–150 samples) to feed a trend-detection module.
 

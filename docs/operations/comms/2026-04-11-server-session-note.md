@@ -1,5 +1,10 @@
 # Note for the parallel server-coding session
 
+**Status:** current
+**Created:** 2026-04-11
+**Updated:** 2026-04-15
+**Owner:** AaronCarney
+
 **Date:** 2026-04-11
 **From:** the research/planning session.
 **To:** whoever is currently coding the BioLiminal server (probably executing

@@ -1,5 +1,8 @@
 # BioLiminal Capstone
 
+**Updated:** 2026-04-16
+**Owner:** AaronCarney
+
 AI-powered movement screening + sEMG compression garment for injury prevention. Gauntlet AI capstone project.
 
 > **Current focus (until Mon 2026-04-20):** single bicep curl demo. Project-wide scope and model picks live in `../CLAUDE.md` (project root) and `docs/research/model-commercial-viability-matrix-2026-04-16.md`. The "Two-layer system" description below is the full-product roadmap, not demo-day scope.

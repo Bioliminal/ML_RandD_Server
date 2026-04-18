@@ -1,5 +1,10 @@
 # Go-to-Market Plan: 100 GitHub Stars in 3 Weeks
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-14
+**Owner:** AaronCarney
+
 ## Passing Criteria
 - **Target**: 100 GitHub stars (vs 50 paying users — stars is the faster path)
 - **Timeline**: 3 weeks from capstone start

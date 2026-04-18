@@ -1,5 +1,10 @@
 # DTW Library Comparison — BioLiminal RnD Server
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-14
+**Owner:** AaronCarney
+
 **Date:** 2026-04-14
 **Context:** Align 1D rep angle time-series (N≈30–150) vs reference. Python 3.11+ / FastAPI / numpy. Need `(distance, warp_path)`. Non-real-time, ~100ms/rep budget. License must be MIT/BSD/Apache-2.0 (no GPL/AGPL).
 

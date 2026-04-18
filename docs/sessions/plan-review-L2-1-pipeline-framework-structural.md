@@ -1,5 +1,10 @@
 # Plan Review — L2-1 Pipeline Framework (Structural)
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-14
+**Owner:** AaronCarney
+
 **Plan:** `docs/plans/2026-04-10-L2-1-pipeline-framework.md`
 **Parent epoch:** `docs/plans/2026-04-10-analysis-pipeline-epoch.md`
 **Review type:** plan-checker (structural, 8 dimensions)

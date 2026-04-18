@@ -1,5 +1,10 @@
 # L2-1 Pipeline Framework — Architectural Review
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-14
+**Owner:** AaronCarney
+
 **Plan:** `docs/plans/2026-04-10-L2-1-pipeline-framework.md`
 **Reviewer focus:** Abstractions, interface contracts, ordering, integration seams, test feasibility.
 **Scope:** Judgment only. Structural correctness handled separately.

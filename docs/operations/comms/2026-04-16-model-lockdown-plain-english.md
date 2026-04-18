@@ -1,5 +1,10 @@
 # Model Stack — Plain English (2026-04-16)
 
+**Status:** current
+**Created:** 2026-04-16
+**Updated:** 2026-04-16
+**Owner:** AaronCarney
+
 **For:** Kelsi, Rajat, Rajiv.
 **Why this doc exists:** if anyone asks "what's our stack, and can we actually ship it?" — this is the answer. One page. No jargon.
 

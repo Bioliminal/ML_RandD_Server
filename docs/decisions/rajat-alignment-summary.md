@@ -1,5 +1,10 @@
 # Rajat's Research — Alignment Summary 2026-04-08
 
+**Status:** current
+**Created:** 2026-04-13
+**Updated:** 2026-04-13
+**Owner:** AaronCarney
+
 > Distilled from `Rajat/hardware-alignment-injury-prevention.html` and `Rajat/complete-research-document.md`. Agent-friendly capture of Rajat's injury prevention research, component evaluations, and divergences from the torso vest spec.
 
 ---

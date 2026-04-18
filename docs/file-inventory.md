@@ -1,5 +1,10 @@
 # File Inventory — BioLiminal Capstone
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-15
+**Owner:** AaronCarney
+
 > Snapshot 2026-04-11. Maps every file in the repo to its folder and the placement rule that put it there. Source of placement rules: `/CLAUDE.md` → "File Organization" section.
 >
 > This file is descriptive, not prescriptive. When rules and reality disagree, fix one or the other — don't silently ignore.

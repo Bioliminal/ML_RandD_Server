@@ -1,5 +1,10 @@
 # Progress — BioLiminal L2 Plan 4 Execution (ML Interfaces + Fixture Harness)
 
+**Status:** current
+**Created:** 2026-04-14
+**Updated:** 2026-04-14
+**Owner:** AaronCarney
+
 ## Session Directive
 > **MANDATORY:** This progress file defines your assignment. Do NOT interpret, summarize, or re-scope.
 > Resume work exactly where the previous session left off. Follow the What's Next section literally.

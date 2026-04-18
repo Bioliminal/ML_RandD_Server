@@ -1,5 +1,10 @@
 # Plan Changes — Plain English Summary
 
+**Status:** current
+**Created:** 2026-04-11
+**Updated:** 2026-04-15
+**Owner:** AaronCarney
+
 **Date:** 2026-04-11
 **For:** BioLiminal team + anyone catching up on the project.
 **Source documents (if you want the long versions):**

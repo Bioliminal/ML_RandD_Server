@@ -1,5 +1,10 @@
 # Model Commercial-Viability Matrix — 2026-04-16
 
+**Status:** current
+**Created:** 2026-04-16
+**Updated:** 2026-04-16
+**Owner:** AaronCarney
+
 **Purpose.** Decision layer sitting *above* the license audit (`license-audit-2026-04-11-v2.md`) and stack-options matrix (`stack-options-matrix-2026-04-11.md`). Those docs enumerate raw facts; this doc orders them into recommendations that hold up under investor / acquirer scrutiny.
 
 **The core question.** What models should the BioLiminal server use — for the Mon 2026-04-20 bicep curl demo AND for the post-demo commercial trajectory — such that (a) the demo ships, (b) nothing in the stack becomes a licensing liability if an interested party looks closely, and (c) the transition from demo to commercial is a known, costed engineering path rather than a rebuild.

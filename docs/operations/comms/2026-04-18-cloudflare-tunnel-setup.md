@@ -1,5 +1,10 @@
 # Cloudflare Tunnel Setup — Demo Server (2026-04-18)
 
+**Status:** current
+**Created:** 2026-04-18
+**Updated:** 2026-04-18
+**Owner:** AaronCarney
+
 **Audience:** Windows-side Claude Code on the demo server workstation.
 **Prereq:** The standup brief `2026-04-16-demo-server-standup.md` has been followed through step 6 (server running on `0.0.0.0:8000`, local smoke test returns 201).
 **Goal:** expose the server at `https://bioliminal-demo.aaroncarney.me` via a persistent Cloudflare named tunnel.
