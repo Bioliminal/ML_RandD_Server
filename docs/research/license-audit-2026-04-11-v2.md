@@ -1,11 +1,16 @@
 # ML Model & Dataset License Audit — 2026-04-11 (v2)
 
-## What changed
+**Status:** current
+**Created:** 2026-04-11
+**Updated:** 2026-04-18
+**Owner:** AaronCarney
 
-This is the v2 amendment to `license-audit-2026-04-11.md`. Two things changed:
+## What this is
 
-1. **Closed 3 of 5 previously-unverifiable gaps** by fetching the canonical source pages directly (AMASS license page, MediaPipe Pose Landmarker page + BlazePose GHUM 3D model card, simtk.org Rajagopal 2016 project page). Two gaps (WHAM `license.html` and `opencap.ai/terms`) are still unreachable — both pages return only JavaScript shells to headless fetchers. They are re-flagged with an explanation at the bottom.
-2. **Expanded scope from models to datasets + pipeline components.** v1 was model-centric. v2 adds per-row entries for every public dataset the project is likely to touch (AMASS, Human3.6M, COCO, MPII, 3DPW, EMDB, BEDLAM, Fit3D) and every pipeline component (`mediapipe` PyPI package, BlazePose GHUM 3D weights, OpenSim Python bindings, Rajagopal 2016 MSK model). The four "Critical question" sections from v1 are preserved; answers are updated where new evidence moved the needle. A new "Dataset licensing summary" section at the end buckets datasets by verdict.
+This is the canonical ML model + dataset license audit for BioLiminal. It replaces an earlier model-only draft. Two characteristics:
+
+1. **Filled 3 of 5 previously-unverifiable gaps** by fetching canonical source pages directly (AMASS license page, MediaPipe Pose Landmarker page + BlazePose GHUM 3D model card, simtk.org Rajagopal 2016 project page). Two gaps (WHAM `license.html` and `opencap.ai/terms`) remain unreachable — both pages return only JavaScript shells to headless fetchers. They are flagged with an explanation at the bottom.
+2. **Scope covers models, datasets, and pipeline components.** Per-row entries for every public dataset the project is likely to touch (AMASS, Human3.6M, COCO, MPII, 3DPW, EMDB, BEDLAM, Fit3D) and every pipeline component (`mediapipe` PyPI package, BlazePose GHUM 3D weights, OpenSim Python bindings, Rajagopal 2016 MSK model). The four "Critical question" sections are preserved, with a "Dataset licensing summary" section at the end bucketing datasets by verdict.
 
 **Bottom line for BioLiminal:** the dataset landscape is worse than v1 implied. Almost every 3D pose dataset (AMASS, Human3.6M, 3DPW, EMDB, BEDLAM, Fit3D) is non-commercial with explicit "no training for commercial use" clauses. Only MS COCO, MPII (annotations), and BEDLAM-derived synthetics are even in the conversation for commercial use — and even COCO's image rights live with Flickr users, not with the dataset authors. The SMPL-family chain is confirmed hard-blocked for commercial use. **One previously-unconfirmed verdict flipped in BioLiminal's favor: the Rajagopal 2016 full-body MSK model is explicitly MIT Use Agreement on simtk.org — it moves from "Low confidence / Likely" to "High confidence / Ship-ready for code-level integration."**
 
