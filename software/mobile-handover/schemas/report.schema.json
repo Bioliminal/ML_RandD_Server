@@ -1,0 +1,782 @@
+{
+  "$defs": {
+    "AngleTimeSeries": {
+      "properties": {
+        "angles": {
+          "additionalProperties": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Angles",
+          "type": "object"
+        },
+        "timestamps_ms": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Timestamps Ms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "angles",
+        "timestamps_ms"
+      ],
+      "title": "AngleTimeSeries",
+      "type": "object"
+    },
+    "ChainName": {
+      "enum": [
+        "superficial_back_line",
+        "back_functional_line",
+        "front_functional_line"
+      ],
+      "title": "ChainName",
+      "type": "string"
+    },
+    "ChainObservation": {
+      "properties": {
+        "chain": {
+          "$ref": "#/$defs/ChainName"
+        },
+        "severity": {
+          "$ref": "#/$defs/ObservationSeverity"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "trigger_rule": {
+          "title": "Trigger Rule",
+          "type": "string"
+        },
+        "involved_joints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Involved Joints",
+          "type": "array"
+        },
+        "evidence": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Evidence",
+          "type": "object"
+        },
+        "narrative": {
+          "title": "Narrative",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chain",
+        "severity",
+        "confidence",
+        "trigger_rule",
+        "narrative"
+      ],
+      "title": "ChainObservation",
+      "type": "object"
+    },
+    "CrossMovementMetric": {
+      "description": "One metric aggregated across the sessions in a protocol.\n\nvalues_by_session is keyed by session_id (preserving insertion order, which\nmirrors the session_ids order from the request). Session-keyed (not\nmovement-keyed) so repeated same-movement sessions in a protocol don't\noverwrite each other.\ntrend classifies the sequence: \"improving\" when lower-is-better metrics\ndecrease across sessions or higher-is-better metrics increase; \"declining\"\nis the opposite; \"stable\" when neither.",
+      "properties": {
+        "metric_name": {
+          "title": "Metric Name",
+          "type": "string"
+        },
+        "values_by_session": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Values By Session",
+          "type": "object"
+        },
+        "trend": {
+          "enum": [
+            "improving",
+            "stable",
+            "declining"
+          ],
+          "title": "Trend",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric_name",
+        "values_by_session",
+        "trend"
+      ],
+      "title": "CrossMovementMetric",
+      "type": "object"
+    },
+    "CrossMovementSection": {
+      "description": "Plan 3 cross-movement slot. Populated only by the protocol aggregator.",
+      "properties": {
+        "cross_movement_metrics": {
+          "items": {
+            "$ref": "#/$defs/CrossMovementMetric"
+          },
+          "title": "Cross Movement Metrics",
+          "type": "array"
+        }
+      },
+      "title": "CrossMovementSection",
+      "type": "object"
+    },
+    "LiftedAngleTimeSeries": {
+      "properties": {
+        "angles": {
+          "additionalProperties": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Angles",
+          "type": "object"
+        },
+        "timestamps_ms": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Timestamps Ms",
+          "type": "array"
+        },
+        "scale_factor": {
+          "exclusiveMinimum": 0,
+          "title": "Scale Factor",
+          "type": "number"
+        },
+        "is_3d": {
+          "title": "Is 3D",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "angles",
+        "timestamps_ms",
+        "scale_factor",
+        "is_3d"
+      ],
+      "title": "LiftedAngleTimeSeries",
+      "type": "object"
+    },
+    "MovementSection": {
+      "properties": {
+        "movement": {
+          "title": "Movement",
+          "type": "string"
+        },
+        "quality_report": {
+          "$ref": "#/$defs/SessionQualityReport"
+        },
+        "angle_series": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AngleTimeSeries"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "normalized_angle_series": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NormalizedAngleTimeSeries"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rep_boundaries": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RepBoundaries"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "per_rep_metrics": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PerRepMetrics"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "within_movement_trend": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WithinMovementTrend"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lift_result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LiftedAngleTimeSeries"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "skeleton_result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SkeletonBundle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "phase_boundaries": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PhaseBoundaries"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "chain_observations": {
+          "items": {
+            "$ref": "#/$defs/ChainObservation"
+          },
+          "title": "Chain Observations",
+          "type": "array"
+        },
+        "movement_temporal_summary": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MovementTemporalSummary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "movement",
+        "quality_report"
+      ],
+      "title": "MovementSection",
+      "type": "object"
+    },
+    "MovementTemporalSummary": {
+      "description": "Within-movement temporal aggregation over a list of RepComparisons.\n\nncc_slope_per_rep is fit with numpy.polyfit over the NCC scores treating\nrep index as x; a negative slope means shape is drifting away from the\nreference across the set. mean_rom_deviation_pct is a plain mean of the\nrom_deviation_pct field. form_drift_detected is a joint condition \u2014 both\na sufficiently negative NCC slope AND a large mean ROM deviation must be\npresent \u2014 to avoid false positives from a single noisy rep.",
+      "properties": {
+        "primary_angle": {
+          "title": "Primary Angle",
+          "type": "string"
+        },
+        "rep_comparisons": {
+          "items": {
+            "$ref": "#/$defs/RepComparison"
+          },
+          "title": "Rep Comparisons",
+          "type": "array"
+        },
+        "mean_ncc": {
+          "title": "Mean Ncc",
+          "type": "number"
+        },
+        "ncc_slope_per_rep": {
+          "title": "Ncc Slope Per Rep",
+          "type": "number"
+        },
+        "mean_rom_deviation_pct": {
+          "title": "Mean Rom Deviation Pct",
+          "type": "number"
+        },
+        "form_drift_detected": {
+          "title": "Form Drift Detected",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "primary_angle",
+        "mean_ncc",
+        "ncc_slope_per_rep",
+        "mean_rom_deviation_pct",
+        "form_drift_detected"
+      ],
+      "title": "MovementTemporalSummary",
+      "type": "object"
+    },
+    "NormalizedAngleTimeSeries": {
+      "properties": {
+        "angles": {
+          "additionalProperties": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Angles",
+          "type": "object"
+        },
+        "timestamps_ms": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Timestamps Ms",
+          "type": "array"
+        },
+        "scale_factor": {
+          "exclusiveMinimum": 0,
+          "title": "Scale Factor",
+          "type": "number"
+        }
+      },
+      "required": [
+        "angles",
+        "timestamps_ms",
+        "scale_factor"
+      ],
+      "title": "NormalizedAngleTimeSeries",
+      "type": "object"
+    },
+    "ObservationSeverity": {
+      "enum": [
+        "info",
+        "concern",
+        "flag"
+      ],
+      "title": "ObservationSeverity",
+      "type": "string"
+    },
+    "PerRepMetrics": {
+      "properties": {
+        "primary_angle": {
+          "title": "Primary Angle",
+          "type": "string"
+        },
+        "reps": {
+          "items": {
+            "$ref": "#/$defs/RepMetric"
+          },
+          "title": "Reps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary_angle"
+      ],
+      "title": "PerRepMetrics",
+      "type": "object"
+    },
+    "Phase": {
+      "properties": {
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "start_timestamp_ms": {
+          "minimum": 0,
+          "title": "Start Timestamp Ms",
+          "type": "integer"
+        },
+        "end_timestamp_ms": {
+          "minimum": 0,
+          "title": "End Timestamp Ms",
+          "type": "integer"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "start_timestamp_ms",
+        "end_timestamp_ms",
+        "label"
+      ],
+      "title": "Phase",
+      "type": "object"
+    },
+    "PhaseBoundaries": {
+      "properties": {
+        "phases": {
+          "items": {
+            "$ref": "#/$defs/Phase"
+          },
+          "title": "Phases",
+          "type": "array"
+        }
+      },
+      "title": "PhaseBoundaries",
+      "type": "object"
+    },
+    "QualityIssue": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "detail"
+      ],
+      "title": "QualityIssue",
+      "type": "object"
+    },
+    "RepBoundaries": {
+      "properties": {
+        "by_angle": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/RepBoundaryModel"
+            },
+            "type": "array"
+          },
+          "title": "By Angle",
+          "type": "object"
+        }
+      },
+      "title": "RepBoundaries",
+      "type": "object"
+    },
+    "RepBoundaryModel": {
+      "properties": {
+        "start_index": {
+          "minimum": 0,
+          "title": "Start Index",
+          "type": "integer"
+        },
+        "bottom_index": {
+          "minimum": 0,
+          "title": "Bottom Index",
+          "type": "integer"
+        },
+        "end_index": {
+          "minimum": 0,
+          "title": "End Index",
+          "type": "integer"
+        },
+        "start_angle": {
+          "title": "Start Angle",
+          "type": "number"
+        },
+        "bottom_angle": {
+          "title": "Bottom Angle",
+          "type": "number"
+        },
+        "end_angle": {
+          "title": "End Angle",
+          "type": "number"
+        }
+      },
+      "required": [
+        "start_index",
+        "bottom_index",
+        "end_index",
+        "start_angle",
+        "bottom_angle",
+        "end_angle"
+      ],
+      "title": "RepBoundaryModel",
+      "type": "object"
+    },
+    "RepComparison": {
+      "description": "One rep scored against the movement's reference rep.\n\nncc_score may be NaN when the user rep is a flat signal (zero variance);\ncallers must handle NaN before arithmetic. rom_deviation_pct is a signed\npercentage: positive means the user's range of motion exceeds the\nreference, negative means it falls short. status is the combined\nclassification from NCC and ROM thresholds (NCC amplitude-guard rule \u2014\nsee plan architectural decision 5).",
+      "properties": {
+        "rep_index": {
+          "minimum": 0,
+          "title": "Rep Index",
+          "type": "integer"
+        },
+        "angle": {
+          "title": "Angle",
+          "type": "string"
+        },
+        "ncc_score": {
+          "title": "Ncc Score",
+          "type": "number"
+        },
+        "dtw_distance": {
+          "minimum": 0.0,
+          "title": "Dtw Distance",
+          "type": "number"
+        },
+        "rom_user_deg": {
+          "minimum": 0.0,
+          "title": "Rom User Deg",
+          "type": "number"
+        },
+        "rom_reference_deg": {
+          "minimum": 0.0,
+          "title": "Rom Reference Deg",
+          "type": "number"
+        },
+        "rom_deviation_pct": {
+          "title": "Rom Deviation Pct",
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "clean",
+            "concern",
+            "flag"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rep_index",
+        "angle",
+        "ncc_score",
+        "dtw_distance",
+        "rom_user_deg",
+        "rom_reference_deg",
+        "rom_deviation_pct",
+        "status"
+      ],
+      "title": "RepComparison",
+      "type": "object"
+    },
+    "RepMetric": {
+      "properties": {
+        "rep_index": {
+          "minimum": 0,
+          "title": "Rep Index",
+          "type": "integer"
+        },
+        "amplitude_deg": {
+          "title": "Amplitude Deg",
+          "type": "number"
+        },
+        "peak_velocity_deg_per_s": {
+          "title": "Peak Velocity Deg Per S",
+          "type": "number"
+        },
+        "rom_deg": {
+          "title": "Rom Deg",
+          "type": "number"
+        },
+        "mean_trunk_lean_deg": {
+          "title": "Mean Trunk Lean Deg",
+          "type": "number"
+        },
+        "mean_knee_valgus_deg": {
+          "title": "Mean Knee Valgus Deg",
+          "type": "number"
+        }
+      },
+      "required": [
+        "rep_index",
+        "amplitude_deg",
+        "peak_velocity_deg_per_s",
+        "rom_deg",
+        "mean_trunk_lean_deg",
+        "mean_knee_valgus_deg"
+      ],
+      "title": "RepMetric",
+      "type": "object"
+    },
+    "ReportMetadata": {
+      "properties": {
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "movement": {
+          "title": "Movement",
+          "type": "string"
+        },
+        "captured_at_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Captured At Ms"
+        }
+      },
+      "required": [
+        "session_id",
+        "movement"
+      ],
+      "title": "ReportMetadata",
+      "type": "object"
+    },
+    "SessionQualityReport": {
+      "properties": {
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "issues": {
+          "items": {
+            "$ref": "#/$defs/QualityIssue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "metrics": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Metrics",
+          "type": "object"
+        }
+      },
+      "required": [
+        "passed"
+      ],
+      "title": "SessionQualityReport",
+      "type": "object"
+    },
+    "SkeletonBundle": {
+      "properties": {
+        "params": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Params",
+          "type": "object"
+        },
+        "fitted": {
+          "title": "Fitted",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "fitted"
+      ],
+      "title": "SkeletonBundle",
+      "type": "object"
+    },
+    "TemporalSection": {
+      "description": "Plan 3 temporal analysis slot. Populated for rep-based movements.",
+      "properties": {
+        "movement_temporal_summary": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MovementTemporalSummary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "TemporalSection",
+      "type": "object"
+    },
+    "WithinMovementTrend": {
+      "properties": {
+        "rom_slope_deg_per_rep": {
+          "title": "Rom Slope Deg Per Rep",
+          "type": "number"
+        },
+        "velocity_slope_deg_per_s_per_rep": {
+          "title": "Velocity Slope Deg Per S Per Rep",
+          "type": "number"
+        },
+        "valgus_slope_deg_per_rep": {
+          "title": "Valgus Slope Deg Per Rep",
+          "type": "number"
+        },
+        "trunk_lean_slope_deg_per_rep": {
+          "title": "Trunk Lean Slope Deg Per Rep",
+          "type": "number"
+        },
+        "fatigue_detected": {
+          "title": "Fatigue Detected",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rom_slope_deg_per_rep",
+        "velocity_slope_deg_per_s_per_rep",
+        "valgus_slope_deg_per_rep",
+        "trunk_lean_slope_deg_per_rep",
+        "fatigue_detected"
+      ],
+      "title": "WithinMovementTrend",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "metadata": {
+      "$ref": "#/$defs/ReportMetadata"
+    },
+    "movement_section": {
+      "$ref": "#/$defs/MovementSection"
+    },
+    "overall_narrative": {
+      "title": "Overall Narrative",
+      "type": "string"
+    },
+    "temporal_section": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TemporalSection"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "cross_movement_section": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CrossMovementSection"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "metadata",
+    "movement_section",
+    "overall_narrative"
+  ],
+  "title": "Report",
+  "type": "object"
+}

@@ -15,7 +15,8 @@ software/mobile-handover/
 │   ├── pose_detector.dart             ← abstract pose-model interface
 │   └── mediapipe_pose_detector.dart   ← reference implementation skeleton
 ├── schemas/
-│   └── session.schema.json            ← JSON Schema exported from pydantic
+│   ├── session.schema.json            ← POST /sessions request (exported from pydantic)
+│   └── report.schema.json             ← GET /sessions/{id}/report response (exported from pydantic)
 ├── fixtures/
 │   ├── sample_valid_session.json            ← pose-only, overhead_squat (5 frames)
 │   └── sample_bicep_curl_with_emg.json      ← pose + emg + consent worked example
@@ -23,7 +24,7 @@ software/mobile-handover/
 │   ├── DOWNLOAD.md                    ← where to get pose_landmarker_full.task
 │   └── blazepose_landmark_order.md    ← canonical 33-landmark index table
 └── tools/
-    ├── export_schemas.py              ← regenerate session.schema.json
+    ├── export_schemas.py              ← regenerate session.schema.json + report.schema.json
     └── post_sample.sh                 ← smoke-test upload against a running server
 ```
 
@@ -38,13 +39,48 @@ What's demo-specific:
 
 - **`metadata.movement` = `"bicep_curl"`.** Added to `MovementType` alongside
   the four post-demo movements.
-- **Demo server URL:** `https://bioliminal-demo.aaroncarney.me` (Cloudflare tunnel
-  to the demo Windows workstation). Build with `--dart-define=SERVER_URL=https://bioliminal-demo.aaroncarney.me`.
+- **Demo server URL:** `https://bioliminal-demo.aaroncarney.me` (Cloudflare
+  named tunnel → `localhost:8000` on the demo workstation). Build with
+  `--dart-define=SERVER_URL=https://bioliminal-demo.aaroncarney.me`.
 - **Report content is sparse until `#12` lands.** `chain_observations` will
   come back empty for bicep curl until the rule YAML ships. Render gracefully.
 - **sEMG in the payload is still pending `#13`.** Schema supports it; whether
   the demo upload carries `emg` depends on the `#13` decision and hardware
   readiness. Pose-only bicep curl sessions work end-to-end today.
+
+### Where the demo server actually runs
+
+Not a cloud VM. A dedicated Windows workstation with a P100/V100-class GPU,
+serving `localhost:8000` behind a Cloudflare named tunnel. The phone talks
+to the tunnel hostname — the workstation dials out to Cloudflare's edge,
+the phone connects to that edge. That's why the URL is stable
+(`bioliminal-demo.aaroncarney.me`) regardless of demo-venue WiFi or NAT.
+
+**Primary path: Cloudflare tunnel.** Phone hits
+`https://bioliminal-demo.aaroncarney.me`, tunnel forwards to the workstation.
+Build with `--dart-define=SERVER_URL=https://bioliminal-demo.aaroncarney.me`.
+
+**Backup path: LAN (only if the tunnel drops).** If the venue lets us bring
+the phone and workstation onto the same subnet, the phone can fall back to
+`http://<workstation-lan-ip>:8000` directly. Not the default; only invoked
+if the tunnel is down and we can confirm LAN reachability at the venue.
+No code path should prefer LAN — the tunnel is the contract.
+
+Kept simple for 4/20: the pipeline is CPU-only (rule eval + geometry on
+BlazePose landmarks). The GPU is available for post-demo upgrades (3D
+lifting, richer narrative models, server-side sEMG feature extraction) —
+none of that ships before Monday. "Demo simple, then improve."
+
+What this means for the phone team:
+- The URL and contract will not change for the demo.
+- Tunnel round-trip is ~100–300 ms depending on network. Build upload UX
+  to tolerate that — no blocking UI on the POST.
+- The server runs as a persistent service on the workstation; it does not
+  need a warm-up request before the demo.
+
+Full standup + tunnel runbooks (for the workstation operator, not the
+mobile team): `bioliminal-ops/operations/comms/2026-04-16-demo-server-standup.md`
+and `bioliminal-ops/operations/comms/2026-04-18-cloudflare-tunnel-setup.md`.
 
 ---
 
@@ -265,25 +301,47 @@ final url = Uri.parse('$_baseUrl/sessions/$sessionId/report');
 ### 3. `Report.fromJson` expects fields that the server doesn't return
 
 Client currently expects `findings[]` and `practitioner_points[]`.
-Server actually returns `metadata`, `movement_section`, `overall_narrative`.
+Server actually returns `metadata`, `movement_section`, `overall_narrative`,
+and optional `temporal_section` / `cross_movement_section`.
 
-The server's response shape (see `software/server/src/auralink/report/schemas.py`
-on the server side or re-generate `session.schema.json` in this package):
+Source of truth: `schemas/report.schema.json` (generated from
+`software/server/src/auralink/report/schemas.py`). Minimal demo shape:
 
 ```json
 {
-  "metadata": { "session_id": "...", "movement": "bicep_curl", "generated_at": "..." },
-  "movement_section": {
-    "summary": "...",
-    "rep_scores": [ { "rep_index": 0, "quality": "good", "narrative": "..." }, ... ],
-    "chain_observations": [ ... ]
+  "metadata": {
+    "session_id": "...",
+    "movement": "bicep_curl",
+    "captured_at_ms": 1745200000000
   },
-  "overall_narrative": "..."
+  "movement_section": {
+    "movement": "bicep_curl",
+    "quality_report": { "passed": true, "reasons": [] },
+    "per_rep_metrics": { "...": "optional, populated when reps segmented" },
+    "chain_observations": [],
+    "...": "other optional analysis slots — see report.schema.json"
+  },
+  "overall_narrative": "Your movement shows a clean overall pattern — no notable compensations detected.",
+  "temporal_section": null,
+  "cross_movement_section": null
 }
 ```
 
-Update the Dart `Report.fromJson` to map those fields. Until `#12` (rule YAML)
-lands, `chain_observations` will be empty — render gracefully.
+**Minimum render path for the demo** — these three fields are always populated:
+
+- `metadata.session_id`, `metadata.movement`
+- `overall_narrative` (one-paragraph human-readable summary)
+- `movement_section.quality_report.passed` (bool) — if false, show the
+  quality reasons instead of trying to render analysis
+
+Everything else on `movement_section` is optional (`per_rep_metrics`,
+`chain_observations`, `angle_series`, etc.) and can be progressively rendered
+as the UI matures. `chain_observations` is empty for bicep curl until `#12`
+ships — render gracefully.
+
+Update the Dart `Report.fromJson` to map at least the three required fields
+above. Load the full schema from `schemas/report.schema.json` if you want
+type-safe bindings for the optional analysis payload.
 
 ---
 
@@ -328,18 +386,20 @@ What the phone DOES own:
 
 ---
 
-## Regenerating the JSON schema
+## Regenerating the JSON schemas
 
-If the server-side pydantic models change, refresh the schema:
+If the server-side pydantic models change, refresh both schemas:
 
 ```
 cd tools
-./export_schemas.py
+../../server/.venv/bin/python export_schemas.py
 ```
 
-This writes `schemas/session.schema.json` from the live pydantic models.
-Commit the refreshed file. The Dart classes are hand-written — update
-`interface/models.dart` to match.
+This writes `schemas/session.schema.json` (request: `Session`) and
+`schemas/report.schema.json` (response: `Report`) from the live pydantic
+models. Commit the refreshed files. The Dart classes are hand-written —
+update `interface/models.dart` to match if request-side fields changed,
+and update the Dart `Report.fromJson` if response-side fields changed.
 
 ---
 

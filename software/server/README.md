@@ -20,4 +20,24 @@ uv run pytest
 
 ## Project Layout
 
-See `docs/operations/comms/research-integration-report.md` section 6 for architectural context. Pipeline stages live under `src/auralink/` organized by domain (pose, analysis, reasoning, etc.).
+Pipeline stages live under `src/auralink/` organized by domain:
+`api/` (FastAPI app + routes + request schemas), `pipeline/` (stage
+orchestrator + artifacts), `pose/`, `analysis/`, `reasoning/`, `ml/`
+(lifter / skeleton / phase-segmenter protocols), `temporal/`, `protocol/`,
+`report/` (response schemas + narrative assembler).
+
+## Demo deployment (2026-04-20)
+
+For the 4/20 bicep curl demo the server runs on a Windows workstation with
+a P100/V100-class GPU, exposed to the phone via a Cloudflare named tunnel at
+`https://bioliminal-demo.aaroncarney.me` → `localhost:8000`. Pipeline is
+CPU-only for the demo; the GPU is reserved for post-demo upgrades.
+
+Standup + tunnel runbooks:
+- `bioliminal-ops/operations/comms/2026-04-16-demo-server-standup.md`
+- `bioliminal-ops/operations/comms/2026-04-18-cloudflare-tunnel-setup.md`
+
+Mobile-facing contract: `software/mobile-handover/README.md` and the
+machine-readable schemas under `software/mobile-handover/schemas/`
+(`session.schema.json` for the request, `report.schema.json` for the
+response).
