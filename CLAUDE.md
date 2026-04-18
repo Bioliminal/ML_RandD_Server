@@ -17,46 +17,21 @@ Project-wide context (team, pipeline architecture, constraints, GitLab label tax
 
 ### Placement Rules
 
-Files go where their **primary purpose** lives. When a file could belong in multiple places, use these tiebreakers:
+Files go where their **primary purpose** lives. This repo is public; internal strategy/ops/session content lives in the private `bioliminal-ops` repo, and literature content lives in the private `research` repo.
 
-| If the file is primarily about... | It goes in... | Even if it also touches... |
-|---|---|---|
-| A physical component, sensor, actuator, or form factor | `hardware/` | Software that reads it, ML that processes its signal |
-| Buying, sourcing, or pricing components | `hardware/bom/` | Research that justified the purchase |
-| Fascial chains, anatomy, injury epidemiology, movement science | `docs/research/biomechanics/` | Sensors that measure it, ML that models it |
-| sEMG signal quality, pose estimation accuracy, CV performance | `docs/research/sensing/` | Hardware specs, biomechanics context |
-| Competitors, market sizing, regulatory/FDA, business models | `docs/research/market/` | Product direction, pricing |
-| Per-paper deep reads, model/framework recommendations, citation lists | `docs/research/` (root) | Cross-cutting research synthesis |
-| **High-level project framing**: BrainLifts, GTM, mission, vision, SPOVs | `docs/operations/` | Research backing them |
-| **Communications & cross-team handoffs**: plain-English summaries, session notes between Aaron / teammates / parallel coding sessions, shareable technical reports for the team | `docs/operations/comms/` | Whatever they're communicating about |
-| Implementation plans (L1 epochs, L2 tactical) | `docs/plans/` | Research and decisions they consume |
-| Session handover, context dumps, plan reviews between work sessions | `docs/sessions/` | Everything — these are snapshots, not primary sources |
-| Tradeoff decisions that span HW+SW+ML | `docs/decisions/` | Individual domain details |
-| Training scripts, model configs, dataset processing | `ml/` | Hardware that collects the data |
-| Application code, UI, API | `software/` | ML models it calls, hardware it reads |
-| Mobile/server contract handoffs (Dart interfaces, JSON schemas, fixtures) | `software/mobile-handover/` | Implementation details inside `software/server/` |
-| Build tooling, CI, Docker, scripts | `tools/` | Any domain it automates |
-
-### Research Subdirectory Tiebreakers
-
-Within `docs/research/`:
-- `biomechanics/` — The body. Fascial chains, muscle anatomy, injury mechanisms, clinical thresholds, movement patterns. If it cites Wilke, McGill, Hewett, Schleip, or discusses force transmission → biomechanics.
-- `sensing/` — The measurement. sEMG signal chains, MediaPipe accuracy, sensor validation, gap analysis of what's measurable vs claimed. If it's about whether we *can* detect something → sensing.
-- `market/` — The business. Competitors, TAM/SAM, FDA/regulatory, pricing, practitioner counts. If it's about who else does this or whether we can sell it → market.
-- Root (`docs/research/`) — Engineering-decision artifacts: license audits, stack-options matrices, library comparisons, algorithm implementation notes, and model/framework recommendation docs.
-
-**`docs/operations/` vs `docs/research/`** — operations is about *what we're building and why*; research is about *what the science says*.
-- If it frames the product (BrainLift, SPOVs, GTM, mission) → `docs/operations/`
-- If it cites papers and synthesizes evidence → `docs/research/`
-- Example: `gtm.md` is in `docs/operations/` because it's a product strategy document, even though it cites market research.
-- Example: `pipeline-architecture-decision-2026-04-10.md` is in `docs/research/` because it's an engineering decision grounded in paper findings — it drives implementation choices for the sensing/ML layer.
-
-**`docs/operations/` vs `docs/operations/comms/`** — operations holds living strategy/framing docs that the team owns over time; `comms/` holds the artifacts produced *for* communicating between humans (or between Aaron and parallel coding sessions).
-- Living, owned by the team, updated as the project evolves → `docs/operations/` (root)
-- Dated, write-once, communication artifact → `docs/operations/comms/`
-- Examples in `docs/operations/`: `BRAINLIFT.pdf`, `Balance Brainlift.pdf`, `gtm.md`.
-- Examples in `docs/operations/comms/`: `research-integration-report.md` (technical context for teammates), `2026-04-11-plan-changes-plain-english.md` (Slack-paste team summary), `2026-04-11-server-session-note.md` (handoff to parallel coding session).
-- Naming convention for `comms/`: dated files (`YYYY-MM-DD-<slug>.md`) for snapshots; undated for evergreen team-context docs that get revised in place.
+| If the file is primarily about... | It goes in... |
+|---|---|
+| A physical component, sensor, actuator, or form factor | `hardware/` in this repo |
+| Buying, sourcing, or pricing components | `hardware/bom/` in this repo |
+| Engineering decisions safe for public view: license audits, algorithm implementation notes, library comparisons | `docs/research/` in this repo |
+| Training scripts, model configs, dataset processing | `ml/` in this repo |
+| Application code, UI, API | `software/` in this repo |
+| Mobile/server contract handoffs (Dart interfaces, JSON schemas, fixtures) | `software/mobile-handover/` in this repo |
+| Build tooling, CI, Docker, scripts | `tools/` in this repo |
+| Literature: papers, synopses, synthesis docs, deep reads | [`research`](https://gitlab.com/bioliminal/research) repo (private) |
+| Strategy: commercial viability, GTM, investor-facing framing, L1/L2 plans, cross-domain decisions | [`bioliminal-ops`](https://gitlab.com/bioliminal/bioliminal-ops) repo (private) |
+| Competitors, market sizing, pricing, regulatory strategy | `market/` in `bioliminal-ops` |
+| Cross-team internal comms, session handoffs, progress files | `operations/comms/` or `sessions/` in `bioliminal-ops` |
 
 **`hardware/bom/` vs `hardware/`** — BOMs, shopping lists, and pricing docs go in `bom/`. Specs, evaluation docs, and architecture decisions stay in `hardware/`.
 
