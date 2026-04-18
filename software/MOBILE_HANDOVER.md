@@ -8,6 +8,8 @@ mirror manually into the Flutter repo.
 **New location:** `bioliminal-ops/operations/handover/mobile/`
 
 - Contract docs + README: `operations/handover/mobile/README.md`
+- Per-stage phone-vs-server ownership + adaptive sketch:
+  `operations/handover/mobile/what-runs-where.md`
 - JSON schemas (session + report): `operations/handover/mobile/schemas/`
 - Dart interface files + fixtures: `operations/handover/mobile/interface/`,
   `.../fixtures/`
