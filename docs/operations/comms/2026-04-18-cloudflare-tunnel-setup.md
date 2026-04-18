@@ -8,7 +8,7 @@
 - Hostname: `bioliminal-demo.aaroncarney.me` (Aaron owns this zone on Cloudflare).
 - Ingress rule: `localhost:8000` → tunnel.
 - No Zero Trust / Access wrapper — demo is unauthenticated by design.
-- Run mode: foreground in a persistent shell for the demo window (simpler than Windows-service install; Aaron will restart manually if it drops).
+- Provisioning flow: **Dashboard token** (Path 1), not the CLI `cloudflared tunnel login` flow. No `cert.pem` to shuffle between machines; `cloudflared service install <token>` handles everything, and the tunnel persists across reboots as a Windows service.
 
 ---
 
@@ -26,64 +26,34 @@ winget install --id Cloudflare.cloudflared -e
 
 Close and reopen the shell so `cloudflared` is on PATH. Re-run `cloudflared --version` to confirm.
 
-## Step 2 — Authenticate to Aaron's Cloudflare account
+## Step 2 — Create the tunnel in the Cloudflare dashboard (Aaron does this)
 
+Aaron logs in at https://one.dash.cloudflare.com → **Networks → Tunnels** → **Create a tunnel** → connector type **Cloudflared** → name `bioliminal-demo` → **Save tunnel**. The next screen shows an install command containing a long token (`eyJ...`). Aaron copies that token only — not the whole command.
+
+## Step 3 — Install the tunnel connector as a Windows service
+
+Run (elevated CMD / PowerShell) with the token Aaron gives you:
 ```
-cloudflared tunnel login
-```
-
-This opens a browser — **Aaron must log in personally** (this is his Cloudflare account, not a service account). Pick the `aaroncarney.me` zone when prompted. On success, a cert file is written to `%USERPROFILE%\.cloudflared\cert.pem`. That file is the only thing that proves you can create tunnels under his account; treat it accordingly.
-
-If you see "No zones found" after login, Aaron needs to verify `aaroncarney.me` is actually in his Cloudflare account. Stop and check.
-
-## Step 3 — Create the named tunnel
-
-```
-cloudflared tunnel create bioliminal-demo
+cloudflared service install <token>
 ```
 
-Output includes a tunnel UUID and creates `%USERPROFILE%\.cloudflared\<UUID>.json` (the credentials file). Copy the UUID — you'll need it for the config. If a tunnel named `bioliminal-demo` already exists (e.g. re-running this script), use the existing one:
-
+`cloudflared` registers as a Windows service, connects outbound to Cloudflare's edge, and persists across reboots. Confirm with:
 ```
+Get-Service cloudflared
 cloudflared tunnel list
 ```
 
-## Step 4 — Route DNS at the hostname
+## Step 4 — Add the public hostname route (Aaron does this)
 
-```
-cloudflared tunnel route dns bioliminal-demo bioliminal-demo.aaroncarney.me
-```
+Back in the Cloudflare dashboard on the tunnel's detail page → **Public Hostname** tab → **Add a public hostname**:
+- Subdomain: `bioliminal-demo`
+- Domain: `aaroncarney.me`
+- Type: `HTTP`
+- URL: `localhost:8000`
 
-This creates a CNAME record in the `aaroncarney.me` zone pointing at the tunnel. If it reports "already exists," that's fine — the record was set up in a prior run.
+Save. Cloudflare creates the DNS record and starts routing traffic to the connector automatically. No CLI work, no config.yml, no cert.pem.
 
-## Step 5 — Write the config file
-
-Create `%USERPROFILE%\.cloudflared\config.yml` (use a real text editor, not Notepad's Unicode default; UTF-8 no BOM):
-
-```yaml
-tunnel: bioliminal-demo
-credentials-file: C:\Users\<your-username>\.cloudflared\<UUID>.json
-
-ingress:
-  - hostname: bioliminal-demo.aaroncarney.me
-    service: http://localhost:8000
-  - service: http_status:404
-```
-
-Substitute `<your-username>` and `<UUID>` with the real values. The trailing `http_status:404` rule is mandatory — cloudflared rejects configs without a catch-all.
-
-## Step 6 — Run the tunnel (foreground, demo-window persistent)
-
-In a fresh CMD / PowerShell window (leave it open):
-```
-cloudflared tunnel run bioliminal-demo
-```
-
-Expected: log lines saying the tunnel registered with 4 Cloudflare edge nodes and is active. Leave this window open for the demo. If the machine reboots, this window closes and the tunnel goes down — Aaron will need to re-run the command.
-
-(If you want a Windows service install instead — for reboots — `cloudflared service install` works, but only after `config.yml` is in place. Skip unless Aaron asks.)
-
-## Step 7 — Verify from outside
+## Step 5 — Verify from outside
 
 From any machine that is **not** the demo server (phone hotspot, laptop on another network, etc.):
 
@@ -102,7 +72,7 @@ Expected: `/health` returns 200; `POST /sessions` returns 201 with a
 `session_id` and `frames_received: 1`. On the server machine, a new session
 directory should appear under `$AURALINK_DATA_DIR`.
 
-## Step 8 — Post the outcome on gitlab
+## Step 6 — Post the outcome on gitlab
 
 On gitlab `ML_RandD_Server#11`, add a comment with:
 - Machine hostname (the Windows box).
@@ -127,9 +97,11 @@ That's the signal to Kelsi that she can `--dart-define=SERVER_URL=https://biolim
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `cloudflared` not found after winget install | Shell hasn't reloaded PATH | Close all shells, open fresh |
-| "No zones found" after `tunnel login` | Cloudflare account doesn't own `aaroncarney.me` | Stop and confirm with Aaron |
-| Tunnel runs but `curl` from outside returns 502 | Server not actually bound to `0.0.0.0:8000` | Re-check standup brief step 5 |
-| `POST /sessions` returns 422 through tunnel but 201 locally | Request body being rewritten by something | Rare; check `config.yml` for stray TLS or header rules |
+| Dashboard "Save tunnel" completed but no hostname added | Step 4 skipped — tunnel exists but is orphan | Go back to the tunnel's detail page → Public Hostname tab → add the route. Non-destructive. |
+| Tunnel shows INACTIVE in dashboard | `service install <token>` never ran or failed | `Get-Service cloudflared` on the demo PC; if missing, re-run with a fresh token |
+| Tunnel shows HEALTHY but `curl` from outside returns 502 | Server not actually bound to `0.0.0.0:8000` | Re-check standup brief step 5 |
+| Tunnel shows HEALTHY but external curl returns 530 | No public-hostname route yet | Add the route per step 4 |
+| `POST /sessions` returns 422 through tunnel but 201 locally | Request body being rewritten by something | Rare; check the dashboard's tunnel config for stray TLS or header rules |
 | Tunnel drops after a few minutes | Laptop sleep / network change | Keep the server on wired ethernet, disable sleep |
 
 ## Exit criteria
