@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from auralink.api.schemas import Session
+from bioliminal.api.schemas import Session
 from tests.fixtures.loader import load_fixture
 from tests.fixtures.synthetic.generator import generate_session
 

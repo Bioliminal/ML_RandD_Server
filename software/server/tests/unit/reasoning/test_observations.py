@@ -1,8 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.reasoning.chains import ChainName
-from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+from bioliminal.reasoning.chains import ChainName
+from bioliminal.reasoning.observations import ChainObservation, ObservationSeverity
 
 
 def test_creates_observation():

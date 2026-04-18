@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
-from auralink.api.schemas import Session
+from bioliminal.api.main import create_app
+from bioliminal.api.schemas import Session
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
@@ -22,7 +22,7 @@ def _post_squat(
 
 
 def test_four_clean_sessions_do_not_trigger_fatigue_carryover(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 
@@ -41,7 +41,7 @@ def test_four_clean_sessions_do_not_trigger_fatigue_carryover(tmp_path, monkeypa
 def test_four_sessions_with_escalating_compensation_trigger_fatigue_carryover(
     tmp_path, monkeypatch
 ):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 

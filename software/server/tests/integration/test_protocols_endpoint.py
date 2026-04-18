@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 from tests.fixtures.loader import load_fixture
 
 
@@ -12,7 +12,7 @@ def _post_session(client: TestClient, movement: str, variant: str = "clean") -> 
 
 
 def test_protocol_with_single_session_returns_report(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
     sid = _post_session(client, "overhead_squat", "clean")
@@ -26,7 +26,7 @@ def test_protocol_with_single_session_returns_report(tmp_path, monkeypatch):
 
 
 def test_protocol_missing_session_returns_404(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 
@@ -35,7 +35,7 @@ def test_protocol_missing_session_returns_404(tmp_path, monkeypatch):
 
 
 def test_protocol_empty_session_list_returns_422(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 
@@ -44,7 +44,7 @@ def test_protocol_empty_session_list_returns_422(tmp_path, monkeypatch):
 
 
 def test_protocol_two_sessions_produces_cross_movement_metrics(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
     sid_a = _post_session(client, "overhead_squat", "clean")

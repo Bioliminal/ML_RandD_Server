@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from auralink.reasoning.rule_loader import load_rules
+from bioliminal.reasoning.rule_loader import load_rules
 
 
 def _write_rule_file(path: Path, rule_id: str, chain: str) -> None:

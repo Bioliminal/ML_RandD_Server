@@ -1,13 +1,13 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.ml.phase_segmenter import (
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.ml.phase_segmenter import (
     Phase,
     PhaseBoundaries,
     PhaseSegmenter,
     SinglePhaseSegmenter,
 )
-from auralink.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.base import StageContext
 
 
 def _session(frame_count: int) -> Session:

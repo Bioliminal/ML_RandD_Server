@@ -1,9 +1,9 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import AngleTimeSeries
-from auralink.pipeline.stages.base import StageContext
-from auralink.pipeline.stages.normalize import run_normalize
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import AngleTimeSeries
+from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.normalize import run_normalize
 
 
 def _frame(shoulder_y: float, hip_y: float) -> Frame:

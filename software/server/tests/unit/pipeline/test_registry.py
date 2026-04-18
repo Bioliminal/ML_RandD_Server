@@ -1,8 +1,8 @@
 import pytest
 
-from auralink.pipeline.errors import PipelineError
-from auralink.pipeline.registry import StageRegistry
-from auralink.pipeline.stages.base import Stage
+from bioliminal.pipeline.errors import PipelineError
+from bioliminal.pipeline.registry import StageRegistry
+from bioliminal.pipeline.stages.base import Stage
 
 
 def _noop_stage(name: str) -> Stage:

@@ -1,6 +1,6 @@
-from auralink.pipeline.artifacts import PipelineArtifacts, SessionQualityReport
-from auralink.reasoning.chains import ChainName
-from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+from bioliminal.pipeline.artifacts import PipelineArtifacts, SessionQualityReport
+from bioliminal.reasoning.chains import ChainName
+from bioliminal.reasoning.observations import ChainObservation, ObservationSeverity
 
 
 def test_pipeline_artifacts_accepts_chain_observations():

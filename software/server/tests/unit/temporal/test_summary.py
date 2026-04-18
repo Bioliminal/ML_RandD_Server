@@ -1,8 +1,8 @@
 import pytest
 
-from auralink.pipeline.artifacts import RepComparison
-from auralink.temporal.summary import summarize_comparisons
-from auralink.temporal.threshold_loader import TemporalThresholds
+from bioliminal.pipeline.artifacts import RepComparison
+from bioliminal.temporal.summary import summarize_comparisons
+from bioliminal.temporal.threshold_loader import TemporalThresholds
 
 
 @pytest.fixture

@@ -3,13 +3,13 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
-from auralink.pipeline.errors import PipelineError, StageError
+from bioliminal.api.main import create_app
+from bioliminal.pipeline.errors import PipelineError, StageError
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_quality_gate_rejection_returns_422(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     payload = copy.deepcopy(build_overhead_squat_payload())
     payload["metadata"]["frame_rate"] = 10.0  # below MIN_FRAME_RATE = 20
@@ -22,14 +22,14 @@ def test_quality_gate_rejection_returns_422(tmp_path, monkeypatch):
 
 
 def test_stage_error_returns_500_with_stage_detail(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     payload = build_overhead_squat_payload()
 
     def _boom(session, registry=None):
         raise StageError(stage_name="angle_series", detail="simulated failure")
 
-    with patch("auralink.api.routes.sessions.run_pipeline", _boom):
+    with patch("bioliminal.api.routes.sessions.run_pipeline", _boom):
         response = client.post("/sessions?sync=true", json=payload)
 
     assert response.status_code == 500
@@ -40,14 +40,14 @@ def test_stage_error_returns_500_with_stage_detail(tmp_path, monkeypatch):
 
 
 def test_generic_pipeline_error_returns_500(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     payload = build_overhead_squat_payload()
 
     def _boom(session, registry=None):
         raise PipelineError("no stages registered for movement 'mystery'")
 
-    with patch("auralink.api.routes.sessions.run_pipeline", _boom):
+    with patch("bioliminal.api.routes.sessions.run_pipeline", _boom):
         response = client.post("/sessions?sync=true", json=payload)
 
     assert response.status_code == 500

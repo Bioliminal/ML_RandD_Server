@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.pipeline.artifacts import (
+from bioliminal.pipeline.artifacts import (
     AngleTimeSeries,
     NormalizedAngleTimeSeries,
     PerRepMetrics,

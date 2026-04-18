@@ -1,6 +1,6 @@
 import numpy as np
 
-from auralink.analysis.rep_segmentation import segment_reps
+from bioliminal.analysis.rep_segmentation import segment_reps
 
 
 def test_segment_reps_single_rep():

@@ -1,4 +1,4 @@
-from auralink.pose.keypoints import (
+from bioliminal.pose.keypoints import (
     BLAZEPOSE_LANDMARK_COUNT,
     LandmarkIndex,
     landmark_index,

@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 
 
 def test_health_endpoint():
@@ -10,4 +10,4 @@ def test_health_endpoint():
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "ok"
-    assert body["app"] == "auralink-server"
+    assert body["app"] == "bioliminal-server"

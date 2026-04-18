@@ -1,7 +1,7 @@
 import pytest
 
-from auralink.pipeline.artifacts import QualityIssue, SessionQualityReport
-from auralink.pipeline.errors import (
+from bioliminal.pipeline.artifacts import QualityIssue, SessionQualityReport
+from bioliminal.pipeline.errors import (
     PipelineError,
     QualityGateError,
     StageError,

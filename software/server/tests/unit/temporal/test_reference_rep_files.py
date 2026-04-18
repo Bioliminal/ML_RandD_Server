@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from auralink.temporal.reference_reps import ReferenceRep, load_reference_rep
+from bioliminal.temporal.reference_reps import ReferenceRep, load_reference_rep
 
 _CONFIG_DIR = Path(__file__).resolve().parents[3] / "config" / "reference_reps"
 
 
 # Primary angles that rep_comparison will look up per movement, sourced
-# from auralink.pipeline.stages.per_rep_metrics.PRIMARY_ANGLE and the
+# from bioliminal.pipeline.stages.per_rep_metrics.PRIMARY_ANGLE and the
 # push_up stage's analogous constant. If these drift, T11's stage fails
 # at runtime with a cryptic KeyError — catch it here instead.
 _PRIMARY_ANGLE_BY_MOVEMENT = {

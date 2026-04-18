@@ -1,8 +1,8 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import PipelineArtifacts, QualityIssue, SessionQualityReport
-from auralink.pipeline.storage import SessionStorage
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import PipelineArtifacts, QualityIssue, SessionQualityReport
+from bioliminal.pipeline.storage import SessionStorage
 
 
 def _session() -> Session:

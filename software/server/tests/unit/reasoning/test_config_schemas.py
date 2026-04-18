@@ -1,8 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.reasoning.chains import ChainName
-from auralink.reasoning.config_schemas import (
+from bioliminal.reasoning.chains import ChainName
+from bioliminal.reasoning.config_schemas import (
     BodyTypeAdjustment,
     RuleConfig,
     ThresholdSetConfig,

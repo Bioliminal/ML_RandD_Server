@@ -1,7 +1,7 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.storage import SessionStorage
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.storage import SessionStorage
 
 
 @pytest.fixture

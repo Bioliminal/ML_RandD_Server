@@ -1,14 +1,14 @@
-from auralink.pipeline.artifacts import PerRepMetrics, RepMetric
-from auralink.reasoning.body_type import BodyTypeProfile
-from auralink.reasoning.chains import ChainName
-from auralink.reasoning.config_schemas import (
+from bioliminal.pipeline.artifacts import PerRepMetrics, RepMetric
+from bioliminal.reasoning.body_type import BodyTypeProfile
+from bioliminal.reasoning.chains import ChainName
+from bioliminal.reasoning.config_schemas import (
     BodyTypeAdjustment,
     BodyTypeAdjustmentsConfig,
     RuleConfig,
     ThresholdSetConfig,
 )
-from auralink.reasoning.observations import ObservationSeverity
-from auralink.reasoning.rule_engine import RuleBasedChainReasoner
+from bioliminal.reasoning.observations import ObservationSeverity
+from bioliminal.reasoning.rule_engine import RuleBasedChainReasoner
 
 
 def _rep(valgus: float = 0.0, trunk_lean: float = 0.0) -> RepMetric:

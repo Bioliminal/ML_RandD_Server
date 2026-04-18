@@ -1,4 +1,4 @@
-from auralink.reasoning.body_type import BodyTypeProfile, Sex
+from bioliminal.reasoning.body_type import BodyTypeProfile, Sex
 
 
 def test_default_profile():

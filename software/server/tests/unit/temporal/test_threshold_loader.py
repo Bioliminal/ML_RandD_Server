@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from auralink.temporal.threshold_loader import (
+from bioliminal.temporal.threshold_loader import (
     TemporalThresholds,
     load_temporal_thresholds,
 )

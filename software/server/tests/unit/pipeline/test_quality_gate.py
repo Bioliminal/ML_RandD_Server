@@ -1,8 +1,8 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.stages.base import StageContext
-from auralink.pipeline.stages.quality_gate import run_quality_gate
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.quality_gate import run_quality_gate
 
 
 def _lm(visibility: float = 1.0, presence: float = 1.0) -> Landmark:

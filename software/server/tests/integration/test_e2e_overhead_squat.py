@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_overhead_squat_round_trip_produces_populated_report(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
 
     payload = build_overhead_squat_payload(rep_count=3, frames_per_rep=30)

@@ -1,12 +1,12 @@
-from auralink.pipeline.artifacts import (
+from bioliminal.pipeline.artifacts import (
     MovementTemporalSummary,
     PipelineArtifacts,
     RepComparison,
     SessionQualityReport,
 )
-from auralink.protocol.schemas import CrossMovementMetric
-from auralink.report.assembler import assemble_report
-from auralink.report.schemas import CrossMovementSection, Report, TemporalSection
+from bioliminal.protocol.schemas import CrossMovementMetric
+from bioliminal.report.assembler import assemble_report
+from bioliminal.report.schemas import CrossMovementSection, Report, TemporalSection
 
 
 def _mk_summary() -> MovementTemporalSummary:

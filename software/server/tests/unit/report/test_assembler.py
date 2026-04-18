@@ -1,7 +1,7 @@
-from auralink.pipeline.artifacts import PipelineArtifacts, SessionQualityReport
-from auralink.reasoning.chains import ChainName
-from auralink.reasoning.observations import ChainObservation, ObservationSeverity
-from auralink.report.assembler import assemble_report
+from bioliminal.pipeline.artifacts import PipelineArtifacts, SessionQualityReport
+from bioliminal.reasoning.chains import ChainName
+from bioliminal.reasoning.observations import ChainObservation, ObservationSeverity
+from bioliminal.report.assembler import assemble_report
 
 
 def _artifacts(chain_observations=None) -> PipelineArtifacts:

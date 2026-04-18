@@ -1,6 +1,6 @@
 import pytest
 
-from auralink.temporal.dtw import DTWResult, run_dtw
+from bioliminal.temporal.dtw import DTWResult, run_dtw
 
 
 def test_identical_sequences_have_zero_distance_and_diagonal_path():

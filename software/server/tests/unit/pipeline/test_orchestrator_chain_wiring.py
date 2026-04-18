@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
-from auralink.pipeline.orchestrator import (
+from bioliminal.pipeline.orchestrator import (
     _assemble_artifacts,
     _default_stage_list,
     _push_up_stage_list,
     _rollup_stage_list,
 )
-from auralink.pipeline.stages.base import (
+from bioliminal.pipeline.stages.base import (
     STAGE_NAME_CHAIN_REASONING,
     STAGE_NAME_QUALITY_GATE,
     Stage,
@@ -50,7 +50,7 @@ def test_assemble_artifacts_populates_chain_observations():
     }
     ctx.config = {}
 
-    with patch("auralink.pipeline.orchestrator.PipelineArtifacts") as fake_pa:
+    with patch("bioliminal.pipeline.orchestrator.PipelineArtifacts") as fake_pa:
         _assemble_artifacts(ctx)
         kwargs = fake_pa.call_args.kwargs
         assert kwargs["chain_observations"] == ["sentinel-observation"]
@@ -63,12 +63,12 @@ def test_chain_reasoning_return_value_reaches_assemble_artifacts():
     """
     from datetime import UTC, datetime
 
-    from auralink.api.schemas import Session, SessionMetadata
-    from auralink.pipeline.artifacts import SessionQualityReport
-    from auralink.pipeline.orchestrator import run_pipeline
-    from auralink.pipeline.registry import StageRegistry
-    from auralink.reasoning.chains import ChainName
-    from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+    from bioliminal.api.schemas import Session, SessionMetadata
+    from bioliminal.pipeline.artifacts import SessionQualityReport
+    from bioliminal.pipeline.orchestrator import run_pipeline
+    from bioliminal.pipeline.registry import StageRegistry
+    from bioliminal.reasoning.chains import ChainName
+    from bioliminal.reasoning.observations import ChainObservation, ObservationSeverity
 
     sentinel_obs = ChainObservation(
         chain=ChainName.SBL,

@@ -1,7 +1,7 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark
-from auralink.pose.joint_angles import trunk_lean_angle
+from bioliminal.api.schemas import Frame, Landmark
+from bioliminal.pose.joint_angles import trunk_lean_angle
 
 
 def _frame_with(left_sh, right_sh, left_hip, right_hip) -> Frame:

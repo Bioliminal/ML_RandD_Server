@@ -1,8 +1,8 @@
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.ml.lifter import LiftedAngleTimeSeries
-from auralink.ml.skeleton import NoOpSkeletonFitter, SkeletonBundle
-from auralink.pipeline.stages.base import STAGE_NAME_SKELETON, StageContext
-from auralink.pipeline.stages.skeleton import run_skeleton
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.ml.lifter import LiftedAngleTimeSeries
+from bioliminal.ml.skeleton import NoOpSkeletonFitter, SkeletonBundle
+from bioliminal.pipeline.stages.base import STAGE_NAME_SKELETON, StageContext
+from bioliminal.pipeline.stages.skeleton import run_skeleton
 
 
 def _ctx_with_lifted() -> StageContext:

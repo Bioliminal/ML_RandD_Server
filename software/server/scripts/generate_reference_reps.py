@@ -25,11 +25,11 @@ _SERVER_ROOT = _SCRIPT_DIR.parent
 sys.path.insert(0, str(_SERVER_ROOT / "src"))
 sys.path.insert(0, str(_SERVER_ROOT))  # for tests.fixtures import
 
-from auralink.api.schemas import Session  # noqa: E402
-from auralink.pipeline.stages.angle_series import run_angle_series  # noqa: E402
-from auralink.pipeline.stages.base import StageContext  # noqa: E402
-from auralink.pipeline.stages.normalize import run_normalize  # noqa: E402
-from auralink.pipeline.stages.quality_gate import run_quality_gate  # noqa: E402
+from bioliminal.api.schemas import Session  # noqa: E402
+from bioliminal.pipeline.stages.angle_series import run_angle_series  # noqa: E402
+from bioliminal.pipeline.stages.base import StageContext  # noqa: E402
+from bioliminal.pipeline.stages.normalize import run_normalize  # noqa: E402
+from bioliminal.pipeline.stages.quality_gate import run_quality_gate  # noqa: E402
 from tests.fixtures.synthetic.generator import generate_reference_rep  # noqa: E402
 
 _OUTPUT_DIR = _SERVER_ROOT / "config" / "reference_reps"

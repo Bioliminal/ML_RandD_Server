@@ -1,5 +1,5 @@
-from auralink.ml.lifter import IdentityLifter, LiftedAngleTimeSeries, Lifter
-from auralink.pipeline.artifacts import NormalizedAngleTimeSeries
+from bioliminal.ml.lifter import IdentityLifter, LiftedAngleTimeSeries, Lifter
+from bioliminal.pipeline.artifacts import NormalizedAngleTimeSeries
 
 
 def _sample_normalized() -> NormalizedAngleTimeSeries:

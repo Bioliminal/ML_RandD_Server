@@ -1,5 +1,5 @@
-from auralink.ml.lifter import LiftedAngleTimeSeries
-from auralink.ml.skeleton import NoOpSkeletonFitter, SkeletonBundle, SkeletonFitter
+from bioliminal.ml.lifter import LiftedAngleTimeSeries
+from bioliminal.ml.skeleton import NoOpSkeletonFitter, SkeletonBundle, SkeletonFitter
 
 
 def _sample_lifted() -> LiftedAngleTimeSeries:

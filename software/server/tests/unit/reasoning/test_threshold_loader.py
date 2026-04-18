@@ -2,12 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from auralink.reasoning.body_type import BodyTypeProfile
-from auralink.reasoning.config_schemas import (
+from bioliminal.reasoning.body_type import BodyTypeProfile
+from bioliminal.reasoning.config_schemas import (
     BodyTypeAdjustmentsConfig,
     ThresholdSetConfig,
 )
-from auralink.reasoning.threshold_loader import (
+from bioliminal.reasoning.threshold_loader import (
     adjust_for_body_type,
     load_body_type_adjustments,
     load_default_thresholds,

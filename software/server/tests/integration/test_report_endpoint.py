@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_get_report_returns_artifacts_after_post(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     post = client.post("/sessions?sync=true", json=build_overhead_squat_payload())
     session_id = post.json()["session_id"]
@@ -20,7 +20,7 @@ def test_get_report_returns_artifacts_after_post(tmp_path, monkeypatch):
 
 
 def test_get_report_404_when_session_missing(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     response = client.get("/sessions/does-not-exist/report")
     assert response.status_code == 404

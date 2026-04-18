@@ -1,13 +1,13 @@
 import numpy as np
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import (
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import (
     NormalizedAngleTimeSeries,
     RepBoundaries,
     RepBoundaryModel,
 )
-from auralink.pipeline.stages.base import StageContext
-from auralink.pipeline.stages.per_rep_metrics import run_per_rep_metrics
+from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.per_rep_metrics import run_per_rep_metrics
 
 
 def _ctx(knee_flex: list[float], trunk: list[float], valgus_l: list[float], valgus_r: list[float]):

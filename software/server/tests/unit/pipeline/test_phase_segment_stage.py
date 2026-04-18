@@ -1,7 +1,7 @@
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.ml.phase_segmenter import PhaseBoundaries, SinglePhaseSegmenter
-from auralink.pipeline.stages.base import STAGE_NAME_PHASE_SEGMENT, StageContext
-from auralink.pipeline.stages.phase_segment import run_phase_segment
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.ml.phase_segmenter import PhaseBoundaries, SinglePhaseSegmenter
+from bioliminal.pipeline.stages.base import STAGE_NAME_PHASE_SEGMENT, StageContext
+from bioliminal.pipeline.stages.phase_segment import run_phase_segment
 
 
 def _rollup_session(frame_count: int) -> Session:

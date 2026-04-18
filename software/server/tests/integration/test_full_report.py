@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 from tests.fixtures.loader import load_fixture
 
 
 def test_overhead_squat_valgus_produces_sbl_observation(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 
@@ -29,7 +29,7 @@ def test_overhead_squat_valgus_produces_sbl_observation(tmp_path, monkeypatch):
 
 
 def test_overhead_squat_clean_produces_no_observations(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 
@@ -54,7 +54,7 @@ def test_single_leg_squat_clean_runs_end_to_end_with_bfl_rule_loaded(tmp_path, m
     with BFL rules loaded, no 5xx, and either 0 observations or any
     observation that (if present) belongs to a recognized chain.
     """
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
 

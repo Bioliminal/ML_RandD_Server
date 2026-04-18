@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from auralink.api.schemas import Frame, Landmark
-from auralink.pose.joint_angles import (
+from bioliminal.api.schemas import Frame, Landmark
+from bioliminal.pose.joint_angles import (
     angle_between_points,
     hip_flexion_angle,
     knee_flexion_angle,

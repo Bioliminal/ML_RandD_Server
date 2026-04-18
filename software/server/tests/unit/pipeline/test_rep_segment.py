@@ -1,9 +1,9 @@
 import numpy as np
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import NormalizedAngleTimeSeries
-from auralink.pipeline.stages.base import StageContext
-from auralink.pipeline.stages.rep_segment import (
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import NormalizedAngleTimeSeries
+from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.rep_segment import (
     PRIMARY_REP_ANGLES_BY_MOVEMENT,
     run_rep_segment,
 )

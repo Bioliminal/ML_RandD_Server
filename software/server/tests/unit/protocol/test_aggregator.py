@@ -1,9 +1,9 @@
-from auralink.pipeline.artifacts import (
+from bioliminal.pipeline.artifacts import (
     MovementTemporalSummary,
     SessionQualityReport,
 )
-from auralink.protocol.aggregator import aggregate_protocol
-from auralink.report.schemas import MovementSection, Report, ReportMetadata
+from bioliminal.protocol.aggregator import aggregate_protocol
+from bioliminal.report.schemas import MovementSection, Report, ReportMetadata
 
 
 def _movement_section(movement: str, summary: MovementTemporalSummary | None) -> MovementSection:

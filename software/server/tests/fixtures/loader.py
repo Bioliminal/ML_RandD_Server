@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from auralink.api.schemas import Session
+from bioliminal.api.schemas import Session
 
 MovementType = Literal["overhead_squat", "single_leg_squat", "push_up", "rollup"]
 

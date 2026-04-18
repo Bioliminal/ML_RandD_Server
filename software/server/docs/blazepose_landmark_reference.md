@@ -71,7 +71,7 @@ Reference: https://github.com/google-ai-edge/mediapipe/blob/master/docs/solution
 
 ## Server-Side Contract
 
-The server consumes JSON sessions matching the pydantic schema in `auralink.api.schemas.Session`:
+The server consumes JSON sessions matching the pydantic schema in `bioliminal.api.schemas.Session`:
 
 ```json
 {

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from auralink.api.schemas import Session
+from bioliminal.api.schemas import Session
 
 FIXTURE_DIR = Path(__file__).parent / "synthetic"
 

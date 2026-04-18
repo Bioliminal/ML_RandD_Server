@@ -1,8 +1,8 @@
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.ml.lifter import IdentityLifter, LiftedAngleTimeSeries
-from auralink.pipeline.artifacts import NormalizedAngleTimeSeries
-from auralink.pipeline.stages.base import STAGE_NAME_LIFT, StageContext
-from auralink.pipeline.stages.lift import run_lift
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.ml.lifter import IdentityLifter, LiftedAngleTimeSeries
+from bioliminal.pipeline.artifacts import NormalizedAngleTimeSeries
+from bioliminal.pipeline.stages.base import STAGE_NAME_LIFT, StageContext
+from bioliminal.pipeline.stages.lift import run_lift
 
 
 def _ctx_with_normalized(

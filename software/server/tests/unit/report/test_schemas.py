@@ -1,5 +1,5 @@
-from auralink.pipeline.artifacts import SessionQualityReport
-from auralink.report.schemas import (
+from bioliminal.pipeline.artifacts import SessionQualityReport
+from bioliminal.report.schemas import (
     CrossMovementSection,
     MovementSection,
     Report,

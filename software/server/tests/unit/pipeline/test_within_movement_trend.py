@@ -1,7 +1,7 @@
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import PerRepMetrics, RepMetric
-from auralink.pipeline.stages.base import StageContext
-from auralink.pipeline.stages.within_movement_trend import run_within_movement_trend
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import PerRepMetrics, RepMetric
+from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.within_movement_trend import run_within_movement_trend
 
 
 def _ctx_with_reps(reps: list[RepMetric]) -> StageContext:

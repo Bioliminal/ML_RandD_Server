@@ -1,4 +1,4 @@
-from auralink.ml.loader import ModelLoader, NoOpLoader
+from bioliminal.ml.loader import ModelLoader, NoOpLoader
 
 
 def test_noop_loader_reports_loaded_without_side_effects():

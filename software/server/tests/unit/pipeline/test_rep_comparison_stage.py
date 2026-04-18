@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import (
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import (
     MovementTemporalSummary,
     NormalizedAngleTimeSeries,
     PerRepMetrics,
@@ -12,8 +12,8 @@ from auralink.pipeline.artifacts import (
     RepBoundaryModel,
     RepMetric,
 )
-from auralink.pipeline.stages.base import StageContext
-from auralink.pipeline.stages.rep_comparison import run_rep_comparison
+from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.rep_comparison import run_rep_comparison
 
 
 def _make_session(movement: str) -> Session:
@@ -107,8 +107,8 @@ rom_deviation_flag_pct: 25.0
 form_drift_ncc_slope_threshold: -0.02
 form_drift_rom_mean_deviation_pct: 15.0
 """)
-    import auralink.temporal.reference_reps as ref_mod
-    import auralink.temporal.threshold_loader as thr_mod
+    import bioliminal.temporal.reference_reps as ref_mod
+    import bioliminal.temporal.threshold_loader as thr_mod
 
     monkeypatch.setattr(ref_mod, "_DEFAULT_CONFIG_DIR", ref_dir)
     monkeypatch.setattr(thr_mod, "_DEFAULT_PATH", thr_path)

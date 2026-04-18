@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
 
 
 def test_landmark_valid():

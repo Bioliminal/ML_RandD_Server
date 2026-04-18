@@ -1,4 +1,4 @@
-from auralink.pipeline.artifacts import MovementTemporalSummary, RepComparison
+from bioliminal.pipeline.artifacts import MovementTemporalSummary, RepComparison
 
 
 def test_rep_comparison_serializes_all_fields():

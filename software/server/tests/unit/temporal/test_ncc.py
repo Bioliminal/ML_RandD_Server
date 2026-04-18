@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from auralink.temporal.ncc import ncc
+from bioliminal.temporal.ncc import ncc
 
 
 def test_identical_signals_score_one():

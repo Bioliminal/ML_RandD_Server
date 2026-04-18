@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from auralink.temporal.reference_reps import ReferenceRep, load_reference_rep
+from bioliminal.temporal.reference_reps import ReferenceRep, load_reference_rep
 
 
 def _write_ref(tmp_path: Path, movement: str, payload: dict) -> Path:

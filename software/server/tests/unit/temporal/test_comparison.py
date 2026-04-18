@@ -2,8 +2,8 @@ import math
 
 import pytest
 
-from auralink.temporal.comparison import compare_rep
-from auralink.temporal.threshold_loader import TemporalThresholds
+from bioliminal.temporal.comparison import compare_rep
+from bioliminal.temporal.threshold_loader import TemporalThresholds
 
 
 @pytest.fixture

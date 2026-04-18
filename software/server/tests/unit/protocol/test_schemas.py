@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from auralink.protocol.schemas import CrossMovementMetric, ProtocolReport, ProtocolRequest
+from bioliminal.protocol.schemas import CrossMovementMetric, ProtocolReport, ProtocolRequest
 
 
 def test_protocol_request_min_and_max_length():

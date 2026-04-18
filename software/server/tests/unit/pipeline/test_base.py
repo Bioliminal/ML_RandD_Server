@@ -1,5 +1,5 @@
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.stages.base import Stage, StageContext
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.stages.base import Stage, StageContext
 
 
 def _minimal_session() -> Session:

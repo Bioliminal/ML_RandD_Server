@@ -7,7 +7,7 @@ Python server for BioLiminal's movement screening ML pipeline. Accepts pose keyp
 ```bash
 cd software/server
 uv sync
-uv run uvicorn auralink.api.main:app --reload
+uv run uvicorn bioliminal.api.main:app --reload
 ```
 
 Server runs at `http://localhost:8000`. API docs at `http://localhost:8000/docs`.
@@ -20,7 +20,7 @@ uv run pytest
 
 ## Project Layout
 
-Pipeline stages live under `src/auralink/` organized by domain:
+Pipeline stages live under `src/bioliminal/` organized by domain:
 `api/` (FastAPI app + routes + request schemas), `pipeline/` (stage
 orchestrator + artifacts), `pose/`, `analysis/`, `reasoning/`, `ml/`
 (lifter / skeleton / phase-segmenter protocols), `temporal/`, `protocol/`,

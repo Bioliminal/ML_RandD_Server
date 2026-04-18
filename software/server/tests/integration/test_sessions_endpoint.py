@@ -2,12 +2,12 @@ import copy
 
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_post_session_returns_id(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
     payload = build_overhead_squat_payload(rep_count=2, frames_per_rep=30)
@@ -19,7 +19,7 @@ def test_post_session_returns_id(tmp_path, monkeypatch):
 
 
 def test_post_session_rejects_bad_landmark_count(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
     payload = copy.deepcopy(build_overhead_squat_payload(rep_count=2, frames_per_rep=30))
@@ -29,7 +29,7 @@ def test_post_session_rejects_bad_landmark_count(tmp_path, monkeypatch):
 
 
 def test_get_session_round_trip(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     app = create_app()
     client = TestClient(app)
     payload = build_overhead_squat_payload(rep_count=2, frames_per_rep=30)

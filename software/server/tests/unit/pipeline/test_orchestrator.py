@@ -1,11 +1,11 @@
 import pytest
 
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.artifacts import PipelineArtifacts
-from auralink.pipeline.errors import PipelineError, QualityGateError, StageError
-from auralink.pipeline.orchestrator import DEFAULT_REGISTRY, run_pipeline
-from auralink.pipeline.registry import StageRegistry
-from auralink.pipeline.stages.base import Stage
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.artifacts import PipelineArtifacts
+from bioliminal.pipeline.errors import PipelineError, QualityGateError, StageError
+from bioliminal.pipeline.orchestrator import DEFAULT_REGISTRY, run_pipeline
+from bioliminal.pipeline.registry import StageRegistry
+from bioliminal.pipeline.stages.base import Stage
 
 
 def _lm(vis: float = 1.0, pres: float = 1.0) -> Landmark:
@@ -64,7 +64,7 @@ def test_run_pipeline_wraps_unexpected_stage_failure_as_stage_error():
 
 
 def _pass():
-    from auralink.pipeline.artifacts import SessionQualityReport
+    from bioliminal.pipeline.artifacts import SessionQualityReport
 
     return SessionQualityReport(passed=True, issues=[], metrics={})
 

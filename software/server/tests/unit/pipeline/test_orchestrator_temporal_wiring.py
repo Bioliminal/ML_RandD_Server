@@ -1,9 +1,9 @@
-from auralink.pipeline.orchestrator import (
+from bioliminal.pipeline.orchestrator import (
     _default_stage_list,
     _push_up_stage_list,
     _rollup_stage_list,
 )
-from auralink.pipeline.stages.base import (
+from bioliminal.pipeline.stages.base import (
     STAGE_NAME_CHAIN_REASONING,
     STAGE_NAME_PER_REP_METRICS,
     STAGE_NAME_REP_COMPARISON,

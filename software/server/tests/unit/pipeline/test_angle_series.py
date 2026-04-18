@@ -1,6 +1,6 @@
-from auralink.api.schemas import Frame, Landmark, Session, SessionMetadata
-from auralink.pipeline.stages.angle_series import TRACKED_ANGLE_NAMES, run_angle_series
-from auralink.pipeline.stages.base import StageContext
+from bioliminal.api.schemas import Frame, Landmark, Session, SessionMetadata
+from bioliminal.pipeline.stages.angle_series import TRACKED_ANGLE_NAMES, run_angle_series
+from bioliminal.pipeline.stages.base import StageContext
 
 
 def _frame(timestamp_ms: int) -> Frame:

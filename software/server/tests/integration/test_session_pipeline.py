@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
 
-from auralink.api.main import create_app
+from bioliminal.api.main import create_app
 from tests.fixtures.synthetic.generator import build_overhead_squat_payload
 
 
 def test_post_sessions_runs_pipeline_and_persists_artifacts(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     payload = build_overhead_squat_payload(rep_count=2, frames_per_rep=30)
     response = client.post("/sessions?sync=true", json=payload)
@@ -19,7 +19,7 @@ def test_post_sessions_runs_pipeline_and_persists_artifacts(tmp_path, monkeypatc
 
 
 def test_sync_flag_is_accepted_as_noop(tmp_path, monkeypatch):
-    monkeypatch.setenv("AURALINK_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("BIOLIMINAL_DATA_DIR", str(tmp_path))
     client = TestClient(create_app())
     payload = build_overhead_squat_payload()
     r1 = client.post("/sessions?sync=true", json=payload)

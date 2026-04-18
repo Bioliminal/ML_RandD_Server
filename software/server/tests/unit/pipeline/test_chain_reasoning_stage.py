@@ -1,10 +1,10 @@
 from datetime import UTC, datetime
 
-from auralink.api.schemas import Session, SessionMetadata
-from auralink.pipeline.stages.base import STAGE_NAME_PER_REP_METRICS, StageContext
-from auralink.pipeline.stages.chain_reasoning import run_chain_reasoning
-from auralink.reasoning.chains import ChainName
-from auralink.reasoning.observations import ChainObservation, ObservationSeverity
+from bioliminal.api.schemas import Session, SessionMetadata
+from bioliminal.pipeline.stages.base import STAGE_NAME_PER_REP_METRICS, StageContext
+from bioliminal.pipeline.stages.chain_reasoning import run_chain_reasoning
+from bioliminal.reasoning.chains import ChainName
+from bioliminal.reasoning.observations import ChainObservation, ObservationSeverity
 
 
 class _FakeReasoner:

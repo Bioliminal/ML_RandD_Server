@@ -1,7 +1,7 @@
 import pytest
 
-from auralink.ml.loader import NoOpLoader
-from auralink.models.registry import REGISTRY, ModelRegistry
+from bioliminal.ml.loader import NoOpLoader
+from bioliminal.models.registry import REGISTRY, ModelRegistry
 
 
 def test_register_and_get_loader():
