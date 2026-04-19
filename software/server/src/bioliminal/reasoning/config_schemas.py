@@ -5,6 +5,32 @@ from pydantic import BaseModel, Field
 from bioliminal.reasoning.chains import ChainName
 
 
+EvidenceLevel = Literal[
+    "rct",
+    "prospective_cohort",
+    "cross_sectional",
+    "case_series",
+    "expert_consensus",
+    "mechanism_only",
+]
+
+
+class EvidenceBlock(BaseModel):
+    """Per-rule evidence required by the MSI cherry-pick stance (ML#1, 2026-04-19).
+
+    Every `RuleConfig` must declare what literature supports its kinematic claim.
+    Rules with weak or absent supporting evidence are still allowed (level
+    `expert_consensus` or `mechanism_only`) but must be honest about it; the
+    report-narrative layer can use `level` to gate language strength.
+    """
+
+    level: EvidenceLevel
+    citation: str = Field(min_length=1)
+    mechanism: str = Field(min_length=1)
+    correlation: str | None = None
+    notes: str | None = None
+
+
 class ThresholdSetConfig(BaseModel):
     knee_valgus_concern: float
     knee_valgus_flag: float
@@ -41,3 +67,4 @@ class RuleConfig(BaseModel):
     involved_joints: list[str] = Field(default_factory=list)
     narrative_template: str
     confidence: float = Field(ge=0.0, le=1.0, default=0.8)
+    evidence: EvidenceBlock

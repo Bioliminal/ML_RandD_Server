@@ -9,3 +9,8 @@ rules:
     involved_joints: [contralateral_shoulder, hip, opposite_knee]
     narrative_template: "Your front-line movement pattern shows {value:.1f} degrees of trunk movement — exploring the pec-to-adductor connection may be helpful."
     confidence: 0.65
+    evidence:
+      level: expert_consensus
+      citation: "Myers TW. Anatomy Trains: Myofascial Meridians for Manual and Movement Therapists. 4th ed. Edinburgh: Elsevier; 2020."
+      mechanism: "Trunk shift during weight-bearing overhead movements is consistent with myofascial coupling along the front functional line (contralateral pec → abdominal → adductor), per the Anatomy Trains framework."
+      notes: "Expert-consensus / theoretical-framework level only. Anatomy Trains is widely used in movement-therapy practice but the front functional line specifically lacks prospective clinical-outcome validation. Narrative kept exploratory ('may be helpful'); no diagnostic claim. Confidence intentionally low (0.65). Per ML#1 cherry-pick stance, retained as exploratory pattern observation; would be a candidate for removal if a stricter evidence floor is adopted post-launch."

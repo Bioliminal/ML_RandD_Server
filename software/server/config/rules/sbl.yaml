@@ -9,6 +9,12 @@ rules:
     involved_joints: [ankle, knee, hip]
     narrative_template: "Your knee tracking shows {value:.1f} degrees of inward movement — an opportunity to explore the ankle-to-hip body connection along the back line."
     confidence: 0.75
+    evidence:
+      level: prospective_cohort
+      citation: "Hewett TE, Myer GD, Ford KR, et al. Biomechanical measures of neuromuscular control and valgus loading of the knee predict anterior cruciate ligament injury risk in female athletes: a prospective study. Am J Sports Med. 2005;33(4):492-501."
+      mechanism: "Dynamic knee valgus during weight-bearing flexion correlates with elevated knee abduction moment, prospectively predictive of ACL injury risk in female athletes."
+      correlation: "Knee abduction moment ≥25.3 Nm predicted ACL injury, sensitivity 78%, specificity 73%."
+      notes: "Wellness positioning: report the kinematic pattern; do not surface ACL injury risk language to the user. Cherry-picked per ML#1 — the kinematic finding is defensible; downstream clinical claims are not."
   - rule_id: sbl_trunk_lean_concern
     chain: superficial_back_line
     applies_to_movements: [overhead_squat]
@@ -19,3 +25,8 @@ rules:
     involved_joints: [ankle, hip, spine]
     narrative_template: "Your trunk lean measured {value:.1f} degrees during the squat — the back-line chain from calves to spine may be an area to explore."
     confidence: 0.7
+    evidence:
+      level: expert_consensus
+      citation: "Cook G, Burton L, Hoogenboom B. Pre-participation screening: the use of fundamental movements as an assessment of function — Part 1. N Am J Sports Phys Ther. 2006;1(2):62-72."
+      mechanism: "Forward trunk lean during overhead squat indicates restricted ankle dorsiflexion or thoracic extension, both common compensations described in the Functional Movement Screen literature."
+      notes: "Expert-consensus level only — the FMS overhead-squat scoring system is widely used clinically but lacks RCT validation linking trunk-lean magnitude to specific outcomes. Narrative kept descriptive; no diagnostic claim. Per ML#1 MSI cherry-pick stance, retained as a kinematic observation, not a clinical diagnosis."

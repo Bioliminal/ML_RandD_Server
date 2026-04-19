@@ -9,3 +9,9 @@ rules:
     involved_joints: [hip, contralateral_shoulder]
     narrative_template: "Your lateral trunk shift of {value:.1f} degrees suggests an opportunity to explore the lat-to-glute body connection."
     confidence: 0.7
+    evidence:
+      level: cross_sectional
+      citation: "Harris-Hayes M, Mueller MJ, Sahrmann SA, et al. Persons with chronic hip joint pain exhibit reduced hip muscle strength. J Orthop Sports Phys Ther. 2014;44(11):890-898."
+      mechanism: "Lateral trunk shift during single-leg squat reflects reduced ipsilateral hip abductor recruitment, which loads the back functional line via gluteus maximus and contralateral latissimus connections during single-leg stance."
+      correlation: "Hip adduction angle during single-leg squat correlates with patient-reported function in chronic hip pain populations (Harris-Hayes 2014: HHS r = -0.67, p < 0.01)."
+      notes: "Cross-sectional evidence — kinematic pattern correlates with function in symptomatic populations. Narrative kept descriptive (back-line connection as exploration prompt); no diagnostic claim. This is the rule type the ML#1 cherry-pick stance explicitly endorses (defensible kinematic-to-outcome link)."

@@ -19,6 +19,10 @@ def _write_rule_file(path: Path, rule_id: str, chain: str) -> None:
         "    involved_joints: [knee]\n"
         '    narrative_template: "value {value:.1f}"\n'
         "    confidence: 0.8\n"
+        "    evidence:\n"
+        "      level: prospective_cohort\n"
+        '      citation: "Hewett TE et al. Am J Sports Med. 2005;33(4):492-501."\n'
+        '      mechanism: "Knee valgus correlates with elevated abduction moment."\n'
     )
 
 
@@ -48,9 +52,32 @@ def test_rejects_malformed_rule(tmp_path: Path):
         "    threshold_concern_ref: x\n"
         "    threshold_flag_ref: y\n"
         '    narrative_template: "n"\n'
+        "    evidence:\n"
+        "      level: rct\n"
+        '      citation: "x"\n'
+        '      mechanism: "y"\n'
     )
     with pytest.raises(ValidationError):
         load_rules(tmp_path)
+
+
+def test_rejects_rule_missing_evidence_block(tmp_path: Path):
+    (tmp_path / "no_evidence.yaml").write_text(
+        "rules:\n"
+        "  - rule_id: no_evidence\n"
+        "    chain: superficial_back_line\n"
+        "    applies_to_movements: [overhead_squat]\n"
+        "    metric_key: mean_knee_valgus_deg\n"
+        "    aggregation: max\n"
+        "    threshold_concern_ref: knee_valgus_concern\n"
+        "    threshold_flag_ref: knee_valgus_flag\n"
+        "    involved_joints: [knee]\n"
+        '    narrative_template: "value {value:.1f}"\n'
+        "    confidence: 0.8\n"
+    )
+    with pytest.raises(ValidationError) as exc_info:
+        load_rules(tmp_path)
+    assert "evidence" in str(exc_info.value).lower()
 
 
 def test_rejects_duplicate_rule_id_across_files(tmp_path: Path):
