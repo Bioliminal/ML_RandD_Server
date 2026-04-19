@@ -60,6 +60,17 @@ DEFAULT_FIXTURE = (
     / "synthetic"
     / "overhead_squat_clean.json"
 )
+# Used by the reasoner-fires step — known to deterministically trigger the
+# SBL knee_valgus rule. Skipped when --no-valgus or when the fixture is gone.
+DEFAULT_VALGUS_FIXTURE = (
+    REPO_ROOT
+    / "software"
+    / "server"
+    / "tests"
+    / "fixtures"
+    / "synthetic"
+    / "overhead_squat_valgus.json"
+)
 DEFAULT_LOG_DIR = REPO_ROOT / "tools" / "smoke-logs"
 
 # Endpoints + schemas the deployed server MUST expose. Anything missing here
@@ -354,7 +365,11 @@ class Smoke:
         meta_session_id = meta.get("session_id")
         meta_movement = meta.get("movement")
         narrative = payload.get("overall_narrative")
-        chain_obs = payload.get("chain_observations") or []
+        # chain_observations live inside movement_section, not at the top
+        # level — earlier smoke runs reported 0 because they read the wrong
+        # path. Top-level chain_observations does not exist on Report.
+        movement_section = payload.get("movement_section") or {}
+        chain_obs = movement_section.get("chain_observations") or []
         problems: list[str] = []
         if meta_session_id != session_id:
             problems.append(f"metadata.session_id={meta_session_id} != {session_id}")
@@ -375,6 +390,89 @@ class Smoke:
         if self.verbose:
             print(f"      narrative: {narrative!r}")
         return narrative
+
+    def step_reasoner_fires(self, slot: int, fixture_path: Path) -> bool:
+        """Post a known-bad fixture and assert ≥1 chain_observation comes back.
+
+        Without this, a regressed reasoner that always returns no observations
+        would still pass the rest of the smoke (clean fixture is silent by
+        design). We pick the valgus fixture because it deterministically
+        triggers the SBL knee_valgus rule on a healthy build.
+        """
+        if not fixture_path.is_file():
+            self._record(
+                "reasoner-fires",
+                False,
+                0,
+                f"valgus fixture missing: {fixture_path}",
+            )
+            return False
+        body = fixture_path.read_bytes()
+        status, headers, resp_body, latency = self._request("POST", "/sessions", body=body)
+        self._persist(
+            slot,
+            "post-session-valgus",
+            "POST",
+            "/sessions",
+            status,
+            headers,
+            resp_body,
+            latency,
+            request_body=body,
+        )
+        if status not in (200, 201):
+            self._record(
+                "reasoner-fires", False, latency, f"POST status={status} body={resp_body[:200]!r}"
+            )
+            return False
+        try:
+            session_id = json.loads(resp_body)["session_id"]
+        except (json.JSONDecodeError, KeyError) as exc:
+            self._record("reasoner-fires", False, latency, f"bad POST body: {exc}")
+            return False
+        path = f"/sessions/{urllib.parse.quote(session_id)}/report"
+        status2, headers2, resp_body2, latency2 = self._request("GET", path)
+        self._persist(
+            slot + 1,
+            "get-report-valgus",
+            "GET",
+            path,
+            status2,
+            headers2,
+            resp_body2,
+            latency2,
+        )
+        if status2 != 200:
+            self._record(
+                "reasoner-fires", False, latency2, f"GET status={status2} body={resp_body2[:200]!r}"
+            )
+            return False
+        try:
+            report = json.loads(resp_body2)
+        except json.JSONDecodeError as exc:
+            self._record("reasoner-fires", False, latency2, f"non-JSON report: {exc}")
+            return False
+        chain_obs = (report.get("movement_section") or {}).get("chain_observations") or []
+        if not chain_obs:
+            self._record(
+                "reasoner-fires",
+                False,
+                latency + latency2,
+                "valgus fixture returned 0 chain_observations — reasoner regressed or rules broke",
+            )
+            return False
+        chains = sorted({o.get("chain") for o in chain_obs})
+        severities = sorted({o.get("severity") for o in chain_obs})
+        self._record(
+            "reasoner-fires",
+            True,
+            latency + latency2,
+            f"{len(chain_obs)} observation(s); chains={chains} severities={severities}",
+        )
+        if self.verbose:
+            for o in chain_obs[:3]:
+                print(f"      {o.get('chain')}/{o.get('severity')}: {o.get('narrative','')[:80]!r}")
+        return True
 
     def step_determinism(self) -> bool:
         if self.report_1_narrative is None or self.report_2_narrative is None:
@@ -398,7 +496,7 @@ class Smoke:
 
     # -- Driver ----------------------------------------------------------
 
-    def run(self, skip_determinism: bool) -> int:
+    def run(self, skip_determinism: bool, valgus_fixture: Path | None) -> int:
         print(f"== smoke run → {self.base_url}")
         print(f"   logs → {self.run_dir}")
         if not self.step_preflight():
@@ -414,7 +512,7 @@ class Smoke:
         if self.report_1_narrative is None:
             return self._finish()
         if skip_determinism:
-            print("   (skipping determinism re-post per --quick)")
+            print("   (skipping determinism re-post + reasoner-fires per --quick)")
             return self._finish()
         self.session_id_2 = self.step_post_session(5)
         if not self.session_id_2:
@@ -423,6 +521,8 @@ class Smoke:
         if self.report_2_narrative is None:
             return self._finish()
         self.step_determinism()
+        if valgus_fixture is not None:
+            self.step_reasoner_fires(7, valgus_fixture)
         return self._finish()
 
     def _finish(self) -> int:
@@ -447,7 +547,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--fixture", type=Path, default=DEFAULT_FIXTURE)
     p.add_argument("--log-dir", type=Path, default=DEFAULT_LOG_DIR)
     p.add_argument("--timeout", type=float, default=30.0)
-    p.add_argument("--quick", action="store_true", help="skip determinism re-post")
+    p.add_argument("--quick", action="store_true", help="skip determinism re-post + reasoner-fires step")
+    p.add_argument("--valgus-fixture", type=Path, default=DEFAULT_VALGUS_FIXTURE)
+    p.add_argument("--no-valgus", action="store_true", help="skip the reasoner-fires step")
     p.add_argument("-v", "--verbose", action="store_true", help="echo report narratives")
     p.add_argument(
         "--user-agent",
@@ -466,7 +568,8 @@ def main(argv: list[str] | None = None) -> int:
         verbose=args.verbose,
         user_agent=args.user_agent,
     )
-    return smoke.run(skip_determinism=args.quick)
+    valgus = None if args.no_valgus else args.valgus_fixture
+    return smoke.run(skip_determinism=args.quick, valgus_fixture=valgus)
 
 
 if __name__ == "__main__":

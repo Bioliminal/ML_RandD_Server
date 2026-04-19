@@ -15,6 +15,7 @@ Runs a deterministic round-trip against the deployed analysis server:
 5. **get-report-4** — `GET /sessions/{id}/report`, assert `metadata.session_id`, `metadata.movement` (matches fixture), and a non-empty `overall_narrative`.
 6. **post-session-5 + get-report-6** — re-post the same fixture. Reports must produce the same `overall_narrative` (deterministic reasoner).
 7. **determinism** — narratives identical across the two posts.
+8. **reasoner-fires** — POST `overhead_squat_valgus.json` (known-bad) and assert ≥1 chain_observation comes back. Without this, a regression that always returns no observations would still pass the rest of the smoke (the clean fixture is silent by design). Skipped via `--no-valgus` or `--quick`. Reads `chain_observations` from `report.movement_section.chain_observations` — the top-level field does not exist on `Report` and earlier smoke versions reported 0 incorrectly.
 
 Every request and response (bodies, headers, status, latency) is written to
 `tools/smoke-logs/<UTC-ISO>-<host>/`. The full `openapi.json` is persisted so
