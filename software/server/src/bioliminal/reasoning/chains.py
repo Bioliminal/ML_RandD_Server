@@ -13,6 +13,7 @@ class ChainName(StrEnum):
     SBL = "superficial_back_line"
     BFL = "back_functional_line"
     FFL = "front_functional_line"
+    UPPER_LIMB_LOCAL = "upper_limb_local"
 
 
 @dataclass(frozen=True)

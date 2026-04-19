@@ -38,6 +38,17 @@ class ThresholdSetConfig(BaseModel):
     hip_drop_flag: float
     trunk_lean_concern: float
     trunk_lean_flag: float
+    # Bicep curl thresholds — bicep-curl-server-thresholds-2026-04-19.md §D
+    bicep_short_rom_concern: float = 100.0
+    bicep_short_rom_flag: float = 80.0
+    bicep_momentum_bias_concern: float = 2.0
+    bicep_momentum_bias_flag: float = 1.0
+    bicep_velocity_decline_concern: float = 0.15
+    bicep_velocity_decline_flag: float = 0.25
+    bicep_amplitude_cv_concern: float = 15.0
+    bicep_amplitude_cv_flag: float = 25.0
+    bicep_tempo_cv_concern: float = 10.0
+    bicep_tempo_cv_flag: float = 20.0
 
 
 class BodyTypeAdjustment(BaseModel):
@@ -60,8 +71,17 @@ class RuleConfig(BaseModel):
         "mean_trunk_lean_deg",
         "rom_deg",
         "peak_velocity_deg_per_s",
+        # Bicep curl metrics
+        "amplitude_deg",
+        "concentric_s",
+        "velocity_decline_pct",
+        "amplitude_cv_pct",
+        "tempo_cv_pct",
     ]
     aggregation: Literal["max", "min", "mean"]
+    # direction: "ge" fires when aggregated >= threshold (default, upper-bound rules).
+    # "le" fires when aggregated <= threshold (lower-bound rules, e.g. short ROM).
+    direction: Literal["ge", "le"] = "ge"
     threshold_concern_ref: str
     threshold_flag_ref: str
     involved_joints: list[str] = Field(default_factory=list)

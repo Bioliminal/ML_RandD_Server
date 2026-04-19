@@ -72,10 +72,16 @@ class RuleBasedChainReasoner:
             if concern is None or flag is None:
                 continue
             severity: ObservationSeverity | None = None
-            if aggregated >= flag:
-                severity = ObservationSeverity.FLAG
-            elif aggregated >= concern:
-                severity = ObservationSeverity.CONCERN
+            if rule.direction == "le":
+                if aggregated <= flag:
+                    severity = ObservationSeverity.FLAG
+                elif aggregated <= concern:
+                    severity = ObservationSeverity.CONCERN
+            else:
+                if aggregated >= flag:
+                    severity = ObservationSeverity.FLAG
+                elif aggregated >= concern:
+                    severity = ObservationSeverity.CONCERN
             if severity is None:
                 continue
             narrative = rule.narrative_template.format(value=aggregated)

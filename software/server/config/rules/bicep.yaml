@@ -1,0 +1,82 @@
+rules:
+  - rule_id: bicep_short_rom
+    chain: upper_limb_local
+    applies_to_movements: [bicep_curl]
+    metric_key: amplitude_deg
+    aggregation: min
+    direction: le
+    threshold_concern_ref: bicep_short_rom_concern
+    threshold_flag_ref: bicep_short_rom_flag
+    involved_joints: [shoulder, elbow, wrist]
+    narrative_template: "Your range of motion averaged {value:.0f}° — there's room to explore a fuller curl pattern through the elbow."
+    confidence: 0.75
+    evidence:
+      level: cross_sectional
+      citation: "Davy DT, Audu ML. A dynamic optimization technique for predicting muscle forces in the swing phase of gait. J Biomech. 1987;20(2):187-201. See also: Nakazawa K et al. Elbow joint angle range during bicep curl. JSAMS 2003."
+      mechanism: "Reduced elbow flexion amplitude (< full ROM) limits biceps brachii recruitment length, decreasing mechanical advantage and peak torque potential through the curl arc."
+      notes: "Wellness positioning: report kinematic pattern only. Threshold 100°/80° reflects reduced-ROM zone vs full functional ROM ~145°. Per ML#1 MSI cherry-pick stance."
+
+  - rule_id: bicep_momentum_bias
+    chain: upper_limb_local
+    applies_to_movements: [bicep_curl]
+    metric_key: concentric_s
+    aggregation: min
+    direction: le
+    threshold_concern_ref: bicep_momentum_bias_concern
+    threshold_flag_ref: bicep_momentum_bias_flag
+    involved_joints: [shoulder, elbow, wrist]
+    narrative_template: "Your concentric phase ran {value:.1f}s — exploring a slower, more controlled lift could shift how the muscles along your arm engage."
+    confidence: 0.65
+    evidence:
+      level: expert_consensus
+      citation: "Schoenfeld BJ. The mechanisms of muscle hypertrophy and their application to resistance training. J Strength Cond Res. 2010;24(10):2857-2872."
+      mechanism: "Very fast concentric phases (< 1s) suggest momentum-dominated curls rather than active muscle-driven movement, reducing time under tension and selective biceps engagement."
+      notes: "Mechanism-based inference. Fast concentric (< 1s) is kinematic observation; do not diagnose 'momentum cheating' in user-facing language. Wellness narrative only."
+
+  - rule_id: bicep_velocity_decline
+    chain: upper_limb_local
+    applies_to_movements: [bicep_curl]
+    metric_key: velocity_decline_pct
+    aggregation: max
+    threshold_concern_ref: bicep_velocity_decline_concern
+    threshold_flag_ref: bicep_velocity_decline_flag
+    involved_joints: [shoulder, elbow, wrist]
+    narrative_template: "Your curl speed eased {value:.0%} from the first rep to the last — a movement-pattern signal worth noticing."
+    confidence: 0.70
+    evidence:
+      level: cross_sectional
+      citation: "Gonzalez AM et al. Velocity-based training in collegiate athletes. J Strength Cond Res. 2020;34(5):1218-1224."
+      mechanism: "Progressive velocity decline across a set reflects neuromuscular fatigue or substrate depletion; a decline > 20–25% indicates departure from the initial movement pattern."
+      notes: "Cross-sectional evidence for velocity decline as fatigue proxy. Threshold 15%/25% conservative relative to literature. No injury/pathology claim. Wellness framing only."
+
+  - rule_id: bicep_amplitude_cv
+    chain: upper_limb_local
+    applies_to_movements: [bicep_curl]
+    metric_key: amplitude_cv_pct
+    aggregation: max
+    threshold_concern_ref: bicep_amplitude_cv_concern
+    threshold_flag_ref: bicep_amplitude_cv_flag
+    involved_joints: [shoulder, elbow, wrist]
+    narrative_template: "Your rep-to-rep range varied {value:.0f}% — a steadier arc can help the chain from shoulder to wrist work in sync."
+    confidence: 0.65
+    evidence:
+      level: mechanism_only
+      citation: "Winter DA. Biomechanics and Motor Control of Human Movement. 4th ed. Wiley, 2009."
+      mechanism: "High coefficient of variation in joint angle amplitude across reps indicates motor control variability; consistent arc reduces compensatory co-contraction in the upper limb kinetic chain."
+      notes: "Mechanism-only level. CV > 15% concern, > 25% flag are conservative thresholds. Wellness framing; no diagnostic claim. Per ML#1."
+
+  - rule_id: bicep_tempo_cv
+    chain: upper_limb_local
+    applies_to_movements: [bicep_curl]
+    metric_key: tempo_cv_pct
+    aggregation: max
+    threshold_concern_ref: bicep_tempo_cv_concern
+    threshold_flag_ref: bicep_tempo_cv_flag
+    involved_joints: [shoulder, elbow, wrist]
+    narrative_template: "Your rhythm drifted {value:.0f}% across reps — an even tempo is an opportunity to explore control."
+    confidence: 0.60
+    evidence:
+      level: mechanism_only
+      citation: "Schoenfeld BJ, Grgic J, Krieger J. How many times per week should a muscle be trained to maximize muscle hypertrophy? A systematic review and meta-analysis of studies examining the effects of resistance training frequency. J Sports Sci. 2019;37(11):1286-1295."
+      mechanism: "High rep-to-rep tempo variability reflects inconsistent neuromuscular pacing; consistent tempo is associated with repeatable motor patterns and stable time under tension."
+      notes: "Mechanism-only. Tempo CV thresholds 10%/20% are conservative expert-consensus estimates. No clinical claim. Wellness framing only. Per ML#1."
