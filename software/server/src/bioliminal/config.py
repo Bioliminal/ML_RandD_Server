@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     app_name: str = "bioliminal-server"
     data_dir: Path = Field(default=Path("./data"))
 
+    # ML#20 demo-day default retention window. ConsentMetadata.data_retention_days
+    # falls back to this when the client doesn't specify. Pruning enforcement is
+    # post-demo (see ML#20 deferred items); this is the published policy value.
+    default_retention_days: int = Field(default=30, ge=1)
+
     @computed_field
     @property
     def sessions_dir(self) -> Path:
