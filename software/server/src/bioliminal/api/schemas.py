@@ -18,6 +18,10 @@ class Landmark(BaseModel):
     presence: float = Field(ge=0.0, le=1.0)
 
 
+# Alias for cross-repo and test compatibility.
+PoseLandmark = Landmark
+
+
 class Frame(BaseModel):
     """A single captured frame with 33 BlazePose landmarks in canonical order."""
 

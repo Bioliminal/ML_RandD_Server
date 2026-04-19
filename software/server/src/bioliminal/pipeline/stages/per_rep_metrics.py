@@ -7,15 +7,22 @@ from bioliminal.pipeline.artifacts import (
     RepMetric,
 )
 from bioliminal.pipeline.stages.base import StageContext
+from bioliminal.pipeline.stages.per_rep_metrics_bicep import run_bicep_per_rep_metrics
 
 PRIMARY_ANGLE = "left_knee_flexion"
+
+PRIMARY_ANGLE_BY_MOVEMENT = {
+    "overhead_squat": "left_knee_flexion",
+    "single_leg_squat": "left_knee_flexion",
+    "bicep_curl": "left_elbow_flexion",
+}
 
 
 def _slice(series: list[float], start: int, end: int) -> list[float]:
     return series[start : end + 1]
 
 
-def run_per_rep_metrics(ctx: StageContext) -> PerRepMetrics:
+def _run_squat_style(ctx: StageContext) -> PerRepMetrics:
     normalized: NormalizedAngleTimeSeries = ctx.artifacts["normalize"]
     reps: RepBoundaries = ctx.artifacts["rep_segment"]
     frame_rate = ctx.session.metadata.frame_rate
@@ -59,3 +66,9 @@ def run_per_rep_metrics(ctx: StageContext) -> PerRepMetrics:
         )
 
     return PerRepMetrics(primary_angle=PRIMARY_ANGLE, reps=out)
+
+
+def run_per_rep_metrics(ctx: StageContext) -> PerRepMetrics:
+    if ctx.movement_type == "bicep_curl":
+        return run_bicep_per_rep_metrics(ctx)
+    return _run_squat_style(ctx)

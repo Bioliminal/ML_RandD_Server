@@ -4,3 +4,14 @@ hip_drop_concern: 5.0
 hip_drop_flag: 10.0
 trunk_lean_concern: 6.0
 trunk_lean_flag: 10.0
+# Bicep curl thresholds — bicep-curl-server-thresholds-2026-04-19.md §D
+bicep_short_rom_concern: 100.0
+bicep_short_rom_flag: 80.0
+bicep_momentum_bias_concern: 2.0
+bicep_momentum_bias_flag: 1.0
+bicep_velocity_decline_concern: 0.15
+bicep_velocity_decline_flag: 0.25
+bicep_amplitude_cv_concern: 15.0
+bicep_amplitude_cv_flag: 25.0
+bicep_tempo_cv_concern: 10.0
+bicep_tempo_cv_flag: 20.0

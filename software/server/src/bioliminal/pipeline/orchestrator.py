@@ -1,5 +1,6 @@
 from bioliminal.api.schemas import Session
 from bioliminal.pipeline.artifacts import PipelineArtifacts
+from bioliminal.report.assembler import assemble_rep_scores
 from bioliminal.pipeline.errors import PipelineError, QualityGateError, StageError
 from bioliminal.pipeline.registry import StageRegistry
 from bioliminal.pipeline.stages.angle_series import run_angle_series
@@ -72,15 +73,16 @@ def _rollup_stage_list() -> list[Stage]:
 
 
 def _bicep_curl_stage_list() -> list[Stage]:
-    """Bicep curl pipeline: stops at skeleton. Rep-based stages require
-    elbow_flexion angles which are deferred to gitlab ML_RandD_Server#12
-    (bicep curl rule YAML + report narrative)."""
+    """Bicep curl pipeline — full rep-based path now that elbow flexion
+    and bicep per-rep metrics are wired (ML_RandD_Server#12 + #18)."""
     return [
         Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
         Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
         Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
         Stage(name=STAGE_NAME_LIFT, run=run_lift),
         Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
+        Stage(name=STAGE_NAME_REP_SEGMENT, run=run_rep_segment),
+        Stage(name=STAGE_NAME_PER_REP_METRICS, run=run_per_rep_metrics),
         Stage(name=STAGE_NAME_CHAIN_REASONING, run=run_chain_reasoning),
     ]
 
@@ -123,16 +125,31 @@ def run_pipeline(
 
 
 def _assemble_artifacts(ctx: StageContext) -> PipelineArtifacts:
+    per_rep = ctx.artifacts.get(STAGE_NAME_PER_REP_METRICS)
+    normalized = ctx.artifacts.get(STAGE_NAME_NORMALIZE)
+    boundaries = ctx.artifacts.get(STAGE_NAME_REP_SEGMENT)
+    movement = ctx.session.metadata.movement
+    rep_scores = (
+        assemble_rep_scores(
+            per_rep=per_rep,
+            normalized=normalized,
+            boundaries=boundaries,
+            movement_type=movement,
+        )
+        if per_rep is not None and normalized is not None and boundaries is not None
+        else None
+    )
     return PipelineArtifacts(
         quality_report=ctx.artifacts[STAGE_NAME_QUALITY_GATE],
         angle_series=ctx.artifacts.get(STAGE_NAME_ANGLE_SERIES),
-        normalized_angle_series=ctx.artifacts.get(STAGE_NAME_NORMALIZE),
-        rep_boundaries=ctx.artifacts.get(STAGE_NAME_REP_SEGMENT),
-        per_rep_metrics=ctx.artifacts.get(STAGE_NAME_PER_REP_METRICS),
+        normalized_angle_series=normalized,
+        rep_boundaries=boundaries,
+        per_rep_metrics=per_rep,
         within_movement_trend=ctx.artifacts.get(STAGE_NAME_WITHIN_MOVEMENT_TREND),
         lift_result=ctx.artifacts.get(STAGE_NAME_LIFT),
         skeleton_result=ctx.artifacts.get(STAGE_NAME_SKELETON),
         phase_boundaries=ctx.artifacts.get(STAGE_NAME_PHASE_SEGMENT),
         chain_observations=ctx.artifacts.get(STAGE_NAME_CHAIN_REASONING),
         movement_temporal_summary=ctx.artifacts.get(STAGE_NAME_REP_COMPARISON),
+        rep_scores=rep_scores,
     )

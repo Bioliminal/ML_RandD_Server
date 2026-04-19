@@ -2,6 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from bioliminal.api.schemas import RepScore
 from bioliminal.reasoning.observations import ChainObservation
 
 
@@ -47,6 +48,15 @@ class RepMetric(BaseModel):
     rom_deg: float
     mean_trunk_lean_deg: float
     mean_knee_valgus_deg: float
+    # Bicep-only fields. Default None so squat/other movement pipelines are unaffected.
+    concentric_s: float | None = None
+    eccentric_s: float | None = None
+    # Session-scalar CV + decline metrics. Same value repeated on every rep
+    # so the rule engine's per-rep aggregator enum (max/min/mean) can
+    # "aggregate" them correctly via max.
+    velocity_decline_pct: float | None = None
+    amplitude_cv_pct: float | None = None
+    tempo_cv_pct: float | None = None
 
 
 class PerRepMetrics(BaseModel):
@@ -137,3 +147,4 @@ class PipelineArtifacts(BaseModel):
     phase_boundaries: PhaseBoundaries | None = None
     chain_observations: list[ChainObservation] | None = None
     movement_temporal_summary: MovementTemporalSummary | None = None
+    rep_scores: list[RepScore] | None = None

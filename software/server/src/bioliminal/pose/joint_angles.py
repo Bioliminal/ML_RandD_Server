@@ -6,6 +6,7 @@ ignored at this scaffolding stage. 3D-aware versions come after MotionBERT
 integration.
 """
 
+import math
 from typing import Literal
 
 import numpy as np
@@ -126,3 +127,44 @@ def trunk_lean_angle(frame: Frame) -> float:
     cos_angle = float(np.dot(trunk, vertical) / norm)
     cos_angle = max(-1.0, min(1.0, cos_angle))
     return float(np.degrees(np.arccos(cos_angle)))
+
+
+_Side = Literal["left", "right"]
+
+_LANDMARK_IDX_BY_SIDE: dict[str, tuple[int, int, int]] = {
+    # (shoulder, elbow, wrist)
+    "left": (11, 13, 15),
+    "right": (12, 14, 16),
+}
+
+
+def elbow_flexion_angle(frame: Frame, side: _Side) -> float:
+    """Interior angle at the elbow (shoulder-elbow-wrist), 2D x/y only.
+
+    Mirrors the phone formula at
+    `bioliminal-mobile-application/lib/features/bicep_curl/services/pose_math.dart:angleDeg()`.
+    Returns degrees in [0, 180]. ~180° = fully extended, ~30-60° = peak flexion.
+    `z` is deliberately ignored: BlazePose's monocular-lifted z is not metric
+    and adding it degrades accuracy (see
+    `research/synthesis/bicep-curl-server-thresholds-2026-04-19.md` §A1).
+    """
+    if side not in _LANDMARK_IDX_BY_SIDE:
+        raise ValueError(f"unknown side: {side!r}; expected 'left' or 'right'")
+    s_idx, e_idx, w_idx = _LANDMARK_IDX_BY_SIDE[side]
+    s = frame.landmarks[s_idx]
+    e = frame.landmarks[e_idx]
+    w = frame.landmarks[w_idx]
+
+    v1x = s.x - e.x
+    v1y = s.y - e.y
+    v2x = w.x - e.x
+    v2y = w.y - e.y
+
+    mag1 = math.sqrt(v1x * v1x + v1y * v1y)
+    mag2 = math.sqrt(v2x * v2x + v2y * v2y)
+    if mag1 == 0.0 or mag2 == 0.0:
+        return 0.0
+
+    dot = v1x * v2x + v1y * v2y
+    cos = max(-1.0, min(1.0, dot / (mag1 * mag2)))
+    return math.degrees(math.acos(cos))
