@@ -45,14 +45,20 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_URL = "https://bioliminal-demo.aaroncarney.me"
+# The mobile-handover fixtures (`sample_bicep_curl_with_emg.json`, 1 frame;
+# `sample_valid_session.json`, 5 frames) are schema worked-examples and get
+# rejected by the server's quality_gate (1s minimum). Default to the
+# synthetic fixture that's 60 frames (~1.95s) and known to traverse the full
+# pipeline. Override with --fixture when smoking the bicep pipeline once
+# ML#18+ML#12 land.
 DEFAULT_FIXTURE = (
-    REPO_ROOT.parent
-    / "bioliminal-ops"
-    / "operations"
-    / "handover"
-    / "mobile"
+    REPO_ROOT
+    / "software"
+    / "server"
+    / "tests"
     / "fixtures"
-    / "sample_bicep_curl_with_emg.json"
+    / "synthetic"
+    / "overhead_squat_clean.json"
 )
 DEFAULT_LOG_DIR = REPO_ROOT / "tools" / "smoke-logs"
 
@@ -64,11 +70,17 @@ EXPECTED_PATHS: list[tuple[str, str]] = [
     ("/sessions/{session_id}", "get"),
     ("/sessions/{session_id}/report", "get"),
 ]
-EXPECTED_SCHEMAS: list[str] = [
-    "Session",
-    "SessionCreateResponse",
-    "Report",
-    "EvidenceBlock",  # proves ML#1 evidence-block requirement shipped
+# FastAPI splits `Session` into `Session-Input`/`Session-Output` when the
+# validator and serializer schemas diverge, so accept either variant. Schemas
+# only referenced internally (e.g. reasoning.config_schemas.EvidenceBlock,
+# loaded from YAML at startup) never land in openapi.json, so they can't be
+# used as a deploy-currency proof. `ConsentMetadata` is the newest request-
+# path addition and is a decent "recent build" marker.
+EXPECTED_SCHEMA_GROUPS: list[list[str]] = [
+    ["Session", "Session-Input"],
+    ["SessionCreateResponse"],
+    ["Report"],
+    ["ConsentMetadata"],
 ]
 
 
@@ -88,11 +100,13 @@ class Smoke:
         log_dir: Path,
         timeout: float,
         verbose: bool,
+        user_agent: str,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.fixture = fixture
         self.timeout = timeout
         self.verbose = verbose
+        self.user_agent = user_agent
         run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         self.run_dir = log_dir / f"{run_id}-{socket.gethostname()}"
         self.run_dir.mkdir(parents=True, exist_ok=True)
@@ -112,6 +126,9 @@ class Smoke:
         url = f"{self.base_url}{path}"
         req = urllib.request.Request(url, method=method)
         req.add_header("accept", "application/json")
+        # Cloudflare's default WAF returns 1010 to Python-urllib/*; send a
+        # realistic UA so the tunnel behaves the same way a phone would.
+        req.add_header("user-agent", self.user_agent)
         if body is not None:
             req.add_header("content-type", "application/json")
         t0 = time.perf_counter()
@@ -238,7 +255,10 @@ class Smoke:
             f"{method.upper()} {p}" for p, method in EXPECTED_PATHS
             if p not in paths or method not in (paths.get(p, {}) or {})
         ]
-        missing_schemas = [s for s in EXPECTED_SCHEMAS if s not in schemas]
+        missing_schemas = [
+            "|".join(group) for group in EXPECTED_SCHEMA_GROUPS
+            if not any(s in schemas for s in group)
+        ]
         title = (spec.get("info", {}) or {}).get("title")
         if missing_paths or missing_schemas:
             self._record(
@@ -252,7 +272,7 @@ class Smoke:
             "openapi",
             True,
             latency,
-            f"title={title!r} paths={len(paths)} schemas={len(schemas)} (Evidence+Report+Session present)",
+            f"title={title!r} paths={len(paths)} schemas={len(schemas)} (Session/Report/Consent present)",
         )
         return True
 
@@ -418,6 +438,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--timeout", type=float, default=30.0)
     p.add_argument("--quick", action="store_true", help="skip determinism re-post")
     p.add_argument("-v", "--verbose", action="store_true", help="echo report narratives")
+    p.add_argument(
+        "--user-agent",
+        default=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 bioliminal-smoke/1.0"
+        ),
+        help="UA header (default mimics Chrome + bioliminal-smoke tag so the Cloudflare WAF doesn't 1010 us)",
+    )
     args = p.parse_args(argv)
     smoke = Smoke(
         base_url=args.base_url,
@@ -425,6 +453,7 @@ def main(argv: list[str] | None = None) -> int:
         log_dir=args.log_dir,
         timeout=args.timeout,
         verbose=args.verbose,
+        user_agent=args.user_agent,
     )
     return smoke.run(skip_determinism=args.quick)
 

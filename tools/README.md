@@ -10,7 +10,7 @@ Runs a deterministic round-trip against the deployed analysis server:
 
 1. **preflight** — hash the fixture, capture movement / frame-count / consent
 2. **health** — `GET /health` returns `{"status":"ok","app":...}`. Captures `app` (proves the `bioliminal` rename actually shipped — old builds report `auralink`).
-3. **openapi** — `GET /openapi.json` and assert the deployed spec exposes the four routes (`/health`, `POST /sessions`, `GET /sessions/{id}`, `GET /sessions/{id}/report`) and the four schemas (`Session`, `SessionCreateResponse`, `Report`, `EvidenceBlock`). `EvidenceBlock` proves ML#1 evidence-block requirement is in the deployed build.
+3. **openapi** — `GET /openapi.json` and assert the deployed spec exposes the four routes (`/health`, `POST /sessions`, `GET /sessions/{id}`, `GET /sessions/{id}/report`) and the schema groups: `Session` (or FastAPI's `Session-Input` variant when the in/out schemas diverge), `SessionCreateResponse`, `Report`, `ConsentMetadata`. Schemas only used internally (e.g. `EvidenceBlock`, loaded from YAML at startup and never in a request/response) never appear in `openapi.json`, so they can't be used as deploy-currency proofs. `app='bioliminal-server'` from `/health` is the rename proof.
 4. **post-session-3** — `POST /sessions` with the demo fixture, assert 200/201 + `session_id` + `frames_received == len(fixture.frames)`.
 5. **get-report-4** — `GET /sessions/{id}/report`, assert `metadata.session_id`, `metadata.movement` (matches fixture), and a non-empty `overall_narrative`.
 6. **post-session-5 + get-report-6** — re-post the same fixture. Reports must produce the same `overall_narrative` (deterministic reasoner).
@@ -41,7 +41,7 @@ Exit codes: `0` all pass, `1` one or more checks failed, `2` preflight (fixture 
 ### When this fails
 
 - **`health` fails with `app='auralink'`** — deployed build is pre-rename, predates `RnD_Server` commit `a2196de` (2026-04-18). Redeploy the demo server.
-- **`openapi` reports `missing_schemas=['EvidenceBlock']`** — deployed build predates ML#1 (`6906b5e`). Redeploy.
+- **`openapi` reports `missing_schemas`** — a request/response model is gone from the deployed build. Compare the saved `02-openapi-response.json` against the local FastAPI app via `uv run python -c "from bioliminal.api.main import app; import json; print(json.dumps(app.openapi(), indent=2))" | jq '.components.schemas | keys'`.
 - **`openapi` reports `missing_paths`** — route file diverged or a router was dropped. Compare deployed `openapi.json` (saved in the run-dir) against `software/server/src/bioliminal/api/main.py`.
 - **`post-session` returns 422** — fixture schema drifted from server pydantic models. Regenerate via `bioliminal-ops/operations/handover/mobile/tools/export_schemas.py` and re-export the fixture.
 - **`get-report` returns empty `overall_narrative`** — reasoner produced no observations for the fixture. Expected for the placeholder bicep_curl pipeline pre-ML#18; will be a real failure once ML#18+ML#12 land.
