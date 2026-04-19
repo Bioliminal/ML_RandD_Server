@@ -72,15 +72,16 @@ def _rollup_stage_list() -> list[Stage]:
 
 
 def _bicep_curl_stage_list() -> list[Stage]:
-    """Bicep curl pipeline: stops at skeleton. Rep-based stages require
-    elbow_flexion angles which are deferred to gitlab ML_RandD_Server#12
-    (bicep curl rule YAML + report narrative)."""
+    """Bicep curl pipeline — full rep-based path now that elbow flexion
+    and bicep per-rep metrics are wired (ML_RandD_Server#12 + #18)."""
     return [
         Stage(name=STAGE_NAME_QUALITY_GATE, run=run_quality_gate),
         Stage(name=STAGE_NAME_ANGLE_SERIES, run=run_angle_series),
         Stage(name=STAGE_NAME_NORMALIZE, run=run_normalize),
         Stage(name=STAGE_NAME_LIFT, run=run_lift),
         Stage(name=STAGE_NAME_SKELETON, run=run_skeleton),
+        Stage(name=STAGE_NAME_REP_SEGMENT, run=run_rep_segment),
+        Stage(name=STAGE_NAME_PER_REP_METRICS, run=run_per_rep_metrics),
         Stage(name=STAGE_NAME_CHAIN_REASONING, run=run_chain_reasoning),
     ]
 
