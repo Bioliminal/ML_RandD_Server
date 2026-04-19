@@ -2,6 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from bioliminal.api.schemas import RepScore
 from bioliminal.reasoning.observations import ChainObservation
 
 
@@ -146,3 +147,4 @@ class PipelineArtifacts(BaseModel):
     phase_boundaries: PhaseBoundaries | None = None
     chain_observations: list[ChainObservation] | None = None
     movement_temporal_summary: MovementTemporalSummary | None = None
+    rep_scores: list[RepScore] | None = None
