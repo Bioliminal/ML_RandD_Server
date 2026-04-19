@@ -47,6 +47,15 @@ class RepMetric(BaseModel):
     rom_deg: float
     mean_trunk_lean_deg: float
     mean_knee_valgus_deg: float
+    # Bicep-only fields. Default None so squat/other movement pipelines are unaffected.
+    concentric_s: float | None = None
+    eccentric_s: float | None = None
+    # Session-scalar CV + decline metrics. Same value repeated on every rep
+    # so the rule engine's per-rep aggregator enum (max/min/mean) can
+    # "aggregate" them correctly via max.
+    velocity_decline_pct: float | None = None
+    amplitude_cv_pct: float | None = None
+    tempo_cv_pct: float | None = None
 
 
 class PerRepMetrics(BaseModel):
