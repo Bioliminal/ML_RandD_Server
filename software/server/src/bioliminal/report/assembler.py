@@ -1,10 +1,41 @@
-from bioliminal.pipeline.artifacts import PipelineArtifacts
+from bioliminal.api.schemas import RepScore
+from bioliminal.pipeline.artifacts import (
+    NormalizedAngleTimeSeries,
+    PerRepMetrics,
+    PipelineArtifacts,
+    RepBoundaries,
+)
 from bioliminal.report.schemas import (
     MovementSection,
     Report,
     ReportMetadata,
     TemporalSection,
 )
+
+
+def assemble_rep_scores(
+    *,
+    per_rep: PerRepMetrics,
+    normalized: NormalizedAngleTimeSeries,
+    boundaries: RepBoundaries,
+    movement_type: str,
+) -> list[RepScore]:
+    elbow_series = (
+        normalized.angles.get("left_elbow_flexion", [])
+        if movement_type == "bicep_curl"
+        else []
+    )
+    primary_boundaries = boundaries.by_angle.get(per_rep.primary_angle, [])
+    out: list[RepScore] = []
+    for idx, rm in enumerate(per_rep.reps):
+        elbow_range: tuple[float, float] | None = None
+        if movement_type == "bicep_curl" and idx < len(primary_boundaries) and elbow_series:
+            rep = primary_boundaries[idx]
+            window = elbow_series[rep.start_index : rep.end_index + 1]
+            if window:
+                elbow_range = (float(min(window)), float(max(window)))
+        out.append(RepScore(rep_index=rm.rep_index, elbow_angle_range=elbow_range))
+    return out
 
 
 def _build_overall_narrative(section: MovementSection) -> str:
