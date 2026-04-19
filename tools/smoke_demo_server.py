@@ -234,8 +234,19 @@ class Smoke:
             self._record("health", False, latency, f"status field != ok: {payload!r}")
             return False
         self.app_name = payload.get("app")
+        retention = payload.get("default_retention_days")
         cf_ray = headers.get("cf-ray", "no-cf-ray")
-        self._record("health", True, latency, f"app={self.app_name!r} cf-ray={cf_ray}")
+        # default_retention_days lands on /health in commit 8b7dce6 (ML#20).
+        # Don't fail the gate when it's missing — older builds predate the
+        # field — but surface it so deploy currency is visible.
+        retention_str = (
+            f"retention_days={retention}"
+            if isinstance(retention, int) and retention >= 1
+            else "retention=MISSING(pre-ML#20)"
+        )
+        self._record(
+            "health", True, latency, f"app={self.app_name!r} {retention_str} cf-ray={cf_ray}"
+        )
         return True
 
     def step_openapi(self) -> bool:
