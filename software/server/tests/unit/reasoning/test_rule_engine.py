@@ -4,6 +4,7 @@ from bioliminal.reasoning.chains import ChainName
 from bioliminal.reasoning.config_schemas import (
     BodyTypeAdjustment,
     BodyTypeAdjustmentsConfig,
+    EvidenceBlock,
     RuleConfig,
     ThresholdSetConfig,
 )
@@ -49,6 +50,11 @@ def _valgus_rule() -> RuleConfig:
         involved_joints=["ankle", "knee", "hip"],
         narrative_template="knee valgus {value:.1f}",
         confidence=0.75,
+        evidence=EvidenceBlock(
+            level="prospective_cohort",
+            citation="Hewett TE et al. Am J Sports Med. 2005;33(4):492-501.",
+            mechanism="Knee valgus correlates with elevated abduction moment.",
+        ),
     )
 
 
