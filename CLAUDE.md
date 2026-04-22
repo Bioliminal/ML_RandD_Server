@@ -1,6 +1,6 @@
 # RnD_Server — ML & Analysis Server
 
-**Updated:** 2026-04-18
+**Updated:** 2026-04-21
 **Owner:** AaronCarney
 
 Project-wide context (team, pipeline architecture, constraints, GitLab label taxonomy) lives in the parent `CLAUDE.md` at `projects/bioliminal/CLAUDE.md`. This file covers repo-specific file organization and conventions.
@@ -46,4 +46,16 @@ Status values: `current` (latest buy list), `superseded` (replaced by newer choi
 ## Cross-repo centralization
 
 Strategy, L1/L2 plans, decisions, session progress, and internal comms live in the private `bioliminal-ops` repo. Literature, paper synopses, and synthesis docs live in the private `research` repo. Check those repos before creating strategy or literature artifacts here. Engineering hygiene safe for public view (license audits, algorithm notes, library comparisons) stays in `docs/research/` in this repo per the placement table above.
+
+## Scope changes & interface updates
+
+If an MR in this repo shifts what the system does, moves work between components (firmware ↔ mobile ↔ server), or touches a locked interface contract, follow the convention at `bioliminal-ops/operations/conventions-scope-changes.md`.
+
+Before merging, check whether your change invalidates any of:
+
+- `bioliminal-ops/operations/interface-contracts.md` — IC-1 … IC-4 current state (BLE packet, FF04 opcodes, SessionPayload, IC-4 events).
+- `bioliminal-ops/operations/2026-04-19-demo-stack-diagram.md` — cross-system linkage.
+- `bioliminal-ops/operations/2026-04-19-technical-brief-v1.md` — public-facing Technical Brief.
+
+Update them in the same wave (companion MR in `bioliminal-ops`, linked from your MR description) + append a row to `bioliminal-ops/decisions/decisions.md`. Bug fixes, lint, tuning, dep bumps do not trigger this — see the convention doc for the list.
 
