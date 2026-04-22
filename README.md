@@ -1,6 +1,6 @@
 # BioLiminal Capstone
 
-**Updated:** 2026-04-16
+**Updated:** 2026-04-22
 **Owner:** AaronCarney
 
 AI-powered movement screening + sEMG compression garment for injury prevention. Gauntlet AI capstone project.
