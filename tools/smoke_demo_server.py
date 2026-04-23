@@ -71,6 +71,19 @@ DEFAULT_VALGUS_FIXTURE = (
     / "synthetic"
     / "overhead_squat_valgus.json"
 )
+# Used by the pose-only step — the showcase no-hardware narrative beat. Lives
+# in the sibling `bioliminal-ops` repo so both teams pull from one source. The
+# resolver tolerates either a flat sibling-clone layout or the olorin symlink
+# layout; override with --pose-only-fixture for anything else.
+DEFAULT_POSE_ONLY_FIXTURE = (
+    REPO_ROOT.parent
+    / "bioliminal-ops"
+    / "operations"
+    / "handover"
+    / "mobile"
+    / "fixtures"
+    / "sample_pose_only_bicep.json"
+)
 DEFAULT_LOG_DIR = REPO_ROOT / "tools" / "smoke-logs"
 
 # Endpoints + schemas the deployed server MUST expose. Anything missing here
@@ -474,6 +487,105 @@ class Smoke:
                 print(f"      {o.get('chain')}/{o.get('severity')}: {o.get('narrative','')[:80]!r}")
         return True
 
+    def step_pose_only(self, slot: int, fixture_path: Path) -> bool:
+        """Post the pose-only fixture and assert the Report shape is well-formed.
+
+        Pose-only is the showcase narrative beat (no hardware in the loop).
+        A regression that breaks the optional-EMG path would still pass the
+        rest of the smoke (default fixture is EMG-bearing), so this step is
+        the safety net for the no-hardware Report path.
+        """
+        if not fixture_path.is_file():
+            self._record(
+                "pose-only",
+                False,
+                0,
+                f"pose-only fixture missing: {fixture_path}",
+            )
+            return False
+        body = fixture_path.read_bytes()
+        # Sanity: this fixture really is pose-only (no emg, no consent).
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError as exc:
+            self._record("pose-only", False, 0, f"non-JSON fixture: {exc}")
+            return False
+        if data.get("emg") or data.get("consent"):
+            self._record(
+                "pose-only",
+                False,
+                0,
+                "pose-only fixture has emg/consent — not pose-only",
+            )
+            return False
+        status, headers, resp_body, latency = self._request("POST", "/sessions", body=body)
+        self._persist(
+            slot,
+            "post-session-pose-only",
+            "POST",
+            "/sessions",
+            status,
+            headers,
+            resp_body,
+            latency,
+            request_body=body,
+        )
+        if status not in (200, 201):
+            self._record(
+                "pose-only", False, latency, f"POST status={status} body={resp_body[:200]!r}"
+            )
+            return False
+        try:
+            session_id = json.loads(resp_body)["session_id"]
+        except (json.JSONDecodeError, KeyError) as exc:
+            self._record("pose-only", False, latency, f"bad POST body: {exc}")
+            return False
+        path = f"/sessions/{urllib.parse.quote(session_id)}/report"
+        status2, headers2, resp_body2, latency2 = self._request("GET", path)
+        self._persist(
+            slot + 1,
+            "get-report-pose-only",
+            "GET",
+            path,
+            status2,
+            headers2,
+            resp_body2,
+            latency2,
+        )
+        if status2 != 200:
+            self._record(
+                "pose-only", False, latency2, f"GET status={status2} body={resp_body2[:200]!r}"
+            )
+            return False
+        try:
+            report = json.loads(resp_body2)
+        except json.JSONDecodeError as exc:
+            self._record("pose-only", False, latency2, f"non-JSON report: {exc}")
+            return False
+        movement_section = report.get("movement_section") or {}
+        per_rep = movement_section.get("per_rep_metrics")
+        chain_obs = movement_section.get("chain_observations")
+        problems: list[str] = []
+        # per_rep may be absent if quality_gate rejected the session, but if
+        # present it must have a `reps` list (possibly empty for short clips).
+        if per_rep is not None and "reps" not in per_rep:
+            problems.append(f"per_rep_metrics missing 'reps' key: {list(per_rep.keys())}")
+        # chain_observations may be omitted (= empty), but never the wrong type.
+        if chain_obs is not None and not isinstance(chain_obs, list):
+            problems.append(f"chain_observations non-list: {type(chain_obs).__name__}")
+        if problems:
+            self._record("pose-only", False, latency + latency2, "; ".join(problems))
+            return False
+        n_reps = len(per_rep.get("reps", [])) if per_rep else 0
+        n_obs = len(chain_obs) if chain_obs else 0
+        self._record(
+            "pose-only",
+            True,
+            latency + latency2,
+            f"reps={n_reps} chain_observations={n_obs} (no emg, no consent)",
+        )
+        return True
+
     def step_determinism(self) -> bool:
         if self.report_1_narrative is None or self.report_2_narrative is None:
             self._record("determinism", False, 0, "missing one or both narratives")
@@ -496,7 +608,12 @@ class Smoke:
 
     # -- Driver ----------------------------------------------------------
 
-    def run(self, skip_determinism: bool, valgus_fixture: Path | None) -> int:
+    def run(
+        self,
+        skip_determinism: bool,
+        valgus_fixture: Path | None,
+        pose_only_fixture: Path | None,
+    ) -> int:
         print(f"== smoke run → {self.base_url}")
         print(f"   logs → {self.run_dir}")
         if not self.step_preflight():
@@ -512,7 +629,7 @@ class Smoke:
         if self.report_1_narrative is None:
             return self._finish()
         if skip_determinism:
-            print("   (skipping determinism re-post + reasoner-fires per --quick)")
+            print("   (skipping determinism re-post + reasoner-fires + pose-only per --quick)")
             return self._finish()
         self.session_id_2 = self.step_post_session(5)
         if not self.session_id_2:
@@ -523,6 +640,8 @@ class Smoke:
         self.step_determinism()
         if valgus_fixture is not None:
             self.step_reasoner_fires(7, valgus_fixture)
+        if pose_only_fixture is not None:
+            self.step_pose_only(9, pose_only_fixture)
         return self._finish()
 
     def _finish(self) -> int:
@@ -547,9 +666,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--fixture", type=Path, default=DEFAULT_FIXTURE)
     p.add_argument("--log-dir", type=Path, default=DEFAULT_LOG_DIR)
     p.add_argument("--timeout", type=float, default=30.0)
-    p.add_argument("--quick", action="store_true", help="skip determinism re-post + reasoner-fires step")
+    p.add_argument("--quick", action="store_true", help="skip determinism re-post + reasoner-fires + pose-only steps")
     p.add_argument("--valgus-fixture", type=Path, default=DEFAULT_VALGUS_FIXTURE)
     p.add_argument("--no-valgus", action="store_true", help="skip the reasoner-fires step")
+    p.add_argument("--pose-only-fixture", type=Path, default=DEFAULT_POSE_ONLY_FIXTURE,
+                   help="fixture for the no-hardware showcase path (sibling bioliminal-ops repo by default)")
+    p.add_argument("--no-pose-only", action="store_true", help="skip the pose-only step")
     p.add_argument("-v", "--verbose", action="store_true", help="echo report narratives")
     p.add_argument(
         "--user-agent",
@@ -569,7 +691,12 @@ def main(argv: list[str] | None = None) -> int:
         user_agent=args.user_agent,
     )
     valgus = None if args.no_valgus else args.valgus_fixture
-    return smoke.run(skip_determinism=args.quick, valgus_fixture=valgus)
+    pose_only = None if args.no_pose_only else args.pose_only_fixture
+    return smoke.run(
+        skip_determinism=args.quick,
+        valgus_fixture=valgus,
+        pose_only_fixture=pose_only,
+    )
 
 
 if __name__ == "__main__":
