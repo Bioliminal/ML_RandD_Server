@@ -1,0 +1,348 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="'IBM Plex Sans','Inter',system-ui,sans-serif">
+  <style>
+    .eyebrow { font-family: 'IBM Plex Sans','Inter',system-ui,sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.16em; fill: #0A5CAD; text-transform: uppercase; }
+    .title { font-family: 'Fraunces','IBM Plex Serif','Georgia',serif; font-size: 48px; font-weight: 700; fill: #0A2540; letter-spacing: -0.01em; }
+    .subtitle { font-family: 'Fraunces','IBM Plex Serif','Georgia',serif; font-size: 18px; font-style: italic; fill: #334; }
+    .col-eyebrow { font-family: 'IBM Plex Sans',sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.18em; fill: #0A5CAD; text-transform: uppercase; }
+    .col-title { font-family: 'Fraunces','Georgia',serif; font-size: 30px; font-weight: 700; fill: #0A2540; letter-spacing: -0.005em; }
+    .col-tagline { font-family: 'Fraunces','Georgia',serif; font-size: 16px; font-style: italic; fill: #445570; }
+    .bullet { font-family: 'IBM Plex Sans',sans-serif; font-size: 16px; fill: #1f2d3d; }
+    .bullet-strong { font-family: 'IBM Plex Sans',sans-serif; font-size: 16px; fill: #0A2540; font-weight: 600; }
+    .footer { font-family: 'IBM Plex Sans',sans-serif; font-size: 13px; fill: #445570; }
+    .footer-strong { font-family: 'IBM Plex Sans',sans-serif; font-size: 13px; fill: #0A2540; font-weight: 600; }
+    .silhouette { fill: #EEF2F7; stroke: #C8D2E0; stroke-width: 1.2; }
+    .bp-dot { fill: #E76F51; }
+    .bone-stroke { stroke: #0A2540; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .bone-fill { fill: #F2E8D5; stroke: #0A2540; stroke-width: 1.5; }
+    .sapiens-dot { fill: #0A5CAD; }
+    .sapiens-face-dot { fill: #0A5CAD; }
+    .sapiens-hand-dot { fill: #38BDF8; }
+    .label-big { font-family: 'Fraunces','Georgia',serif; font-size: 42px; font-weight: 700; fill: #0A2540; }
+    .label-small { font-family: 'IBM Plex Sans',sans-serif; font-size: 11px; font-weight: 600; fill: #445570; letter-spacing: 0.1em; text-transform: uppercase; }
+    .arrow { stroke: #0A2540; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+  </style>
+
+  <!-- Background -->
+  <rect width="1600" height="900" fill="#FDFDFC"/>
+
+  <!-- Top brand strip -->
+  <rect x="0" y="0" width="1600" height="6" fill="#0A2540"/>
+
+  <!-- =============== HEADER =============== -->
+  <text class="eyebrow" x="80" y="68">What deeper body models could unlock</text>
+  <text class="title" x="80" y="118">Bones, or density — two paths past BlazePose.</text>
+  <text class="subtitle" x="80" y="152">Both research-licensed today. Commercial-clean path already priced in the viability matrix.</text>
+
+  <!-- Horizontal divider under header -->
+  <line x1="80" y1="182" x2="1520" y2="182" stroke="#D0D7DE" stroke-width="1"/>
+
+  <!-- Vertical divider between columns -->
+  <line x1="800" y1="212" x2="800" y2="770" stroke="#D0D7DE" stroke-width="1"/>
+
+  <!-- =============================================================== -->
+  <!-- COLUMN A — SKEL: "Bones, not skin"                                -->
+  <!-- =============================================================== -->
+  <g transform="translate(80, 220)">
+    <text class="col-eyebrow" x="0" y="18">Option A — SKEL</text>
+    <text class="col-title" x="0" y="58">Bones, not skin.</text>
+
+    <!-- Visual: anterior body silhouette, split vertical. Left = BlazePose dots on skin. Right = anatomical skeleton. -->
+    <g transform="translate(0, 80)">
+      <!-- Body silhouette base -->
+      <!-- Head -->
+      <circle class="silhouette" cx="320" cy="35" r="28"/>
+      <!-- Neck -->
+      <rect class="silhouette" x="310" y="60" width="20" height="14"/>
+      <!-- Torso (broad shoulders → narrower waist) -->
+      <path class="silhouette" d="M 255 74 Q 250 90 260 110 L 260 200 Q 260 225 280 235 L 360 235 Q 380 225 380 200 L 380 110 Q 390 90 385 74 Z"/>
+      <!-- Arms -->
+      <path class="silhouette" d="M 260 85 Q 230 95 215 140 L 205 200 Q 200 225 210 250 L 225 250 Q 232 225 234 200 L 245 145 Q 255 120 265 100 Z"/>
+      <path class="silhouette" d="M 380 85 Q 410 95 425 140 L 435 200 Q 440 225 430 250 L 415 250 Q 408 225 406 200 L 395 145 Q 385 120 375 100 Z"/>
+      <!-- Pelvis / hips -->
+      <path class="silhouette" d="M 275 235 L 365 235 L 375 275 Q 370 290 355 290 L 285 290 Q 270 290 265 275 Z"/>
+      <!-- Legs -->
+      <path class="silhouette" d="M 285 290 L 290 400 Q 292 420 285 440 L 310 440 Q 315 420 315 400 L 320 290 Z"/>
+      <path class="silhouette" d="M 355 290 L 350 400 Q 348 420 355 440 L 330 440 Q 325 420 325 400 L 320 290 Z"/>
+
+      <!-- Dividing line through center (vertical) — visual cue that the two halves are different views -->
+      <line x1="320" y1="5" x2="320" y2="440" stroke="#C8D2E0" stroke-width="1" stroke-dasharray="3 4"/>
+      <text class="label-small" x="160" y="-8" text-anchor="middle">BlazePose (skin)</text>
+      <text class="label-small" x="480" y="-8" text-anchor="middle">SKEL (bones)</text>
+
+      <!-- LEFT HALF: BlazePose keypoints (orange dots) on skin surface -->
+      <!-- Nose -->
+      <circle class="bp-dot" cx="315" cy="30" r="4"/>
+      <!-- Eyes -->
+      <circle class="bp-dot" cx="308" cy="28" r="3"/>
+      <circle class="bp-dot" cx="302" cy="30" r="3"/>
+      <!-- Ear -->
+      <circle class="bp-dot" cx="295" cy="38" r="3"/>
+      <!-- L Shoulder -->
+      <circle class="bp-dot" cx="262" cy="90" r="4"/>
+      <!-- L Elbow -->
+      <circle class="bp-dot" cx="232" cy="160" r="4"/>
+      <!-- L Wrist -->
+      <circle class="bp-dot" cx="215" cy="230" r="4"/>
+      <!-- L Hip -->
+      <circle class="bp-dot" cx="280" cy="255" r="4"/>
+      <!-- L Knee -->
+      <circle class="bp-dot" cx="295" cy="370" r="4"/>
+      <!-- L Ankle -->
+      <circle class="bp-dot" cx="300" cy="435" r="4"/>
+
+      <!-- RIGHT HALF: SKEL anatomical skeleton -->
+      <!-- Skull outline (right half of skull) -->
+      <path class="bone-fill" d="M 320 10 Q 350 10 348 40 Q 345 55 335 62 L 320 62 Z"/>
+      <!-- Cervical spine: 3 small vertebrae markers -->
+      <line class="bone-stroke" x1="325" y1="64" x2="326" y2="80"/>
+      <circle class="bone-fill" cx="325" cy="68" r="2.5"/>
+      <circle class="bone-fill" cx="326" cy="74" r="2.5"/>
+      <circle class="bone-fill" cx="326" cy="80" r="2.5"/>
+      <!-- Clavicle (right side) -->
+      <line class="bone-stroke" x1="326" y1="82" x2="380" y2="88"/>
+      <!-- Ribcage (right half — curved ovals suggesting ribs) -->
+      <path class="bone-stroke" d="M 325 90 Q 370 95 382 110"/>
+      <path class="bone-stroke" d="M 325 102 Q 370 106 385 125"/>
+      <path class="bone-stroke" d="M 325 115 Q 370 118 386 140"/>
+      <path class="bone-stroke" d="M 325 128 Q 368 130 385 155"/>
+      <path class="bone-stroke" d="M 325 142 Q 365 143 380 170"/>
+      <!-- Thoracic spine (segment) -->
+      <line class="bone-stroke" x1="325" y1="88" x2="327" y2="195" stroke-width="3"/>
+      <!-- Lumbar spine (segment, different color feel via thicker) -->
+      <line class="bone-stroke" x1="327" y1="195" x2="330" y2="235" stroke-width="4"/>
+      <!-- Shoulder / humerus (right arm bone) -->
+      <line class="bone-stroke" x1="378" y1="88" x2="420" y2="160" stroke-width="3"/>
+      <circle class="bone-fill" cx="378" cy="88" r="4"/>
+      <!-- Elbow joint -->
+      <circle class="bone-fill" cx="420" cy="160" r="4"/>
+      <!-- Radius + ulna -->
+      <line class="bone-stroke" x1="420" y1="160" x2="428" y2="235" stroke-width="2"/>
+      <line class="bone-stroke" x1="420" y1="160" x2="435" y2="232" stroke-width="2"/>
+      <!-- Pelvis (right half — triangular hip wing) -->
+      <path class="bone-fill" d="M 327 240 L 380 245 L 370 290 L 332 278 Z"/>
+      <!-- Hip joint -->
+      <circle class="bone-fill" cx="355" cy="285" r="5"/>
+      <!-- Femur -->
+      <line class="bone-stroke" x1="355" y1="287" x2="345" y2="395" stroke-width="3"/>
+      <!-- Knee -->
+      <circle class="bone-fill" cx="345" cy="397" r="4"/>
+      <!-- Tibia + fibula -->
+      <line class="bone-stroke" x1="345" y1="400" x2="342" y2="435" stroke-width="2.5"/>
+      <line class="bone-stroke" x1="345" y1="400" x2="351" y2="435" stroke-width="2"/>
+    </g>
+
+    <!-- Bullets for Column A -->
+    <g transform="translate(0, 560)">
+      <text class="bullet-strong" x="0" y="0">◆</text>
+      <text class="bullet" x="20" y="0">True elbow flexion from bone — no pronation drift.</text>
+      <text class="bullet" x="20" y="22" font-size="13" fill="#667">Addresses a known weakness of the 4/20 demo.</text>
+
+      <text class="bullet-strong" x="0" y="56">◆</text>
+      <text class="bullet" x="20" y="56">Femur vs tibia separable — Thomas test scoreable.</text>
+      <text class="bullet" x="20" y="78" font-size="13" fill="#667">Hip IR/ER emerges as a real measurement, not a guess.</text>
+
+      <text class="bullet-strong" x="0" y="112">◆</text>
+      <text class="bullet" x="20" y="112">Scapula distinct from humerus — wall slide, Apley scratch.</text>
+      <text class="bullet" x="20" y="134" font-size="13" fill="#667">GH vs ST joint contributions separated.</text>
+    </g>
+
+    <text class="col-tagline" x="0" y="720">Score mobility the way a PT grades it.</text>
+  </g>
+
+  <!-- =============================================================== -->
+  <!-- COLUMN B — Sapiens: "308 landmarks + per-pixel body"              -->
+  <!-- =============================================================== -->
+  <g transform="translate(840, 220)">
+    <text class="col-eyebrow" x="0" y="18">Option B — Sapiens</text>
+    <text class="col-title" x="0" y="58">308 landmarks + per-pixel body.</text>
+
+    <!-- Visual: BlazePose figure on left (33 dots sparse) vs Sapiens figure on right (308 dots dense, especially face + hands) -->
+    <g transform="translate(0, 80)">
+      <!-- Labels -->
+      <text class="label-small" x="130" y="-8" text-anchor="middle">BlazePose</text>
+      <text class="label-small" x="500" y="-8" text-anchor="middle">Sapiens</text>
+
+      <!-- LEFT FIGURE: BlazePose (33 dots sparse) -->
+      <g transform="translate(60, 0)">
+        <!-- Head -->
+        <circle class="silhouette" cx="130" cy="35" r="28"/>
+        <rect class="silhouette" x="120" y="60" width="20" height="14"/>
+        <path class="silhouette" d="M 65 74 Q 60 90 70 110 L 70 200 Q 70 225 90 235 L 170 235 Q 190 225 190 200 L 190 110 Q 200 90 195 74 Z"/>
+        <path class="silhouette" d="M 70 85 Q 40 95 25 140 L 15 200 Q 10 225 20 250 L 35 250 Q 42 225 44 200 L 55 145 Q 65 120 75 100 Z"/>
+        <path class="silhouette" d="M 190 85 Q 220 95 235 140 L 245 200 Q 250 225 240 250 L 225 250 Q 218 225 216 200 L 205 145 Q 195 120 185 100 Z"/>
+        <path class="silhouette" d="M 85 235 L 175 235 L 185 275 Q 180 290 165 290 L 95 290 Q 80 290 75 275 Z"/>
+        <path class="silhouette" d="M 95 290 L 100 400 Q 102 420 95 440 L 120 440 Q 125 420 125 400 L 130 290 Z"/>
+        <path class="silhouette" d="M 165 290 L 160 400 Q 158 420 165 440 L 140 440 Q 135 420 135 400 L 130 290 Z"/>
+
+        <!-- 33 BlazePose keypoints -->
+        <!-- Face: 5 points (nose, eyes, ears roughly) -->
+        <circle class="bp-dot" cx="130" cy="30" r="3.5"/>
+        <circle class="bp-dot" cx="122" cy="28" r="3"/>
+        <circle class="bp-dot" cx="138" cy="28" r="3"/>
+        <circle class="bp-dot" cx="110" cy="38" r="3"/>
+        <circle class="bp-dot" cx="150" cy="38" r="3"/>
+        <!-- Shoulders -->
+        <circle class="bp-dot" cx="72" cy="90" r="3.5"/>
+        <circle class="bp-dot" cx="188" cy="90" r="3.5"/>
+        <!-- Elbows -->
+        <circle class="bp-dot" cx="42" cy="160" r="3.5"/>
+        <circle class="bp-dot" cx="218" cy="160" r="3.5"/>
+        <!-- Wrists -->
+        <circle class="bp-dot" cx="25" cy="230" r="3.5"/>
+        <circle class="bp-dot" cx="235" cy="230" r="3.5"/>
+        <!-- Hand (3 points each: pinky/index/thumb) -->
+        <circle class="bp-dot" cx="18" cy="245" r="2.5"/>
+        <circle class="bp-dot" cx="28" cy="248" r="2.5"/>
+        <circle class="bp-dot" cx="32" cy="240" r="2.5"/>
+        <circle class="bp-dot" cx="228" cy="245" r="2.5"/>
+        <circle class="bp-dot" cx="238" cy="248" r="2.5"/>
+        <circle class="bp-dot" cx="242" cy="240" r="2.5"/>
+        <!-- Hips -->
+        <circle class="bp-dot" cx="95" cy="255" r="3.5"/>
+        <circle class="bp-dot" cx="165" cy="255" r="3.5"/>
+        <!-- Knees -->
+        <circle class="bp-dot" cx="110" cy="370" r="3.5"/>
+        <circle class="bp-dot" cx="150" cy="370" r="3.5"/>
+        <!-- Ankles -->
+        <circle class="bp-dot" cx="115" cy="435" r="3.5"/>
+        <circle class="bp-dot" cx="145" cy="435" r="3.5"/>
+        <!-- Feet (heel, foot index) -->
+        <circle class="bp-dot" cx="110" cy="445" r="2.5"/>
+        <circle class="bp-dot" cx="150" cy="445" r="2.5"/>
+        <circle class="bp-dot" cx="125" cy="450" r="2.5"/>
+        <circle class="bp-dot" cx="155" cy="450" r="2.5"/>
+        <!-- Count label -->
+        <text class="label-big" x="130" y="495" text-anchor="middle">33</text>
+      </g>
+
+      <!-- Arrow between -->
+      <g transform="translate(295, 230)">
+        <line class="arrow" x1="0" y1="0" x2="60" y2="0"/>
+        <polyline class="arrow" points="50,-8 60,0 50,8"/>
+      </g>
+
+      <!-- RIGHT FIGURE: Sapiens (308 dots, dense) -->
+      <g transform="translate(380, 0)">
+        <!-- Body silhouette (same shape) -->
+        <circle class="silhouette" cx="130" cy="35" r="28"/>
+        <rect class="silhouette" x="120" y="60" width="20" height="14"/>
+        <path class="silhouette" d="M 65 74 Q 60 90 70 110 L 70 200 Q 70 225 90 235 L 170 235 Q 190 225 190 200 L 190 110 Q 200 90 195 74 Z"/>
+        <path class="silhouette" d="M 70 85 Q 40 95 25 140 L 15 200 Q 10 225 20 250 L 35 250 Q 42 225 44 200 L 55 145 Q 65 120 75 100 Z"/>
+        <path class="silhouette" d="M 190 85 Q 220 95 235 140 L 245 200 Q 250 225 240 250 L 225 250 Q 218 225 216 200 L 205 145 Q 195 120 185 100 Z"/>
+        <path class="silhouette" d="M 85 235 L 175 235 L 185 275 Q 180 290 165 290 L 95 290 Q 80 290 75 275 Z"/>
+        <path class="silhouette" d="M 95 290 L 100 400 Q 102 420 95 440 L 120 440 Q 125 420 125 400 L 130 290 Z"/>
+        <path class="silhouette" d="M 165 290 L 160 400 Q 158 420 165 440 L 140 440 Q 135 420 135 400 L 130 290 Z"/>
+
+        <!-- Dense FACE dots (stylized — ~50 dots suggesting 243) -->
+        <g fill="#0A5CAD">
+          <circle cx="112" cy="18" r="1.2"/><circle cx="118" cy="16" r="1.2"/><circle cx="124" cy="14" r="1.2"/>
+          <circle cx="130" cy="13" r="1.2"/><circle cx="136" cy="14" r="1.2"/><circle cx="142" cy="16" r="1.2"/>
+          <circle cx="148" cy="18" r="1.2"/><circle cx="107" cy="24" r="1.2"/><circle cx="153" cy="24" r="1.2"/>
+          <circle cx="104" cy="32" r="1.2"/><circle cx="156" cy="32" r="1.2"/><circle cx="103" cy="40" r="1.2"/>
+          <circle cx="157" cy="40" r="1.2"/><circle cx="107" cy="48" r="1.2"/><circle cx="153" cy="48" r="1.2"/>
+          <circle cx="112" cy="54" r="1.2"/><circle cx="148" cy="54" r="1.2"/>
+          <circle cx="118" cy="58" r="1.2"/><circle cx="142" cy="58" r="1.2"/>
+          <circle cx="125" cy="60" r="1.2"/><circle cx="135" cy="60" r="1.2"/>
+          <!-- Eyes -->
+          <circle cx="118" cy="30" r="1.2"/><circle cx="122" cy="30" r="1.2"/>
+          <circle cx="126" cy="30" r="1.2"/><circle cx="134" cy="30" r="1.2"/>
+          <circle cx="138" cy="30" r="1.2"/><circle cx="142" cy="30" r="1.2"/>
+          <!-- Nose -->
+          <circle cx="128" cy="38" r="1.2"/><circle cx="132" cy="38" r="1.2"/>
+          <circle cx="130" cy="42" r="1.2"/><circle cx="126" cy="44" r="1.2"/>
+          <circle cx="134" cy="44" r="1.2"/>
+          <!-- Mouth -->
+          <circle cx="122" cy="48" r="1.2"/><circle cx="128" cy="48" r="1.2"/>
+          <circle cx="132" cy="48" r="1.2"/><circle cx="138" cy="48" r="1.2"/>
+          <circle cx="125" cy="50" r="1.2"/><circle cx="135" cy="50" r="1.2"/>
+          <!-- Cheeks / jaw -->
+          <circle cx="113" cy="42" r="1.2"/><circle cx="147" cy="42" r="1.2"/>
+          <circle cx="115" cy="50" r="1.2"/><circle cx="145" cy="50" r="1.2"/>
+        </g>
+
+        <!-- Body dots (moderate density — suggesting 25 body landmarks) -->
+        <g fill="#0A2540">
+          <circle cx="72" cy="90" r="2"/>
+          <circle cx="188" cy="90" r="2"/>
+          <circle cx="100" cy="110" r="2"/><circle cx="160" cy="110" r="2"/>
+          <circle cx="130" cy="105" r="2"/>
+          <circle cx="100" cy="145" r="2"/><circle cx="160" cy="145" r="2"/>
+          <circle cx="130" cy="170" r="2"/>
+          <circle cx="100" cy="195" r="2"/><circle cx="160" cy="195" r="2"/>
+          <circle cx="130" cy="220" r="2"/>
+          <circle cx="42" cy="160" r="2"/><circle cx="218" cy="160" r="2"/>
+          <circle cx="95" cy="255" r="2"/><circle cx="165" cy="255" r="2"/>
+          <circle cx="130" cy="265" r="2"/>
+          <circle cx="110" cy="320" r="2"/><circle cx="150" cy="320" r="2"/>
+          <circle cx="110" cy="370" r="2"/><circle cx="150" cy="370" r="2"/>
+          <circle cx="115" cy="410" r="2"/><circle cx="145" cy="410" r="2"/>
+          <circle cx="115" cy="435" r="2"/><circle cx="145" cy="435" r="2"/>
+          <circle cx="125" cy="450" r="2"/><circle cx="155" cy="450" r="2"/>
+        </g>
+
+        <!-- Dense HAND dots (stylized — suggesting 20 per hand x 2) -->
+        <g fill="#38BDF8">
+          <!-- Left hand cluster -->
+          <circle cx="10" cy="248" r="1.2"/><circle cx="14" cy="246" r="1.2"/><circle cx="18" cy="244" r="1.2"/>
+          <circle cx="22" cy="243" r="1.2"/><circle cx="12" cy="252" r="1.2"/><circle cx="16" cy="250" r="1.2"/>
+          <circle cx="20" cy="248" r="1.2"/><circle cx="24" cy="246" r="1.2"/><circle cx="14" cy="256" r="1.2"/>
+          <circle cx="18" cy="254" r="1.2"/><circle cx="22" cy="252" r="1.2"/><circle cx="26" cy="250" r="1.2"/>
+          <circle cx="28" cy="244" r="1.2"/><circle cx="32" cy="243" r="1.2"/><circle cx="30" cy="248" r="1.2"/>
+          <circle cx="34" cy="246" r="1.2"/><circle cx="16" cy="260" r="1.2"/><circle cx="20" cy="258" r="1.2"/>
+          <circle cx="24" cy="256" r="1.2"/><circle cx="28" cy="254" r="1.2"/>
+          <!-- Right hand cluster -->
+          <circle cx="250" cy="248" r="1.2"/><circle cx="246" cy="246" r="1.2"/><circle cx="242" cy="244" r="1.2"/>
+          <circle cx="238" cy="243" r="1.2"/><circle cx="248" cy="252" r="1.2"/><circle cx="244" cy="250" r="1.2"/>
+          <circle cx="240" cy="248" r="1.2"/><circle cx="236" cy="246" r="1.2"/><circle cx="246" cy="256" r="1.2"/>
+          <circle cx="242" cy="254" r="1.2"/><circle cx="238" cy="252" r="1.2"/><circle cx="234" cy="250" r="1.2"/>
+          <circle cx="232" cy="244" r="1.2"/><circle cx="228" cy="243" r="1.2"/><circle cx="230" cy="248" r="1.2"/>
+          <circle cx="226" cy="246" r="1.2"/><circle cx="244" cy="260" r="1.2"/><circle cx="240" cy="258" r="1.2"/>
+          <circle cx="236" cy="256" r="1.2"/><circle cx="232" cy="254" r="1.2"/>
+        </g>
+
+        <!-- Count label -->
+        <text class="label-big" x="130" y="495" text-anchor="middle">308</text>
+      </g>
+    </g>
+
+    <!-- Bullets for Column B -->
+    <g transform="translate(0, 560)">
+      <text class="bullet-strong" x="0" y="0">◆</text>
+      <text class="bullet" x="20" y="0">Grip width &amp; wrist neutrality — 40 hand landmarks.</text>
+      <text class="bullet" x="20" y="22" font-size="13" fill="#667">Deadlift, kettlebell swing — broken wrist flagged before low-back load.</text>
+
+      <text class="bullet-strong" x="0" y="56">◆</text>
+      <text class="bullet" x="20" y="56">Scapular tuck from 28-class segmentation.</text>
+      <text class="bullet" x="20" y="78" font-size="13" fill="#667">Bench press setup visible; shoulder point wasn't enough.</text>
+
+      <text class="bullet-strong" x="0" y="112">◆</text>
+      <text class="bullet" x="20" y="112">Grimace &amp; Valsalva — 243 face landmarks as fatigue signal.</text>
+      <text class="bullet" x="20" y="134" font-size="13" fill="#667">Loaded carries, get-ups — strain before the form breaks.</text>
+    </g>
+
+    <text class="col-tagline" x="0" y="720">Hands, face, and the body under clothing — seen.</text>
+  </g>
+
+  <!-- =============== FOOTER =============== -->
+  <line x1="80" y1="790" x2="1520" y2="790" stroke="#D0D7DE" stroke-width="1"/>
+  <g transform="translate(80, 820)">
+    <text class="footer-strong" x="0" y="0">Today</text>
+    <text class="footer" x="60" y="0">· BlazePose · 33 keypoints · commercial-clean · ships in the app</text>
+
+    <text class="footer-strong" x="560" y="0">Frontier</text>
+    <text class="footer" x="628" y="0">· SKEL &amp; Sapiens · research-licensed · slide only, not product</text>
+
+    <text class="footer-strong" x="1140" y="0">Gated on</text>
+    <text class="footer" x="1215" y="0">· commercial dataset access — viability matrix</text>
+  </g>
+
+  <!-- Logo mark bottom right (bioliminal mark) -->
+  <g transform="translate(1500, 840) scale(0.35)" fill="#0A2540">
+    <line x1="42" y1="18" x2="42" y2="92" stroke="#0A2540" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <circle cx="60" cy="74" r="18" stroke="#0A2540" stroke-width="3" fill="none"/>
+    <path d="M44 76 Q 52 62, 60 74 T 76 72" stroke="#0A2540" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <circle cx="44" cy="76" r="2" fill="#0A2540"/>
+    <circle cx="60" cy="74" r="2" fill="#0A2540"/>
+    <circle cx="76" cy="72" r="2" fill="#0A2540"/>
+  </g>
+</svg>
