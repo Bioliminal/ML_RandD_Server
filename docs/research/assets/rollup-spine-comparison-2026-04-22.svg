@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <style>
+    .title { font-size: 22px; font-weight: 700; fill: #1d3557; }
+    .subtitle { font-size: 13px; fill: #555; }
+    .phase-label { font-size: 14px; font-weight: 600; fill: #1d3557; }
+    .row-label { font-size: 16px; font-weight: 700; fill: #1d3557; }
+    .row-sublabel { font-size: 11px; fill: #666; }
+    .caption { font-size: 11px; fill: #444; font-style: italic; }
+    .body-silhouette { fill: #E8E8E8; stroke: #BDBDBD; stroke-width: 1; }
+    .floor { stroke: #CCC; stroke-width: 1; stroke-dasharray: 4 4; }
+    .bp-kp { fill: #F4A261; stroke: #E76F51; stroke-width: 1; }
+    .bp-spine-halo { fill: #FFE5D9; stroke: #D62828; stroke-width: 2; }
+    .bp-spine-dot { fill: #D62828; }
+    .bp-spine-label { font-size: 10px; fill: #D62828; font-weight: 600; }
+    .skel-lumbar { stroke: #E63946; stroke-width: 8; stroke-linecap: round; fill: none; }
+    .skel-thorax { stroke: #2A9D8F; stroke-width: 8; stroke-linecap: round; fill: none; }
+    .skel-cervical { stroke: #457B9D; stroke-width: 8; stroke-linecap: round; fill: none; }
+    .skel-joint { fill: #1d3557; stroke: #fff; stroke-width: 1.5; }
+    .skel-label { font-size: 10px; font-weight: 600; }
+    .panel-border { fill: none; stroke: #E5E5E5; stroke-width: 1; }
+    .insight-box { fill: #FFF8E1; stroke: #F4A261; stroke-width: 1; }
+    .insight-text { font-size: 12px; fill: #3d3d3d; }
+    .insight-text-bold { font-size: 12px; fill: #1d3557; font-weight: 700; }
+  </style>
+
+  <!-- Header -->
+  <text class="title" x="500" y="35" text-anchor="middle">Rollup — what BlazePose sees vs. what SKEL sees</text>
+  <text class="subtitle" x="500" y="58" text-anchor="middle">The whole point of a rollup is the spine's segmental articulation. Only one of these models renders it.</text>
+
+  <!-- Column headers -->
+  <text class="phase-label" x="240" y="92" text-anchor="middle">1. Supine (neutral)</text>
+  <text class="phase-label" x="520" y="92" text-anchor="middle">2. Thoracic peel-off</text>
+  <text class="phase-label" x="800" y="92" text-anchor="middle">3. Full flexion</text>
+
+  <!-- Row labels -->
+  <text class="row-label" x="18" y="225">BlazePose</text>
+  <text class="row-sublabel" x="18" y="245">33 keypoints</text>
+  <text class="row-sublabel" x="18" y="260">spine: 1 virtual point</text>
+  <text class="row-sublabel" x="18" y="275">(midpoint of</text>
+  <text class="row-sublabel" x="18" y="290">shoulders + hips)</text>
+
+  <text class="row-label" x="18" y="500">SKEL</text>
+  <text class="row-sublabel" x="18" y="520">24 bones</text>
+  <text class="row-sublabel" x="18" y="535">spine: 3 segments</text>
+  <text class="row-sublabel" x="18" y="555" fill="#E63946" font-weight="600">■ lumbar</text>
+  <text class="row-sublabel" x="18" y="570" fill="#2A9D8F" font-weight="600">■ thorax</text>
+  <text class="row-sublabel" x="18" y="585" fill="#457B9D" font-weight="600">■ cervical</text>
+
+  <!-- ============================================================ -->
+  <!-- Row 1: BlazePose                                              -->
+  <!-- ============================================================ -->
+
+  <!-- Panel 1: BlazePose, Supine -->
+  <g transform="translate(120, 110)">
+    <rect class="panel-border" x="0" y="0" width="240" height="240"/>
+    <line class="floor" x1="10" y1="200" x2="230" y2="200"/>
+    <!-- Body lying flat, head left, feet right -->
+    <path class="body-silhouette" d="M 45 195 Q 45 180 60 180 L 190 180 Q 205 180 205 195 L 205 200 Q 205 205 195 205 L 55 205 Q 45 205 45 200 Z"/>
+    <circle class="body-silhouette" cx="35" cy="192" r="13"/>
+    <path class="body-silhouette" d="M 60 183 L 20 175 L 14 182 L 58 192 Z"/>
+    <line x1="205" y1="192" x2="225" y2="192" stroke="#BDBDBD" stroke-width="2"/>
+    <!-- BlazePose keypoints -->
+    <circle class="bp-kp" cx="35" cy="192" r="3"/>
+    <circle class="bp-kp" cx="60" cy="185" r="3"/>
+    <circle class="bp-kp" cx="60" cy="199" r="3"/>
+    <circle class="bp-kp" cx="170" cy="185" r="3"/>
+    <circle class="bp-kp" cx="170" cy="199" r="3"/>
+    <circle class="bp-kp" cx="200" cy="192" r="3"/>
+    <circle class="bp-kp" cx="225" cy="192" r="3"/>
+    <circle class="bp-kp" cx="38" cy="182" r="3"/>
+    <circle class="bp-kp" cx="18" cy="178" r="3"/>
+    <!-- Spine virtual midpoint -->
+    <circle class="bp-spine-halo" cx="115" cy="192" r="8"/>
+    <circle class="bp-spine-dot" cx="115" cy="192" r="3.5"/>
+    <text class="bp-spine-label" x="115" y="172" text-anchor="middle">spine</text>
+  </g>
+
+  <!-- Panel 2: BlazePose, Thoracic peel -->
+  <g transform="translate(400, 110)">
+    <rect class="panel-border" x="0" y="0" width="240" height="240"/>
+    <line class="floor" x1="10" y1="200" x2="230" y2="200"/>
+    <!-- Lower body flat, upper body lifted -->
+    <path class="body-silhouette" d="M 150 198 Q 150 185 163 185 L 200 185 Q 213 185 213 198 L 213 205 Q 213 210 203 210 L 160 210 Q 150 210 150 205 Z"/>
+    <!-- Upper torso curving up -->
+    <path class="body-silhouette" d="M 155 195 Q 140 160 115 130 L 100 125 Q 125 155 145 198 Z"/>
+    <!-- Head at top of curl -->
+    <circle class="body-silhouette" cx="92" cy="118" r="13"/>
+    <!-- Arms reaching forward -->
+    <path class="body-silhouette" d="M 100 135 L 60 125 L 56 132 L 100 147 Z"/>
+    <!-- Legs extending right -->
+    <line x1="213" y1="193" x2="235" y2="193" stroke="#BDBDBD" stroke-width="2"/>
+    <!-- BlazePose keypoints -->
+    <circle class="bp-kp" cx="92" cy="118" r="3"/>
+    <circle class="bp-kp" cx="108" cy="135" r="3"/>
+    <circle class="bp-kp" cx="115" cy="145" r="3"/>
+    <circle class="bp-kp" cx="175" cy="195" r="3"/>
+    <circle class="bp-kp" cx="180" cy="203" r="3"/>
+    <circle class="bp-kp" cx="208" cy="195" r="3"/>
+    <circle class="bp-kp" cx="232" cy="193" r="3"/>
+    <circle class="bp-kp" cx="80" cy="130" r="3"/>
+    <circle class="bp-kp" cx="58" cy="128" r="3"/>
+    <!-- Spine virtual midpoint: midpoint of shoulder-hip -->
+    <circle class="bp-spine-halo" cx="143" cy="167" r="8"/>
+    <circle class="bp-spine-dot" cx="143" cy="167" r="3.5"/>
+    <text class="bp-spine-label" x="143" y="154" text-anchor="middle">spine</text>
+  </g>
+
+  <!-- Panel 3: BlazePose, Full flexion -->
+  <g transform="translate(680, 110)">
+    <rect class="panel-border" x="0" y="0" width="240" height="240"/>
+    <line class="floor" x1="10" y1="200" x2="230" y2="200"/>
+    <!-- Seated, folded. Pelvis at left, legs extending right, torso folded forward -->
+    <path class="body-silhouette" d="M 50 198 Q 50 180 65 180 L 190 180 Q 205 180 205 198 L 205 205 Q 205 210 195 210 L 60 210 Q 50 210 50 205 Z"/>
+    <!-- Torso folded: from pelvis (60, 180) curving forward and down over legs -->
+    <path class="body-silhouette" d="M 65 180 Q 85 130 115 105 Q 145 90 165 95 L 170 105 Q 135 115 110 135 Q 85 155 75 185 Z"/>
+    <!-- Head near knees -->
+    <circle class="body-silhouette" cx="165" cy="95" r="13"/>
+    <!-- Legs extending right -->
+    <line x1="205" y1="193" x2="225" y2="193" stroke="#BDBDBD" stroke-width="2"/>
+    <!-- BlazePose keypoints -->
+    <circle class="bp-kp" cx="165" cy="95" r="3"/>
+    <circle class="bp-kp" cx="140" cy="113" r="3"/>
+    <circle class="bp-kp" cx="148" cy="120" r="3"/>
+    <circle class="bp-kp" cx="77" cy="190" r="3"/>
+    <circle class="bp-kp" cx="75" cy="200" r="3"/>
+    <circle class="bp-kp" cx="155" cy="193" r="3"/>
+    <circle class="bp-kp" cx="210" cy="193" r="3"/>
+    <!-- Spine midpoint -->
+    <circle class="bp-spine-halo" cx="110" cy="152" r="8"/>
+    <circle class="bp-spine-dot" cx="110" cy="152" r="3.5"/>
+    <text class="bp-spine-label" x="110" y="139" text-anchor="middle">spine</text>
+  </g>
+
+  <!-- Caption for BlazePose row -->
+  <rect class="insight-box" x="120" y="360" width="800" height="34" rx="3"/>
+  <text class="insight-text-bold" x="135" y="380">Result:</text>
+  <text class="insight-text" x="180" y="380">one spine point translates and rotates across phases. The segmental articulation — the actual scoring target of the rollup — is invisible.</text>
+
+  <!-- ============================================================ -->
+  <!-- Row 2: SKEL                                                   -->
+  <!-- ============================================================ -->
+
+  <!-- Panel 4: SKEL, Supine -->
+  <g transform="translate(120, 410)">
+    <rect class="panel-border" x="0" y="0" width="240" height="240"/>
+    <line class="floor" x1="10" y1="200" x2="230" y2="200"/>
+    <!-- Body silhouette (same as panel 1) -->
+    <path class="body-silhouette" d="M 45 195 Q 45 180 60 180 L 190 180 Q 205 180 205 195 L 205 200 Q 205 205 195 205 L 55 205 Q 45 205 45 200 Z"/>
+    <circle class="body-silhouette" cx="35" cy="192" r="13"/>
+    <path class="body-silhouette" d="M 60 183 L 20 175 L 14 182 L 58 192 Z"/>
+    <line x1="205" y1="192" x2="225" y2="192" stroke="#BDBDBD" stroke-width="2"/>
+    <!-- SKEL 3-segment spine, all aligned (neutral) -->
+    <!-- Lumbar: hip to mid-torso -->
+    <line class="skel-lumbar" x1="165" y1="192" x2="115" y2="192"/>
+    <!-- Thorax: mid-torso to upper shoulder -->
+    <line class="skel-thorax" x1="115" y1="192" x2="65" y2="192"/>
+    <!-- Cervical: shoulder to head -->
+    <line class="skel-cervical" x1="65" y1="192" x2="40" y2="192"/>
+    <!-- Joints -->
+    <circle class="skel-joint" cx="165" cy="192" r="4"/>
+    <circle class="skel-joint" cx="115" cy="192" r="4"/>
+    <circle class="skel-joint" cx="65" cy="192" r="4"/>
+  </g>
+
+  <!-- Panel 5: SKEL, Thoracic peel -->
+  <g transform="translate(400, 410)">
+    <rect class="panel-border" x="0" y="0" width="240" height="240"/>
+    <line class="floor" x1="10" y1="200" x2="230" y2="200"/>
+    <!-- Body silhouette (same shape as panel 2) -->
+    <path class="body-silhouette" d="M 150 198 Q 150 185 163 185 L 200 185 Q 213 185 213 198 L 213 205 Q 213 210 203 210 L 160 210 Q 150 210 150 205 Z"/>
+    <path class="body-silhouette" d="M 155 195 Q 140 160 115 130 L 100 125 Q 125 155 145 198 Z"/>
+    <circle class="body-silhouette" cx="92" cy="118" r="13"/>
+    <path class="body-silhouette" d="M 100 135 L 60 125 L 56 132 L 100 147 Z"/>
+    <line x1="213" y1="193" x2="235" y2="193" stroke="#BDBDBD" stroke-width="2"/>
+    <!-- SKEL spine segments: lumbar still flat (on floor), thorax flexed upward, cervical continuing flexion -->
+    <!-- Lumbar: flat on floor, from hip joint to thoracolumbar junction -->
+    <line class="skel-lumbar" x1="180" y1="195" x2="145" y2="195"/>
+    <!-- Thorax: angled up from thoracolumbar junction -->
+    <line class="skel-thorax" x1="145" y1="195" x2="108" y2="140"/>
+    <!-- Cervical: continuing up into head -->
+    <line class="skel-cervical" x1="108" y1="140" x2="95" y2="120"/>
+    <!-- Joints -->
+    <circle class="skel-joint" cx="180" cy="195" r="4"/>
+    <circle class="skel-joint" cx="145" cy="195" r="4"/>
+    <circle class="skel-joint" cx="108" cy="140" r="4"/>
+    <circle class="skel-joint" cx="95" cy="120" r="4"/>
+    <!-- Annotation: thoracic flexion angle -->
+    <path d="M 145 195 Q 150 180 155 170" fill="none" stroke="#2A9D8F" stroke-width="1" stroke-dasharray="2 2"/>
+    <text class="skel-label" x="162" y="172" fill="#2A9D8F">thoracic flexion</text>
+  </g>
+
+  <!-- Panel 6: SKEL, Full flexion -->
+  <g transform="translate(680, 410)">
+    <rect class="panel-border" x="0" y="0" width="240" height="240"/>
+    <line class="floor" x1="10" y1="200" x2="230" y2="200"/>
+    <!-- Body silhouette (same shape as panel 3) -->
+    <path class="body-silhouette" d="M 50 198 Q 50 180 65 180 L 190 180 Q 205 180 205 198 L 205 205 Q 205 210 195 210 L 60 210 Q 50 210 50 205 Z"/>
+    <path class="body-silhouette" d="M 65 180 Q 85 130 115 105 Q 145 90 165 95 L 170 105 Q 135 115 110 135 Q 85 155 75 185 Z"/>
+    <circle class="body-silhouette" cx="165" cy="95" r="13"/>
+    <line x1="205" y1="193" x2="225" y2="193" stroke="#BDBDBD" stroke-width="2"/>
+    <!-- SKEL spine: all 3 segments flexed, creating C-curve -->
+    <!-- Lumbar: flexed, from pelvis (70, 180) forward and up -->
+    <line class="skel-lumbar" x1="75" y1="185" x2="100" y2="150"/>
+    <!-- Thorax: continuing the curve -->
+    <line class="skel-thorax" x1="100" y1="150" x2="140" y2="115"/>
+    <!-- Cervical: head region -->
+    <line class="skel-cervical" x1="140" y1="115" x2="160" y2="100"/>
+    <!-- Joints -->
+    <circle class="skel-joint" cx="75" cy="185" r="4"/>
+    <circle class="skel-joint" cx="100" cy="150" r="4"/>
+    <circle class="skel-joint" cx="140" cy="115" r="4"/>
+    <circle class="skel-joint" cx="160" cy="100" r="4"/>
+    <!-- Angle annotations -->
+    <text class="skel-label" x="50" y="170" fill="#E63946">lumbar flex</text>
+    <text class="skel-label" x="105" y="135" fill="#2A9D8F">thoracic flex</text>
+  </g>
+
+  <!-- Caption for SKEL row -->
+  <rect class="insight-box" x="120" y="660" width="800" height="50" rx="3"/>
+  <text class="insight-text-bold" x="135" y="680">Result:</text>
+  <text class="insight-text" x="180" y="680">three articulating segments, each with its own flexion angle. Lumbar, thoracic, and cervical contributions are separable —</text>
+  <text class="insight-text" x="135" y="697">which is how physical therapists actually score a rollup: "did the thorax peel before the lumbar, or did they move as a block?"</text>
+  <text class="insight-text" x="135" y="714" font-style="normal" font-weight="600" fill="#1d3557">This is the scoring resolution a movement-screening product needs. BlazePose can't produce it.</text>
+</svg>

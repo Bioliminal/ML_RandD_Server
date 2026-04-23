@@ -90,3 +90,51 @@ All three are research-licensed, which honestly reinforces the investor-defensib
 - [WHAM (CVPR 2024)](https://wham.is.tue.mpg.de/) · [GVHMR (SIGGRAPH Asia 2024)](https://zju3dv.github.io/gvhmr/)
 - [Sapiens (ECCV 2024)](https://arxiv.org/abs/2408.12569) · [Sapiens GitHub](https://github.com/facebookresearch/sapiens)
 - [DensePose](http://densepose.org/)
+
+---
+
+## Slide Design — "Why our spine story needs more than BlazePose"
+
+### Why not a live SKEL/HSMR demo for the showcase
+Off the critical path. HSMR requires the SMPL body model (gated at MPI — registration needed), ~2 GB weights, CUDA + PyTorch setup. Work runway Wed PM → Thu 12:00 noon is S1 (mobile + firmware bricks), S2 (device integration), S3 (pose-only path verification). Introducing a gated research-license dependency tonight risks displacing the items that actually carry the 10-min runtime. SKEL is on the post-showcase roadmap where it belongs.
+
+Static artifact instead: `assets/rollup-spine-comparison-2026-04-22.svg` — 2-row × 3-column comparison of BlazePose vs SKEL across the three phases of a rollup. Slide-ready as-is.
+
+### Slide layout
+
+**Title bar (top, 10%)**
+> "What a deeper body model would unlock"
+> *subtitle:* "BlazePose ships today. The rollup is why we're building toward anatomical skeletons."
+
+**Main content (middle, 75%)**
+The `rollup-spine-comparison-2026-04-22.svg` graphic, full-width. It's a 2×3 grid:
+
+| | Phase 1: Supine | Phase 2: Thoracic peel-off | Phase 3: Full flexion |
+|---|---|---|---|
+| **BlazePose** (33 keypoints) | Body + keypoints + **single** red spine dot | Body curling up, spine dot has translated but is still **one** dot | Body folded, spine dot moved again — still **one** dot |
+| **SKEL** (24 bones) | Body + 3 spine segments (lumbar/thorax/cervical) aligned flat | Lumbar **still flat**, thorax **flexed** — segmental peel visible | All three segments flexed, C-curve visible with per-segment angles |
+
+Two call-out captions sit below each row:
+
+- Under BlazePose row: *"One spine point translates and rotates across phases. The segmental articulation — the actual scoring target of the rollup — is invisible."*
+- Under SKEL row: *"Three articulating segments, each with its own flexion angle. Lumbar, thoracic, and cervical contributions are separable — which is how physical therapists actually score a rollup: 'did the thorax peel before the lumbar, or did they move as a block?'"* → **"This is the scoring resolution a movement-screening product needs. BlazePose can't produce it."**
+
+**Footer strip (bottom, 15%)**
+Three pills side by side, each with a short label:
+
+| | |
+|---|---|
+| **Today** | BlazePose — 33 keypoints — commercial-clean — ships in the app |
+| **Post-showcase** | SKEL/HSMR — 24 bones, 3-segment spine — research license — 4-movement protocol |
+| **Gated on** | Commercial dataset access ($70k–$600k, 6–18 months per viability matrix) |
+
+### Verbal beat (≤ 30 s, fits in the Wrap slot or as a pre-Q&A segue)
+
+> "The bicep curl works with BlazePose because elbow flexion is a 2D problem — skin-surface landmarks are fine. The rollup is the opposite: the whole point of the exercise is *how* the spine unfolds, segment by segment. BlazePose gives us one spine point — it can't score segmental articulation at all. SKEL, from the Max Planck Institute, gives us three articulating spine segments driven by anatomically valid joints. It's research-licensed today, and the commercial-clean version is gated on dataset access we've already priced in the viability matrix. That's the upgrade path — and it's why the 4-movement protocol waits for the post-showcase roadmap."
+
+### Design choices to respect in the final slide
+
+- Keep the **3-segment reality** honest. Don't say "24 vertebrae" or show 24 spine dots — that's not what SKEL outputs. If anyone asks in Q&A: per-vertebra landmarks from RGB is still a CT/MRI problem.
+- Keep the **license framing** honest too. SKEL is CC-BY-NC-SA; it's a slide asset, not a product pick. The investor-defensibility story ("BlazePose clean today, frontier priced post-showcase") is *stronger* when this is explicit, not weaker.
+- The SVG is in the project's SKEL/lumbar/thorax/cervical palette (red/teal/blue). If the deck has a different palette, keep the segment-colour mapping consistent across any follow-up slides.
+- Don't mix this slide with Sapiens or NLF. One model, one punch. Those candidates live elsewhere in this doc for future slides if the 4-movement protocol reveal warrants them.
